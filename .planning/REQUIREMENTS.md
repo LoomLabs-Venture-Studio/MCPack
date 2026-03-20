@@ -45,8 +45,8 @@
 
 ### Package & Documentation
 
-- [ ] **PKG-01**: Package compiles with `tsc` and exports TypeScript type definitions
-- [ ] **PKG-02**: No runtime dependencies beyond `@modelcontextprotocol/sdk` as peer dependency
+- [x] **PKG-01**: Package compiles with `tsc` and exports TypeScript type definitions
+- [x] **PKG-02**: No runtime dependencies beyond `@modelcontextprotocol/sdk` as peer dependency
 - [ ] **PKG-03**: README documents wrap mode usage with code example
 - [ ] **PKG-04**: README documents build mode usage with code example
 - [ ] **PKG-05**: README includes token reduction numbers from the test harness
@@ -104,8 +104,8 @@
 | TEST-01 | Phase 4 | Pending |
 | TEST-02 | Phase 4 | Pending |
 | TEST-03 | Phase 4 | Pending |
-| PKG-01 | Phase 1 | Pending |
-| PKG-02 | Phase 1 | Pending |
+| PKG-01 | Phase 1 | Complete |
+| PKG-02 | Phase 1 | Complete |
 | PKG-03 | Phase 5 | Pending |
 | PKG-04 | Phase 5 | Pending |
 | PKG-05 | Phase 5 | Pending |
