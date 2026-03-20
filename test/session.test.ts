@@ -152,8 +152,9 @@ describe('SessionRegistry', () => {
     const alive = registry.getOrCreate('s1', 'admin');
     expect(alive.loadedTools.has('toolA')).toBe(true);
 
-    // Advance another 1.5 hours (2.5 total) - should be expired
-    vi.advanceTimersByTime(5400000);
+    // Advance past 2 hours from last access (sliding TTL reset at 1hr mark)
+    // Need >7200000ms from last access to expire
+    vi.advanceTimersByTime(7200001);
     const expired = registry.getOrCreate('s1', 'admin');
     expect(expired.loadedTools.size).toBe(0);
   });
