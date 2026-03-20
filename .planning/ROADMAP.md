@@ -30,11 +30,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Search engine scores and ranks tool definitions by keyword relevance (name > description > keyword), respecting configurable result limits
   4. Session registry tracks loaded tools per session, expires sessions after TTL, and exposes a `destroy()` method that stops the cleanup timer
   5. Role filter restricts tool visibility to a caller's role, with wildcard support granting access to all tools
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Project scaffolding, types, and index-builder module
+- [ ] 01-02-PLAN.md — Search engine, session registry, and role filter modules
 
 ### Phase 2: Core Engine and Wrap Mode
 **Goal**: A developer can wrap any existing MCP server with `mcpack(server, config)` and get lazy tool discovery working end-to-end
