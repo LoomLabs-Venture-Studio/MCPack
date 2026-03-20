@@ -12,7 +12,10 @@ Agents discover only the tool schemas they need, when they need them — reducin
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Keyword-based search with 5-tier weighted scoring — Phase 1
+- ✓ Session tracking with sliding TTL and dual cleanup — Phase 1
+- ✓ Role-based filtering with wildcard support — Phase 1
+- ✓ TypeScript with exported types, zero runtime deps — Phase 1
 
 ### Active
 
@@ -66,4 +69,4 @@ Agents discover only the tool schemas they need, when they need them — reducin
 | In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
 
 ---
-*Last updated: 2026-03-19 after initialization*
+*Last updated: 2026-03-20 after Phase 1 completion*
