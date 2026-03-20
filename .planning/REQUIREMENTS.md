@@ -15,21 +15,21 @@
 
 ### Search Engine
 
-- [ ] **SRCH-01**: Keyword-based scoring ranks results by: exact name match > partial name match > description match > extracted keyword match
-- [ ] **SRCH-02**: Result limit is configurable (default 5, max 10) via config and per-query `limit` parameter
+- [x] **SRCH-01**: Keyword-based scoring ranks results by: exact name match > partial name match > description match > extracted keyword match
+- [x] **SRCH-02**: Result limit is configurable (default 5, max 10) via config and per-query `limit` parameter
 
 ### Session Management
 
-- [ ] **SESS-01**: Each session tracks which tool schemas have been loaded via a `loadedTools` set
-- [ ] **SESS-02**: Sessions expire after a configurable TTL (default 2 hours) and are cleaned up automatically
-- [ ] **SESS-03**: Cleanup timer uses `.unref()` to avoid blocking Node.js process exit
-- [ ] **SESS-04**: Public `destroy()` method stops cleanup timer and clears all sessions for clean shutdown
+- [x] **SESS-01**: Each session tracks which tool schemas have been loaded via a `loadedTools` set
+- [x] **SESS-02**: Sessions expire after a configurable TTL (default 2 hours) and are cleaned up automatically
+- [x] **SESS-03**: Cleanup timer uses `.unref()` to avoid blocking Node.js process exit
+- [x] **SESS-04**: Public `destroy()` method stops cleanup timer and clears all sessions for clean shutdown
 
 ### Role-Based Access
 
-- [ ] **ROLE-01**: Roles are defined as a config map of role name to array of allowed tool names
-- [ ] **ROLE-02**: Wildcard `'*'` grants a role access to all tools
-- [ ] **ROLE-03**: `search_tools` results and `total_available` count reflect only tools the caller's role can access
+- [x] **ROLE-01**: Roles are defined as a config map of role name to array of allowed tool names
+- [x] **ROLE-02**: Wildcard `'*'` grants a role access to all tools
+- [x] **ROLE-03**: `search_tools` results and `total_available` count reflect only tools the caller's role can access
 
 ### Entry Points
 
@@ -89,15 +89,15 @@
 | DISC-03 | Phase 2 | Pending |
 | DISC-04 | Phase 3 | Pending |
 | DISC-05 | Phase 2 | Pending |
-| SRCH-01 | Phase 1 | Pending |
-| SRCH-02 | Phase 1 | Pending |
-| SESS-01 | Phase 1 | Pending |
-| SESS-02 | Phase 1 | Pending |
-| SESS-03 | Phase 1 | Pending |
-| SESS-04 | Phase 1 | Pending |
-| ROLE-01 | Phase 1 | Pending |
-| ROLE-02 | Phase 1 | Pending |
-| ROLE-03 | Phase 1 | Pending |
+| SRCH-01 | Phase 1 | Complete |
+| SRCH-02 | Phase 1 | Complete |
+| SESS-01 | Phase 1 | Complete |
+| SESS-02 | Phase 1 | Complete |
+| SESS-03 | Phase 1 | Complete |
+| SESS-04 | Phase 1 | Complete |
+| ROLE-01 | Phase 1 | Complete |
+| ROLE-02 | Phase 1 | Complete |
+| ROLE-03 | Phase 1 | Complete |
 | ENTRY-01 | Phase 2 | Pending |
 | ENTRY-02 | Phase 3 | Pending |
 | ENTRY-03 | Phase 2 | Pending |
