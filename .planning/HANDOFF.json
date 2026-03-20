@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-03-20T07:07:44.951Z",
+  "phase": "01",
+  "phase_name": "foundation-and-leaf-modules",
+  "phase_dir": ".planning/phases/01-foundation-and-leaf-modules",
+  "plan": 2,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "phase_complete",
+  "completed_tasks": [
+    {"id": 1, "name": "Project scaffolding and types", "status": "done", "commit": "a635128"},
+    {"id": 2, "name": "Index builder module", "status": "done", "commit": "738a82e"},
+    {"id": 3, "name": "Search engine", "status": "done", "commit": "c588a04"},
+    {"id": 4, "name": "Session registry", "status": "done", "commit": "ecdac91"},
+    {"id": 5, "name": "Role filter", "status": "done", "commit": "e8ac501"}
+  ],
+  "remaining_tasks": [],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Schema property names as keyword source (weight 1)", "rationale": "Improves recall on tools with generic names", "phase": "01"},
+    {"decision": "__stdio__ as session ID for stdio transport", "rationale": "Descriptive in logs, matches single-connection model", "phase": "01"},
+    {"decision": "Role filtering on both search AND tools/call", "rationale": "Defense in depth — blocks direct tool calls that bypass search", "phase": "01"},
+    {"decision": "Drop tier field, keep roles only", "rationale": "Simplifies type model, role filtering at query time", "phase": "01"},
+    {"decision": "Dual cleanup: lazy expiry + timer backstop", "rationale": "Immediate cleanup on access + safety net for abandoned sessions", "phase": "01"},
+    {"decision": "Query log on Session (server-side only)", "rationale": "Debug trail for developers without adding tokens to agent context", "phase": "01"},
+    {"decision": "Export public API types only", "rationale": "Smaller surface = fewer breaking change risks", "phase": "01"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Run /gsd:discuss-phase 2 to gather context for Phase 2: Core Engine and Wrap Mode",
+  "context_notes": "Phase 1 fully complete — all 5 leaf modules built (types, index-builder, search, session, roles), 45 tests passing, UAT 7/7 passed, verification passed. Phase 2 wires these modules into a core engine and delivers the mcpack(server, config) wrap mode API. The key technical risk is handler capture from the MCP SDK Server class (no public API for reading existing handlers)."
+}
