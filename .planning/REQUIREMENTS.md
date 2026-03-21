@@ -34,7 +34,7 @@
 ### Entry Points
 
 - [x] **ENTRY-01**: `mcpack(server, config)` wraps an existing MCP `Server` instance with lazy discovery
-- [ ] **ENTRY-02**: `createMCPackServer(config)` creates a new MCP `Server` with tools, handlers, and lazy discovery
+- [x] **ENTRY-02**: `createMCPackServer(config)` creates a new MCP `Server` with tools, handlers, and lazy discovery
 - [x] **ENTRY-03**: Both entry points share the same core engine (index, search, sessions, roles)
 
 ### Testing
@@ -99,7 +99,7 @@
 | ROLE-02 | Phase 1 | Complete |
 | ROLE-03 | Phase 1 | Complete |
 | ENTRY-01 | Phase 2 | Complete |
-| ENTRY-02 | Phase 3 | Pending |
+| ENTRY-02 | Phase 3 | Complete |
 | ENTRY-03 | Phase 2 | Complete |
 | TEST-01 | Phase 4 | Pending |
 | TEST-02 | Phase 4 | Pending |
