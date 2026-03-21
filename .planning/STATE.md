@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-21T06:32:33.995Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-21T06:36:38.376Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 02 (core-engine-and-wrap-mode) — EXECUTING
-Plan: 2 of 2
+Phase: 02 (core-engine-and-wrap-mode) — COMPLETE
+Plan: 2 of 2 (all complete)
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 2 of 2
 | Phase 01 P01 | 5min | 2 tasks | 8 files |
 | Phase 01 P02 | 5min | 3 tasks | 8 files |
 | Phase 02 P01 | 2min | 2 tasks | 4 files |
+| Phase 02 P02 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Used NodeJS.Timeout type for .unref() access on setInterval timer
 - [Phase 02]: MCPackEngine is internal -- not exported from package entry point
 - [Phase 02]: errorResult helper is module-level function, not class method
+- [Phase 02]: Handler capture via _requestHandlers Map with defensive check and clear error
+- [Phase 02]: Call-and-capture invokes original tools/list handler with synthetic extra object
+- [Phase 02]: Fallback to config.tools when original handler throws or returns empty
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T06:32:33.994Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-03-21T06:36:38.375Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

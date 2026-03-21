@@ -7,9 +7,9 @@
 
 ### Discovery Interception
 
-- [ ] **DISC-01**: `tools/list` on a wrapped or built server returns exactly one tool: `search_tools`
+- [x] **DISC-01**: `tools/list` on a wrapped or built server returns exactly one tool: `search_tools`
 - [x] **DISC-02**: `search_tools` accepts a natural language query and returns matching tool schemas ranked by relevance
-- [ ] **DISC-03**: All `tools/call` requests for non-`search_tools` tools pass through to the underlying server unchanged (wrap mode)
+- [x] **DISC-03**: All `tools/call` requests for non-`search_tools` tools pass through to the underlying server unchanged (wrap mode)
 - [ ] **DISC-04**: All `tools/call` requests for non-`search_tools` tools route to the correct registered handler (build mode)
 - [x] **DISC-05**: Previously loaded schemas are returned as `loaded: true` with no schema payload on subsequent `search_tools` calls within the same session
 
@@ -33,7 +33,7 @@
 
 ### Entry Points
 
-- [ ] **ENTRY-01**: `mcpack(server, config)` wraps an existing MCP `Server` instance with lazy discovery
+- [x] **ENTRY-01**: `mcpack(server, config)` wraps an existing MCP `Server` instance with lazy discovery
 - [ ] **ENTRY-02**: `createMCPackServer(config)` creates a new MCP `Server` with tools, handlers, and lazy discovery
 - [x] **ENTRY-03**: Both entry points share the same core engine (index, search, sessions, roles)
 
@@ -84,9 +84,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISC-01 | Phase 2 | Pending |
+| DISC-01 | Phase 2 | Complete |
 | DISC-02 | Phase 2 | Complete |
-| DISC-03 | Phase 2 | Pending |
+| DISC-03 | Phase 2 | Complete |
 | DISC-04 | Phase 3 | Pending |
 | DISC-05 | Phase 2 | Complete |
 | SRCH-01 | Phase 1 | Complete |
@@ -98,7 +98,7 @@
 | ROLE-01 | Phase 1 | Complete |
 | ROLE-02 | Phase 1 | Complete |
 | ROLE-03 | Phase 1 | Complete |
-| ENTRY-01 | Phase 2 | Pending |
+| ENTRY-01 | Phase 2 | Complete |
 | ENTRY-02 | Phase 3 | Pending |
 | ENTRY-03 | Phase 2 | Complete |
 | TEST-01 | Phase 4 | Pending |
