@@ -19,7 +19,7 @@ import { isToolAllowed } from './roles.js';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
-function normalizeResult(value: unknown): ToolCallResult {
+function normalizeResult(value: unknown): any {
   if (value == null) {
     return { content: [{ type: 'text', text: '' }] };
   }
