@@ -1,3 +1,5 @@
+export { mcpack } from './wrap.js';
+
 export type {
   MCPackConfig,
   MCPackServerConfig,
@@ -8,4 +10,5 @@ export type {
   SearchToolResponse,
   SearchResult,
   ToolCallResult,
+  MCPackHandle,
 } from './types.js';
