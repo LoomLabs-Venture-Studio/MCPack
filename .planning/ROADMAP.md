@@ -60,10 +60,11 @@ Plans:
   1. `createMCPackServer(config)` returns an MCP Server instance with `search_tools` as the only listed tool
   2. `tools/call` requests route to the correct registered handler based on tool name
   3. Build mode shares the same core engine, search, session, and role behavior as wrap mode
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Type updates (MCPackHandlerContext, MCPackServer) and correctness fixes to wrap.ts
+- [ ] 03-02-PLAN.md — createMCPackServer build mode entry point, tests, and package exports
 
 ### Phase 4: Testing and Integration Harness
 **Goal**: All modules have unit test coverage and the Stripe MCP integration harness proves real-world token reduction
@@ -102,6 +103,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation and Leaf Modules | 0/2 | Not started | - |
 | 2. Core Engine and Wrap Mode | 0/2 | Not started | - |
-| 3. Build Mode | 0/1 | Not started | - |
+| 3. Build Mode | 0/2 | Not started | - |
 | 4. Testing and Integration Harness | 0/2 | Not started | - |
 | 5. Documentation and Release Prep | 0/1 | Not started | - |
