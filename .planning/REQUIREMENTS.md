@@ -10,7 +10,7 @@
 - [x] **DISC-01**: `tools/list` on a wrapped or built server returns exactly one tool: `search_tools`
 - [x] **DISC-02**: `search_tools` accepts a natural language query and returns matching tool schemas ranked by relevance
 - [x] **DISC-03**: All `tools/call` requests for non-`search_tools` tools pass through to the underlying server unchanged (wrap mode)
-- [ ] **DISC-04**: All `tools/call` requests for non-`search_tools` tools route to the correct registered handler (build mode)
+- [x] **DISC-04**: All `tools/call` requests for non-`search_tools` tools route to the correct registered handler (build mode)
 - [x] **DISC-05**: Previously loaded schemas are returned as `loaded: true` with no schema payload on subsequent `search_tools` calls within the same session
 
 ### Search Engine
@@ -87,7 +87,7 @@
 | DISC-01 | Phase 2 | Complete |
 | DISC-02 | Phase 2 | Complete |
 | DISC-03 | Phase 2 | Complete |
-| DISC-04 | Phase 3 | Pending |
+| DISC-04 | Phase 3 | Complete |
 | DISC-05 | Phase 2 | Complete |
 | SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 1 | Complete |
