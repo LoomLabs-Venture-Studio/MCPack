@@ -46,11 +46,11 @@ Plans:
   3. Previously loaded schemas return as `loaded: true` with no schema payload on subsequent calls within the same session
   4. All `tools/call` requests for non-discovery tools pass through to the underlying server unchanged
   5. Wrap mode and (future) build mode share the same core engine instance
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — MCPackEngine core class, MCPackHandle type, session size getter
+- [ ] 02-02-PLAN.md — mcpack() wrap mode entry point, handler interception, package exports
 
 ### Phase 3: Build Mode
 **Goal**: A developer can create a new MCP server from scratch with tools, handlers, and lazy discovery using `createMCPackServer(config)`
