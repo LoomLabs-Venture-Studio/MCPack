@@ -77,6 +77,14 @@ export interface ToolCallResult {
   isError?: boolean;
 }
 
+/**
+ * Control handle returned by mcpack() for lifecycle management.
+ */
+export interface MCPackHandle {
+  destroy(): void;
+  stats(): { sessions: number; tools: number };
+}
+
 // ─── Internal Types ─────────────────────────────────────────────────────────
 
 /**

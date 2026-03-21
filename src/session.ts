@@ -78,6 +78,13 @@ export class SessionRegistry {
   }
 
   /**
+   * Number of active sessions in the registry.
+   */
+  get size(): number {
+    return this.sessions.size;
+  }
+
+  /**
    * Remove all expired sessions from the registry.
    * Called periodically by the cleanup interval timer.
    */
