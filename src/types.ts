@@ -1,4 +1,5 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 
 // ─── Public Types ───────────────────────────────────────────────────────────
 
@@ -23,10 +24,19 @@ export interface MCPackServerConfig extends MCPackConfig {
 }
 
 /**
+ * Context passed to every tool handler invocation.
+ */
+export interface MCPackHandlerContext {
+  toolName: string;
+  sessionId: string;
+  role: string | undefined;
+}
+
+/**
  * A tool definition with an attached handler function for build mode.
  */
 export interface MCPackToolDefinition extends Tool {
-  handler: (args: Record<string, unknown>) => Promise<ToolCallResult>;
+  handler: (args: Record<string, unknown>, ctx: MCPackHandlerContext) => Promise<unknown>;
 }
 
 /**
@@ -83,6 +93,14 @@ export interface ToolCallResult {
 export interface MCPackHandle {
   destroy(): void;
   stats(): { sessions: number; tools: number };
+}
+
+/**
+ * Return value from createMCPackServer() containing the server and control handle.
+ */
+export interface MCPackServer {
+  server: Server;
+  handle: MCPackHandle;
 }
 
 // ─── Internal Types ─────────────────────────────────────────────────────────

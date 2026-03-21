@@ -135,4 +135,15 @@ export class MCPackEngine {
   stats(): { sessions: number; tools: number } {
     return { sessions: this.sessions.size, tools: this.index.length };
   }
+
+  /**
+   * Mark a tool as loaded in the given session.
+   * Called by both wrap and build mode when tools/call is invoked directly.
+   */
+  markToolLoaded(toolName: string, sessionId: string | undefined): void {
+    const sid = sessionId ?? STDIO_SESSION_ID;
+    const role = this.config.defaultRole;
+    const session = this.sessions.getOrCreate(sid, role ?? '');
+    session.loadedTools.add(toolName);
+  }
 }
