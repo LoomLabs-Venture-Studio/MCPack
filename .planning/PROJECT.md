@@ -16,16 +16,16 @@ Agents discover only the tool schemas they need, when they need them — reducin
 - ✓ Session tracking with sliding TTL and dual cleanup — Phase 1
 - ✓ Role-based filtering with wildcard support — Phase 1
 - ✓ TypeScript with exported types, zero runtime deps — Phase 1
+- ✓ `mcpack(server, config)` wraps any existing MCP server with lazy discovery — Phase 2
+- ✓ `tools/list` on any MCPack server returns exactly one tool: `search_tools` — Phase 2
+- ✓ `search_tools` accepts a natural language query and returns matching tool schemas ranked by relevance — Phase 2
+- ✓ Session tracking: schemas loaded once per session are returned as `loaded: true` with no schema on subsequent calls — Phase 2
+- ✓ Role-based filtering: tools outside the caller's role are invisible in search results — Phase 2
+- ✓ Wrap mode passes all non-discovery `tools/call` requests through to the underlying server unchanged — Phase 2
 
 ### Active
 
-- [ ] `mcpack(server, config)` wraps any existing MCP server with lazy discovery
 - [ ] `createMCPackServer(config)` builds a new MCP server with tools, handlers, and lazy discovery baked in
-- [ ] `tools/list` on any MCPack server returns exactly one tool: `search_tools`
-- [ ] `search_tools` accepts a natural language query and returns matching tool schemas ranked by relevance
-- [ ] Session tracking: schemas loaded once per session are returned as `loaded: true` with no schema on subsequent calls
-- [ ] Role-based filtering: tools outside the caller's role are invisible in search results
-- [ ] Wrap mode passes all non-discovery `tools/call` requests through to the underlying server unchanged
 - [ ] Build mode routes `tools/call` requests to the correct registered handler
 - [ ] Keyword-based search with scoring (name match > description match > keyword match)
 - [ ] Integration test harness runs against real Stripe MCP and produces a token reduction comparison report
@@ -69,4 +69,4 @@ Agents discover only the tool schemas they need, when they need them — reducin
 | In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
 
 ---
-*Last updated: 2026-03-20 after Phase 1 completion*
+*Last updated: 2026-03-21 after Phase 2 completion*
