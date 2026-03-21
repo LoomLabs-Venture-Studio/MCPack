@@ -8,6 +8,10 @@ import type { MCPackConfig, MCPackHandle } from './types.js';
 import { MCPackEngine } from './core.js';
 import { isToolAllowed } from './roles.js';
 
+// NOTE: Uses low-level Server class. The SDK marks Server as @deprecated
+// in favor of McpServer, but MCPack requires setRequestHandler() for
+// handler interception, which McpServer does not expose.
+
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
 type RawHandler = (request: any, extra: any) => Promise<any>;
@@ -65,18 +69,25 @@ export async function mcpack(
     }
   }
 
-  // 3. Fallback + empty warning
+  // 3. Fallback to config.tools if original handler returned nothing
   if (tools.length === 0 && (config as any).tools) {
     tools = (config as any).tools;
   }
+  // Throw if still empty -- MCPack requires tools
   if (tools.length === 0) {
-    console.warn(
-      'MCPack: no tools found on server at setup time. search_tools will return empty results.',
-    );
+    throw new Error('MCPack: no tools found on server. Ensure tools are registered before calling mcpack()');
   }
 
   // 4. Create engine
   const engine = new MCPackEngine(tools, config);
+
+  // Snapshot mutable config at setup
+  const roles = config.roles ? { ...config.roles } : undefined;
+  const defaultRole = config.defaultRole;
+
+  if (defaultRole && roles && !roles[defaultRole]) {
+    console.warn(`MCPack: defaultRole "${defaultRole}" is not defined in roles config. Sessions will see no tools.`);
+  }
 
   // 5. Replace tools/list handler
   server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -86,7 +97,7 @@ export async function mcpack(
   // 6. Replace tools/call handler
   server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
     const name = request.params.name;
-    const args = (request.params.arguments ?? {}) as Record<string, unknown>;
+    const args = (request.params.arguments == null ? {} : request.params.arguments) as Record<string, unknown>;
 
     // Route search_tools to engine
     if (name === 'search_tools') {
@@ -95,8 +106,7 @@ export async function mcpack(
     }
 
     // Defense-in-depth: role check before proxying
-    const role = config.defaultRole;
-    if (!isToolAllowed(name, role, config.roles)) {
+    if (!isToolAllowed(name, defaultRole, roles)) {
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
         isError: true,
@@ -112,12 +122,13 @@ export async function mcpack(
     }
 
     try {
-      return await originalCallHandler(request, extra);
+      const result = await originalCallHandler(request, extra);
+      const sessionId = (extra as any).sessionId as string | undefined;
+      engine.markToolLoaded(name, sessionId);
+      return result;
     } catch (err: any) {
       return {
-        content: [
-          { type: 'text', text: err.message ?? 'Tool execution failed' },
-        ],
+        content: [{ type: 'text', text: `Tool "${name}" failed: ${err.message ?? 'Unknown error'}` }],
         isError: true,
       };
     }

@@ -188,7 +188,7 @@ describe('mcpack() wrap mode', () => {
     expect(result.content[0].text).toBe('original:delete_account');
   });
 
-  it('logs console.warn when original tools/list returns empty array', async () => {
+  it('throws when original tools/list returns empty array', async () => {
     const server = new Server(
       { name: 'empty-server', version: '1.0.0' },
       { capabilities: { tools: {} } },
@@ -200,13 +200,7 @@ describe('mcpack() wrap mode', () => {
       return { content: [{ type: 'text', text: 'ok' }] };
     });
 
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    handle = await mcpack(server);
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('no tools found'),
-    );
-    warnSpy.mockRestore();
+    await expect(mcpack(server)).rejects.toThrow('no tools found on server');
   });
 
   it('falls back to config.tools when original tools/list throws', async () => {
@@ -286,5 +280,47 @@ describe('mcpack() wrap mode', () => {
 
     const response = JSON.parse(result.content[0].text);
     expect(response.session_id).toBe('__stdio__');
+  });
+
+  it('includes tool name in error message when original handler throws', async () => {
+    const server = new Server(
+      { name: 'error-server', version: '1.0.0' },
+      { capabilities: { tools: {} } },
+    );
+    server.setRequestHandler(ListToolsRequestSchema, async () => {
+      return { tools: MOCK_TOOLS };
+    });
+    server.setRequestHandler(CallToolRequestSchema, async () => {
+      throw new Error('connection refused');
+    });
+
+    handle = await mcpack(server);
+    const callHandler = getHandler(server, 'tools/call');
+    const result = await callHandler(
+      {
+        method: 'tools/call',
+        params: { name: 'create_customer', arguments: { name: 'Alice', email: 'a@b.com' } },
+      },
+      makeExtra('session-1'),
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Tool "create_customer" failed');
+    expect(result.content[0].text).toContain('connection refused');
+  });
+
+  it('warns when defaultRole is not defined in roles config', async () => {
+    const server = createMockServer();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    handle = await mcpack(server, {
+      defaultRole: 'nonexistent',
+      roles: { admin: '*' },
+    });
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('defaultRole "nonexistent" is not defined in roles config'),
+    );
+    warnSpy.mockRestore();
   });
 });
