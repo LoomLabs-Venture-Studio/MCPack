@@ -110,6 +110,16 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 ## Backlog
 
+### Phase 05.1: Landing Page — Product-quality docs site with hero, terminal demo, feature cards, LoomLabs branding (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 05.1 to break down)
+
 ### Phase 999.1: CI/CD Pipeline (BACKLOG)
 
 **Goal:** GitHub Actions workflow for automated quality gates on pull requests — lint, typecheck, vitest
