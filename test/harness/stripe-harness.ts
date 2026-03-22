@@ -80,7 +80,8 @@ const queries = [
 async function main(): Promise<void> {
   const transport = new StdioClientTransport({
     command: 'npx',
-    args: ['-y', '@stripe/mcp', '--api-key', STRIPE_KEY!],
+    args: ['-y', '@stripe/mcp'],
+    env: { ...process.env, STRIPE_SECRET_KEY: STRIPE_KEY! },
   });
   const client = new Client({ name: 'mcpack-harness', version: '0.1.0' });
 
