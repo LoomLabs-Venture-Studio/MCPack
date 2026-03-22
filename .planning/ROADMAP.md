@@ -107,3 +107,14 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Build Mode | 0/2 | Not started | - |
 | 4. Testing and Integration Harness | 2/2 | Complete   | 2026-03-22 |
 | 5. Documentation and Release Prep | 0/2 | Not started | - |
+
+## Backlog
+
+### Phase 999.1: CI/CD Pipeline (BACKLOG)
+
+**Goal:** GitHub Actions workflow for automated quality gates on pull requests — lint, typecheck, vitest
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready)
