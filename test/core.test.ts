@@ -150,6 +150,30 @@ describe('MCPackEngine', () => {
     expect(engine.stats().tools).toBe(5);
   });
 
+  it('markToolLoaded() marks a tool as loaded in the session', () => {
+    engine = new MCPackEngine(testTools, {});
+
+    // Mark tool as loaded
+    engine.markToolLoaded('create_customer', 'session-mark');
+
+    // Now search should show it as loaded:true
+    const result = parseResponse(engine.handleSearchTools({ query: 'customer' }, 'session-mark'));
+    const customerResult = result.tools.find(t => t.name === 'create_customer');
+    expect(customerResult).toBeDefined();
+    expect(customerResult!.loaded).toBe(true);
+    expect(customerResult!.schema).toBeUndefined();
+  });
+
+  it('markToolLoaded() uses STDIO_SESSION_ID when sessionId is undefined', () => {
+    engine = new MCPackEngine(testTools, {});
+
+    engine.markToolLoaded('create_customer', undefined);
+
+    const result = parseResponse(engine.handleSearchTools({ query: 'customer' }, undefined));
+    const customerResult = result.tools.find(t => t.name === 'create_customer');
+    expect(customerResult!.loaded).toBe(true);
+  });
+
   it('uses STDIO_SESSION_ID when sessionId is undefined', () => {
     engine = new MCPackEngine(testTools, {});
     const result = parseResponse(engine.handleSearchTools({ query: 'customer' }, undefined));

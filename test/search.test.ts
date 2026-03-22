@@ -159,6 +159,29 @@ describe('scoreAndRank', () => {
     expect(results[0].name).toBe('listCustomers');
   });
 
+  it('returns empty array for empty string query', () => {
+    const index = [
+      makeEntry({ name: 'toolA', description: 'customer stuff' }),
+    ];
+
+    const results = scoreAndRank('', index);
+    expect(results).toEqual([]);
+  });
+
+  it('returns empty array for whitespace-only query', () => {
+    const index = [
+      makeEntry({ name: 'toolA', description: 'customer stuff' }),
+    ];
+
+    const results = scoreAndRank('   ', index);
+    expect(results).toEqual([]);
+  });
+
+  it('returns empty array when searching empty index', () => {
+    const results = scoreAndRank('customer', []);
+    expect(results).toEqual([]);
+  });
+
   it('does not mutate the input index array', () => {
     const index = [
       makeEntry({ name: 'toolC', description: 'customer stuff' }),

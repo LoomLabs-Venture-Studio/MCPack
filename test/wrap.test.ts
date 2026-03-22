@@ -309,6 +309,37 @@ describe('mcpack() wrap mode', () => {
     expect(result.content[0].text).toContain('connection refused');
   });
 
+  it('throws when server has no _requestHandlers', async () => {
+    const fakeServer = {} as any;
+    await expect(mcpack(fakeServer)).rejects.toThrow(
+      'server._requestHandlers not found',
+    );
+  });
+
+  it('returns Unknown tool error when no original call handler exists', async () => {
+    const server = new Server(
+      { name: 'no-call-server', version: '1.0.0' },
+      { capabilities: { tools: {} } },
+    );
+    // Register tools/list but NOT tools/call
+    server.setRequestHandler(ListToolsRequestSchema, async () => {
+      return { tools: MOCK_TOOLS };
+    });
+
+    handle = await mcpack(server);
+    const callHandler = getHandler(server, 'tools/call');
+    const result = await callHandler(
+      {
+        method: 'tools/call',
+        params: { name: 'create_customer', arguments: { name: 'Alice', email: 'a@b.com' } },
+      },
+      makeExtra('session-1'),
+    );
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Unknown tool: create_customer');
+  });
+
   it('warns when defaultRole is not defined in roles config', async () => {
     const server = createMockServer();
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});

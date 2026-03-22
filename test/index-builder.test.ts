@@ -81,6 +81,23 @@ describe('buildIndex', () => {
     expect(filesCount).toBe(1);
   });
 
+  it('handles tool with no description (uses empty string fallback)', () => {
+    const tools = [makeTool({ name: 'orphanTool' })];
+    const index = buildIndex(tools);
+
+    expect(index).toHaveLength(1);
+    expect(index[0].description).toBe('');
+    expect(index[0].keywords).toContain('orphan');
+    expect(index[0].keywords).toContain('tool');
+  });
+
+  it('handles tool with no inputSchema properties (empty schemaKeywords)', () => {
+    const tools = [makeTool({ name: 'simpleTool', description: 'A simple tool' })];
+    const index = buildIndex(tools);
+
+    expect(index[0].schemaKeywords).toEqual([]);
+  });
+
   it('preserves the full Tool definition in the schema field', () => {
     const tool = makeTool({
       name: 'getTool',
