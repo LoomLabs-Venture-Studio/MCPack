@@ -22,11 +22,11 @@ Agents discover only the tool schemas they need, when they need them — reducin
 - ✓ Session tracking: schemas loaded once per session are returned as `loaded: true` with no schema on subsequent calls — Phase 2
 - ✓ Role-based filtering: tools outside the caller's role are invisible in search results — Phase 2
 - ✓ Wrap mode passes all non-discovery `tools/call` requests through to the underlying server unchanged — Phase 2
+- ✓ `createMCPackServer(config)` builds a new MCP server with tools, handlers, and lazy discovery baked in — Phase 3
+- ✓ Build mode routes `tools/call` requests to the correct registered handler — Phase 3
 
 ### Active
 
-- [ ] `createMCPackServer(config)` builds a new MCP server with tools, handlers, and lazy discovery baked in
-- [ ] Build mode routes `tools/call` requests to the correct registered handler
 - [ ] Keyword-based search with scoring (name match > description match > keyword match)
 - [ ] Integration test harness runs against real Stripe MCP and produces a token reduction comparison report
 - [ ] README documents both usage modes with examples and token reduction numbers
@@ -69,4 +69,4 @@ Agents discover only the tool schemas they need, when they need them — reducin
 | In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
 
 ---
-*Last updated: 2026-03-21 after Phase 2 completion*
+*Last updated: 2026-03-22 after Phase 3 completion*
