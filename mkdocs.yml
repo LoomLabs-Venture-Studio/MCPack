@@ -1,0 +1,12 @@
+site_name: MCPack
+site_url: https://loomlabs-venture-studio.github.io/mcpack
+repo_url: https://github.com/LoomLabs-Venture-Studio/mcpack
+repo_name: LoomLabs-Venture-Studio/mcpack
+
+theme:
+  name: material
+  palette:
+    scheme: default
+
+nav:
+  - Home: index.md
