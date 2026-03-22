@@ -1,0 +1,33 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'README.md'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install MkDocs
+        run: pip install mkdocs-material
+
+      - name: Sync README to docs
+        run: cp README.md docs/index.md
+
+      - name: Deploy
+        run: mkdocs gh-deploy --force
