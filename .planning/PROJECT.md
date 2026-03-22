@@ -29,9 +29,12 @@ Agents discover only the tool schemas they need, when they need them — reducin
 - ✓ Integration test harness runs against real Stripe MCP with token reduction report — Phase 4
 - ✓ All tests pass with vitest (100 tests across 7 files) — Phase 4
 
+- ✓ README documents both usage modes with examples and token reduction numbers — Phase 5
+- ✓ Spec committed to /spec/mcpack-spec-v1.md and referenced in README — Phase 5
+- ✓ MkDocs docs site with GitHub Actions deployment — Phase 5
+
 ### Active
 
-- [ ] README documents both usage modes with examples and token reduction numbers
 - [ ] Published as TypeScript with exported types, no runtime deps beyond `@modelcontextprotocol/sdk`
 
 ### Out of Scope
@@ -71,4 +74,4 @@ Agents discover only the tool schemas they need, when they need them — reducin
 | In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
 
 ---
-*Last updated: 2026-03-22 after Phase 4 completion*
+*Last updated: 2026-03-22 after Phase 5 completion*
