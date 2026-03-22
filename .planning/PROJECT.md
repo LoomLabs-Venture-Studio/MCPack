@@ -25,10 +25,12 @@ Agents discover only the tool schemas they need, when they need them — reducin
 - ✓ `createMCPackServer(config)` builds a new MCP server with tools, handlers, and lazy discovery baked in — Phase 3
 - ✓ Build mode routes `tools/call` requests to the correct registered handler — Phase 3
 
+- ✓ Unit tests for all modules with 99.56% statement coverage — Phase 4
+- ✓ Integration test harness runs against real Stripe MCP with token reduction report — Phase 4
+- ✓ All tests pass with vitest (100 tests across 7 files) — Phase 4
+
 ### Active
 
-- [ ] Keyword-based search with scoring (name match > description match > keyword match)
-- [ ] Integration test harness runs against real Stripe MCP and produces a token reduction comparison report
 - [ ] README documents both usage modes with examples and token reduction numbers
 - [ ] Published as TypeScript with exported types, no runtime deps beyond `@modelcontextprotocol/sdk`
 
@@ -69,4 +71,4 @@ Agents discover only the tool schemas they need, when they need them — reducin
 | In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
 
 ---
-*Last updated: 2026-03-22 after Phase 3 completion*
+*Last updated: 2026-03-22 after Phase 4 completion*
