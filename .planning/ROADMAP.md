@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundation and Leaf Modules** - Project scaffolding, types, and all independent modules (index-builder, search, sessions, roles)
 - [ ] **Phase 2: Core Engine and Wrap Mode** - Wire modules into core engine, deliver complete wrap mode with search_tools meta-tool
 - [ ] **Phase 3: Build Mode** - Build mode entry point with handler routing, public API exports
-- [ ] **Phase 4: Testing and Integration Harness** - Unit tests for all modules, Stripe MCP integration harness with token comparison
+- [x] **Phase 4: Testing and Integration Harness** - Unit tests for all modules, Stripe MCP integration harness with token comparison (completed 2026-03-22)
 - [ ] **Phase 5: Documentation and Release Prep** - README with examples, spec commit, token reduction numbers
 
 ## Phase Details
@@ -77,7 +77,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Unit test audit, coverage config, gap-filling for all modules
+- [x] 04-01-PLAN.md — Unit test audit, coverage config, gap-filling for all modules
 - [x] 04-02-PLAN.md — Stripe MCP integration harness with token reduction report
 
 ### Phase 5: Documentation and Release Prep
@@ -104,5 +104,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Foundation and Leaf Modules | 0/2 | Not started | - |
 | 2. Core Engine and Wrap Mode | 0/2 | Not started | - |
 | 3. Build Mode | 0/2 | Not started | - |
-| 4. Testing and Integration Harness | 1/2 | In Progress|  |
+| 4. Testing and Integration Harness | 2/2 | Complete   | 2026-03-22 |
 | 5. Documentation and Release Prep | 0/1 | Not started | - |
