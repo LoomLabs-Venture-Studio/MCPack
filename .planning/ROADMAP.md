@@ -92,7 +92,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — README with usage examples and token reduction numbers, spec commit to /spec/
+- [x] 05-01-PLAN.md — README with usage examples and token reduction numbers, spec commit to /spec/
 - [ ] 05-02-PLAN.md — MkDocs site configuration and GitHub Actions deployment workflow
 
 ## Progress

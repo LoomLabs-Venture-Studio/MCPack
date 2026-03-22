@@ -47,10 +47,10 @@
 
 - [x] **PKG-01**: Package compiles with `tsc` and exports TypeScript type definitions
 - [x] **PKG-02**: No runtime dependencies beyond `@modelcontextprotocol/sdk` as peer dependency
-- [ ] **PKG-03**: README documents wrap mode usage with code example
-- [ ] **PKG-04**: README documents build mode usage with code example
-- [ ] **PKG-05**: README includes token reduction numbers from the test harness
-- [ ] **PKG-06**: Spec document from `mcpack-spec-v1.md` (repo root) committed to `/spec/mcpack-spec-v1.md` and referenced in README
+- [x] **PKG-03**: README documents wrap mode usage with code example
+- [x] **PKG-04**: README documents build mode usage with code example
+- [x] **PKG-05**: README includes token reduction numbers from the test harness
+- [x] **PKG-06**: Spec document from `mcpack-spec-v1.md` (repo root) committed to `/spec/mcpack-spec-v1.md` and referenced in README
 
 ## v2 Requirements
 
@@ -106,10 +106,10 @@
 | TEST-03 | Phase 4 | Complete |
 | PKG-01 | Phase 1 | Complete |
 | PKG-02 | Phase 1 | Complete |
-| PKG-03 | Phase 5 | Pending |
-| PKG-04 | Phase 5 | Pending |
-| PKG-05 | Phase 5 | Pending |
-| PKG-06 | Phase 5 | Pending |
+| PKG-03 | Phase 5 | Complete |
+| PKG-04 | Phase 5 | Complete |
+| PKG-05 | Phase 5 | Complete |
+| PKG-06 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total
