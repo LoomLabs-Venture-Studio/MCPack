@@ -40,7 +40,7 @@
 ### Testing
 
 - [ ] **TEST-01**: Unit tests exist for each module: index-builder, search, session, roles, server-builder
-- [ ] **TEST-02**: Integration test harness runs against real Stripe MCP and produces a token reduction comparison report
+- [x] **TEST-02**: Integration test harness runs against real Stripe MCP and produces a token reduction comparison report
 - [ ] **TEST-03**: All tests pass with `vitest`
 
 ### Package & Documentation
@@ -102,7 +102,7 @@
 | ENTRY-02 | Phase 3 | Complete |
 | ENTRY-03 | Phase 2 | Complete |
 | TEST-01 | Phase 4 | Pending |
-| TEST-02 | Phase 4 | Pending |
+| TEST-02 | Phase 4 | Complete |
 | TEST-03 | Phase 4 | Pending |
 | PKG-01 | Phase 1 | Complete |
 | PKG-02 | Phase 1 | Complete |
