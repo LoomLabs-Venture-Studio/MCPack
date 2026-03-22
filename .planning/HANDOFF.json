@@ -1,33 +1,31 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-20T07:07:44.951Z",
-  "phase": "01",
-  "phase_name": "foundation-and-leaf-modules",
-  "phase_dir": ".planning/phases/01-foundation-and-leaf-modules",
+  "timestamp": "2026-03-22T00:14:40.067Z",
+  "phase": "03",
+  "phase_name": "build-mode",
+  "phase_dir": ".planning/phases/03-build-mode",
   "plan": 2,
-  "task": 3,
-  "total_tasks": 3,
+  "task": 2,
+  "total_tasks": 2,
   "status": "phase_complete",
   "completed_tasks": [
-    {"id": 1, "name": "Project scaffolding and types", "status": "done", "commit": "a635128"},
-    {"id": 2, "name": "Index builder module", "status": "done", "commit": "738a82e"},
-    {"id": 3, "name": "Search engine", "status": "done", "commit": "c588a04"},
-    {"id": 4, "name": "Session registry", "status": "done", "commit": "ecdac91"},
-    {"id": 5, "name": "Role filter", "status": "done", "commit": "e8ac501"}
+    {"id": 1, "name": "Types and markToolLoaded", "status": "done", "commit": "5e54d63"},
+    {"id": 2, "name": "Correctness fixes to wrap.ts", "status": "done", "commit": "d41c5fe"},
+    {"id": 3, "name": "Build mode entry point (TDD)", "status": "done", "commit": "167e6fa"},
+    {"id": 4, "name": "Package exports", "status": "done", "commit": "e2d6314"}
   ],
   "remaining_tasks": [],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Schema property names as keyword source (weight 1)", "rationale": "Improves recall on tools with generic names", "phase": "01"},
-    {"decision": "__stdio__ as session ID for stdio transport", "rationale": "Descriptive in logs, matches single-connection model", "phase": "01"},
-    {"decision": "Role filtering on both search AND tools/call", "rationale": "Defense in depth — blocks direct tool calls that bypass search", "phase": "01"},
-    {"decision": "Drop tier field, keep roles only", "rationale": "Simplifies type model, role filtering at query time", "phase": "01"},
-    {"decision": "Dual cleanup: lazy expiry + timer backstop", "rationale": "Immediate cleanup on access + safety net for abandoned sessions", "phase": "01"},
-    {"decision": "Query log on Session (server-side only)", "rationale": "Debug trail for developers without adding tokens to agent context", "phase": "01"},
-    {"decision": "Export public API types only", "rationale": "Smaller surface = fewer breaking change risks", "phase": "01"}
+    {"decision": "Throw on empty tools in both wrap and build mode", "rationale": "MCPack index is static at setup — empty is always a developer mistake", "phase": "03"},
+    {"decision": "MCPackHandlerContext with toolName, sessionId, role — required param", "rationale": "Forward-compatible for multi-MCP wrapping; extensible for future fields", "phase": "03"},
+    {"decision": "Handler returns Promise<unknown>, build.ts normalizes", "rationale": "Flexible DX — handlers don't need to know MCP result format", "phase": "03"},
+    {"decision": "Tool name in error messages for both modes", "rationale": "Debugging context, especially important for multi-MCP scenarios", "phase": "03"},
+    {"decision": "Config snapshot at setup prevents external mutation", "rationale": "Defensive pattern for library code — snapshot roles and defaultRole", "phase": "03"},
+    {"decision": "Mark tools as loaded on direct tools/call", "rationale": "Keeps session registry accurate when agents bypass search_tools", "phase": "03"}
   ],
-  "uncommitted_files": [],
-  "next_action": "Run /gsd:discuss-phase 2 to gather context for Phase 2: Core Engine and Wrap Mode",
-  "context_notes": "Phase 1 fully complete — all 5 leaf modules built (types, index-builder, search, session, roles), 45 tests passing, UAT 7/7 passed, verification passed. Phase 2 wires these modules into a core engine and delivers the mcpack(server, config) wrap mode API. The key technical risk is handler capture from the MCP SDK Server class (no public API for reading existing handlers)."
+  "uncommitted_files": [".planning/config.json"],
+  "next_action": "Run /gsd:discuss-phase 4 to gather context for Phase 4: Testing and Integration Harness",
+  "context_notes": "Phases 1-3 complete. 91 tests passing across 7 test files. Both mcpack() wrap mode and createMCPackServer() build mode are implemented, tested, and UAT-verified. Phase 4 adds comprehensive unit tests for all modules plus the Stripe MCP integration harness with token reduction comparison. Phase 5 is documentation and release prep. Two phases remain."
 }
