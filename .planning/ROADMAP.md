@@ -74,11 +74,11 @@ Plans:
   1. Unit tests exist for each module: index-builder, search, session, roles, server-builder
   2. Integration test harness runs against real Stripe MCP server and produces a token reduction comparison report (vanilla vs MCPack)
   3. All tests pass with `vitest` in a single `npm test` command
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Unit test audit, coverage config, gap-filling for all modules
+- [ ] 04-02-PLAN.md — Stripe MCP integration harness with token reduction report
 
 ### Phase 5: Documentation and Release Prep
 **Goal**: The package is ready for npm publishing with complete documentation showing real token savings
