@@ -89,10 +89,11 @@ Plans:
   2. README documents build mode usage with a complete code example
   3. README includes token reduction numbers from the Stripe MCP integration harness
   4. Spec document is committed to `/spec/mcpack-spec-v1.md` and referenced in README
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — README with usage examples and token reduction numbers, spec commit to /spec/
+- [ ] 05-02-PLAN.md — MkDocs site configuration and GitHub Actions deployment workflow
 
 ## Progress
 
@@ -105,4 +106,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Core Engine and Wrap Mode | 0/2 | Not started | - |
 | 3. Build Mode | 0/2 | Not started | - |
 | 4. Testing and Integration Harness | 2/2 | Complete   | 2026-03-22 |
-| 5. Documentation and Release Prep | 0/1 | Not started | - |
+| 5. Documentation and Release Prep | 0/2 | Not started | - |
