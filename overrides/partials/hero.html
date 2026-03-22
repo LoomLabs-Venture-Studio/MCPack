@@ -1,0 +1,58 @@
+<section class="mp-hero">
+  <div class="mp-hero__inner">
+    <div class="mp-hero__content">
+      <h1 class="mp-hero__title">MCPack</h1>
+      <p class="mp-hero__tagline">
+        Lazy, queryable tool discovery for MCP servers.
+        <br>Reduce tool schema tokens by <strong>80%+</strong> with on-demand search.
+      </p>
+      <div class="mp-hero__stats">
+        <div class="mp-stat">
+          <span class="mp-stat__number">80.7%</span>
+          <span class="mp-stat__label">Token Reduction</span>
+        </div>
+        <div class="mp-stat">
+          <span class="mp-stat__number">28→5</span>
+          <span class="mp-stat__label">Tools per Query</span>
+        </div>
+        <div class="mp-stat">
+          <span class="mp-stat__number">0</span>
+          <span class="mp-stat__label">Runtime Deps</span>
+        </div>
+      </div>
+      <div class="mp-hero__cta">
+        <a href="docs/" class="md-button md-button--primary">
+          Get Started
+        </a>
+        <a href="{{ config.repo_url }}" class="md-button">
+          GitHub
+        </a>
+      </div>
+    </div>
+    <div class="mp-hero__terminal">
+      <div class="mp-terminal">
+        <div class="mp-terminal__bar">
+          <span class="mp-terminal__dot mp-terminal__dot--red"></span>
+          <span class="mp-terminal__dot mp-terminal__dot--yellow"></span>
+          <span class="mp-terminal__dot mp-terminal__dot--green"></span>
+          <span class="mp-terminal__title">search_tools</span>
+        </div>
+        <div class="mp-terminal__body">
+<pre><code><span class="t-dim">// Before: agent gets ALL 28 tool schemas</span>
+<span class="t-header">tools/list</span> → <span class="t-red">8,315 tokens</span> <span class="t-dim">(28 schemas dumped)</span>
+
+<span class="t-dim">// After: agent searches for what it needs</span>
+<span class="t-header">search_tools</span> <span class="t-dim">{ query: "create a payment" }</span>
+
+<span class="t-label">Results:</span>
+  <span class="t-green">✓ create_payment</span>      <span class="t-dim">schema included</span>
+  <span class="t-green">✓ get_invoice</span>          <span class="t-dim">schema included</span>
+  <span class="t-yellow">◆ list_customers</span>       <span class="t-dim">loaded: true (cached)</span>
+
+<span class="t-label">Tokens:</span> <span class="t-red">8,315</span> → <span class="t-green">1,040</span>  <span class="t-green">↓ 87.5%</span>
+<span class="t-label">Tools:</span>  <span class="t-dim">28</span> → <span class="t-green">3</span>  <span class="t-dim">session-aware</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

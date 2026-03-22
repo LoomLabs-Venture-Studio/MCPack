@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'docs/**'
+      - 'overrides/**'
       - 'mkdocs.yml'
       - 'README.md'
 
@@ -27,7 +28,7 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Sync README to docs
-        run: cp README.md docs/index.md
+        run: cp README.md docs/docs.md
 
       - name: Deploy
         run: mkdocs gh-deploy --force
