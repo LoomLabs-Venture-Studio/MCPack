@@ -5,7 +5,7 @@
  * runs multiple search queries through MCPack's index/search engine, and produces
  * a JSON report + console summary showing character count and estimated token reduction.
  *
- * Usage: STRIPE_API_KEY=sk_test_xxx npm run harness
+ * Usage: STRIPE_SECRET_KEY=sk_test_xxx npm run harness
  */
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -50,9 +50,11 @@ interface HarnessReport {
 
 // ─── API Key Check (D-10) ────────────────────────────────────────────────────
 
-if (!process.env.STRIPE_API_KEY) {
-  console.log('STRIPE_API_KEY not set. Skipping Stripe MCP harness.');
-  console.log('Set STRIPE_API_KEY to run: STRIPE_API_KEY=sk_test_xxx npm run harness');
+const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY;
+
+if (!STRIPE_KEY) {
+  console.log('STRIPE_SECRET_KEY not set. Skipping Stripe MCP harness.');
+  console.log('Set STRIPE_SECRET_KEY to run: STRIPE_SECRET_KEY=sk_test_xxx npm run harness');
   process.exit(0);
 }
 
@@ -78,7 +80,7 @@ const queries = [
 async function main(): Promise<void> {
   const transport = new StdioClientTransport({
     command: 'npx',
-    args: ['-y', '@stripe/mcp', '--api-key', process.env.STRIPE_API_KEY!],
+    args: ['-y', '@stripe/mcp', '--api-key', STRIPE_KEY!],
   });
   const client = new Client({ name: 'mcpack-harness', version: '0.1.0' });
 
