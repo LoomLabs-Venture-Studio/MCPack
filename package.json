@@ -22,7 +22,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --reporter=verbose",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "harness": "npx tsx test/harness/stripe-harness.ts"
   },
   "peerDependencies": {
     "@cfworker/json-schema": "^4.1.1",
