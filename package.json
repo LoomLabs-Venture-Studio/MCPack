@@ -1,6 +1,6 @@
 {
-  "name": "mcpack",
-  "version": "0.1.0",
+  "name": "@llvs/mcpack",
+  "version": "1.0.0",
   "description": "Lazy, queryable, session-aware tool discovery for MCP servers",
   "type": "module",
   "main": "dist/index.js",
@@ -26,9 +26,7 @@
     "harness": "npx tsx test/harness/stripe-harness.ts"
   },
   "peerDependencies": {
-    "@cfworker/json-schema": "^4.1.1",
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "zod": "^3.25.0 || ^4.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
     "@cfworker/json-schema": "^4.1.1",

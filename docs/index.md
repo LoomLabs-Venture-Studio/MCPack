@@ -96,11 +96,11 @@ Total est. tokens saved: 33,560
 ## Quick Start
 
 ```bash
-npm install mcpack
+npm install @llvs/mcpack
 ```
 
 ```typescript
-import { mcpack } from 'mcpack';
+import { mcpack } from '@llvs/mcpack';
 
 const handle = await mcpack(server, {
   roles: { default: ['create_payment', 'list_customers'], admin: ['*'] },

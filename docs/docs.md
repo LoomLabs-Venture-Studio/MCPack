@@ -7,7 +7,7 @@ MCP clients receive full tool schemas at connection time via `tools/list`. For s
 ## Install
 
 ```
-npm install mcpack
+npm install @llvs/mcpack
 ```
 
 Peer dependency: `@modelcontextprotocol/sdk ^1.0.0`
@@ -17,7 +17,7 @@ Peer dependency: `@modelcontextprotocol/sdk ^1.0.0`
 Wrap any existing MCP server with one function call. MCPack intercepts `tools/list` and injects `search_tools` automatically.
 
 ```typescript
-import { mcpack } from 'mcpack';
+import { mcpack } from '@llvs/mcpack';
 
 // your existing MCP server
 const server = createMyServer();
@@ -87,7 +87,7 @@ Tools with `loaded: false` include the full schema (first time this session). To
 Build a new MCP server from scratch with tools, handlers, and lazy discovery baked in.
 
 ```typescript
-import { createMCPackServer } from 'mcpack';
+import { createMCPackServer } from '@llvs/mcpack';
 
 const { server, handle } = createMCPackServer({
   name: 'payments-server',
