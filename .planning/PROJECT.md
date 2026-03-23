@@ -2,59 +2,63 @@
 
 ## What This Is
 
-MCPack is an npm package that provides lazy, queryable, session-aware tool discovery for MCP servers. Instead of dumping every tool schema on connect (which can cost thousands of tokens), MCPack exposes a single `search_tools` tool that returns only the schemas an agent actually needs, when it needs them. It supports two modes: wrapping an existing MCP server, or building a new server from scratch with tools and handlers passed explicitly.
+MCPack is an npm package (`@llvs/mcpack`) that provides lazy, queryable, session-aware tool discovery for MCP servers. Instead of dumping every tool schema on connect (which can cost thousands of tokens), MCPack exposes a single `search_tools` tool that returns only the schemas an agent actually needs, when it needs them. It supports two modes: wrapping an existing MCP server, or building a new server from scratch with tools and handlers passed explicitly.
 
 ## Core Value
 
-Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 90%+ on servers with large tool surfaces.
+Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
+
+## Current State
+
+**v1.0 shipped** — published as `@llvs/mcpack@1.0.0` on npm (2026-03-23)
+
+- 946 LOC TypeScript, 1,846 LOC tests
+- 100 tests, 99.56% statement coverage
+- 80.7% token reduction proven on Stripe MCP (28 tools)
+- Docs site: loomlabs-venture-studio.github.io/MCPack/
+- Two entry points: `mcpack()` (wrap) and `createMCPackServer()` (build)
 
 ## Requirements
 
 ### Validated
 
-- ✓ Keyword-based search with 5-tier weighted scoring — Phase 1
-- ✓ Session tracking with sliding TTL and dual cleanup — Phase 1
-- ✓ Role-based filtering with wildcard support — Phase 1
-- ✓ TypeScript with exported types, zero runtime deps — Phase 1
-- ✓ `mcpack(server, config)` wraps any existing MCP server with lazy discovery — Phase 2
-- ✓ `tools/list` on any MCPack server returns exactly one tool: `search_tools` — Phase 2
-- ✓ `search_tools` accepts a natural language query and returns matching tool schemas ranked by relevance — Phase 2
-- ✓ Session tracking: schemas loaded once per session are returned as `loaded: true` with no schema on subsequent calls — Phase 2
-- ✓ Role-based filtering: tools outside the caller's role are invisible in search results — Phase 2
-- ✓ Wrap mode passes all non-discovery `tools/call` requests through to the underlying server unchanged — Phase 2
-- ✓ `createMCPackServer(config)` builds a new MCP server with tools, handlers, and lazy discovery baked in — Phase 3
-- ✓ Build mode routes `tools/call` requests to the correct registered handler — Phase 3
-
-- ✓ Unit tests for all modules with 99.56% statement coverage — Phase 4
-- ✓ Integration test harness runs against real Stripe MCP with token reduction report — Phase 4
-- ✓ All tests pass with vitest (100 tests across 7 files) — Phase 4
-
-- ✓ README documents both usage modes with examples and token reduction numbers — Phase 5
-- ✓ Spec committed to /spec/mcpack-spec-v1.md and referenced in README — Phase 5
-- ✓ MkDocs docs site with GitHub Actions deployment — Phase 5
+- ✓ Keyword-based search with 5-tier weighted scoring — v1.0
+- ✓ Session tracking with sliding TTL and dual cleanup — v1.0
+- ✓ Role-based filtering with wildcard support — v1.0
+- ✓ TypeScript with exported types, zero runtime deps — v1.0
+- ✓ `mcpack(server, config)` wraps any existing MCP server — v1.0
+- ✓ `tools/list` returns exactly one tool: `search_tools` — v1.0
+- ✓ `search_tools` returns matching schemas ranked by relevance — v1.0
+- ✓ Session-aware: loaded schemas returned as references — v1.0
+- ✓ Role-based: tools outside caller's role are invisible — v1.0
+- ✓ Wrap mode passes non-discovery calls through unchanged — v1.0
+- ✓ `createMCPackServer(config)` builds server with lazy discovery — v1.0
+- ✓ Build mode routes calls to correct handler — v1.0
+- ✓ Unit tests for all modules (99.56% coverage) — v1.0
+- ✓ Stripe MCP integration harness with token reduction report — v1.0
+- ✓ README with usage examples and token reduction numbers — v1.0
+- ✓ Spec committed and referenced — v1.0
+- ✓ Published as `@llvs/mcpack@1.0.0` on npm — v1.0
 
 ### Active
 
-- [ ] Published as TypeScript with exported types, no runtime deps beyond `@modelcontextprotocol/sdk`
+(Awaiting v1.1 specs)
 
 ### Out of Scope
 
-- Semantic/embedding-based search — keyword only for v1, semantic planned for v1.1
+- Semantic/embedding-based search — planned for v1.1
 - Binary encoding or MessagePack — planned for v2.0
-- Persistent session storage — in-memory only, no database
-- Standalone proxy server process — MCPack is a library, not a daemon
+- Persistent session storage — in-memory only
+- Standalone proxy server process — MCPack is a library
 - CLI tooling, dashboard, or analytics UI
-- Any changes to MCP client behavior
-- npm publish or GitHub repo creation — build only, publishing is separate
 
 ## Context
 
-- The MCP protocol requires `tools/list` on connect, returning all tool definitions upfront. On a server with 40+ tools (e.g., Stripe MCP), this can cost 8,000+ tokens before a single tool is called.
-- No existing solution addresses this at the wrapper layer. Current approaches require rewriting the server or modifying the client.
-- The MCP SDK's `Server` class uses `setRequestHandler()` for registering handlers. MCPack replaces these handlers to intercept discovery while preserving pass-through for actual tool calls.
-- Primary users are both MCP server authors (adding lazy discovery to their servers) and MCP integrators (wrapping existing third-party servers without modification).
-- PRD with full technical specification available at `mcpack-prd-v1.md` in repo root.
-- Protocol spec available at `mcpack-spec-v1.md` in repo root.
+- Published as `@llvs/mcpack` on npm under the LoomLabs Venture Studio org
+- Docs site deployed via GitHub Pages with MkDocs Material + LoomLabs branding
+- The MCP SDK's `Server` class uses `setRequestHandler()` — MCPack replaces these handlers to intercept discovery
+- Primary users: MCP server authors (build mode) and MCP integrators (wrap mode)
+- Monetization potential identified — public-facing assets optimized for visual impact
 
 ## Constraints
 
@@ -67,11 +71,12 @@ Agents discover only the tool schemas they need, when they need them — reducin
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Handler replacement over proxy pattern | Simpler architecture, no extra server layer, works with MCP SDK's `setRequestHandler` | — Pending |
-| Two modes: wrap + build | Serves both server authors (build mode) and integrators (wrap mode) equally | — Pending |
-| Keyword search only for v1 | Avoids embedding dependencies, keeps package lightweight, semantic search planned for v1.1 | — Pending |
-| Real Stripe MCP for test harness | Community-recognized server with large tool surface, proves real-world value | — Pending |
-| In-memory sessions only | Simplicity for v1, persistent storage adds complexity without clear v1 need | — Pending |
+| Handler replacement over proxy pattern | Simpler architecture, no extra server layer | ✓ Good — clean implementation |
+| Two modes: wrap + build | Serves both server authors and integrators | ✓ Good — both modes share engine |
+| Keyword search only for v1 | Avoids embedding dependencies, keeps lightweight | ✓ Good — 80.7% reduction without embeddings |
+| Real Stripe MCP for test harness | Community-recognized server, proves real-world value | ✓ Good — credible numbers |
+| In-memory sessions only | Simplicity for v1 | ✓ Good — no complaints |
+| @llvs/mcpack scoped package | mcpack taken on npm (Minecraft datapacks) | ✓ Good — professional org scope |
 
 ---
-*Last updated: 2026-03-22 after Phase 5 completion*
+*Last updated: 2026-03-23 after v1.0 milestone completion*
