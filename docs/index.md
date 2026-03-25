@@ -1,6 +1,6 @@
 ---
 template: home.html
-title: MCPack — Intelligent Tool Discovery for MCP Servers
+title: MCPack — RBAC for MCP Servers
 hide:
   - navigation
   - toc
@@ -8,32 +8,32 @@ hide:
 
 <div class="mp-features">
   <div class="mp-card">
+    <div class="mp-card__icon mp-card__icon--roles">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 6c1.4 0 2.8 1.1 2.8 2.5V11c.6 0 1.2.6 1.2 1.3v3.5c0 .6-.6 1.2-1.3 1.2H9.2c-.6 0-1.2-.6-1.2-1.3v-3.5c0-.6.6-1.2 1.2-1.2V9.5C9.2 8.1 10.6 7 12 7m0 1.2c-.8 0-1.5.5-1.5 1.3V11h3V9.5c0-.8-.7-1.3-1.5-1.3"/></svg>
+    </div>
+    <h3 class="mp-card__title">Two-Layer RBAC</h3>
+    <p class="mp-card__text">Discovery layer: agents only see tools their role permits. Execution layer: <code>tools/call</code> blocked for out-of-role tools. The error says "Unknown tool" — invisible, not just blocked.</p>
+  </div>
+  <div class="mp-card">
     <div class="mp-card__icon mp-card__icon--search">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
     </div>
-    <h3 class="mp-card__title">Intelligent Discovery</h3>
-    <p class="mp-card__text">Agents search for tools with natural language instead of receiving every schema upfront. 5-tier keyword scoring surfaces the most relevant results first.</p>
+    <h3 class="mp-card__title">Lazy Discovery</h3>
+    <p class="mp-card__text">Agents search for tools by keyword instead of receiving every schema upfront. 5-tier scoring surfaces the most relevant results. Role-scoped by default.</p>
   </div>
   <div class="mp-card">
     <div class="mp-card__icon mp-card__icon--session">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7m.5-11H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
     </div>
     <h3 class="mp-card__title">Session Memory</h3>
-    <p class="mp-card__text">Schemas loaded once are never sent again. Subsequent calls return lightweight references. Zero duplicate payloads across the session lifetime.</p>
-  </div>
-  <div class="mp-card">
-    <div class="mp-card__icon mp-card__icon--roles">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5zm0 6c1.4 0 2.8 1.1 2.8 2.5V11c.6 0 1.2.6 1.2 1.3v3.5c0 .6-.6 1.2-1.3 1.2H9.2c-.6 0-1.2-.6-1.2-1.3v-3.5c0-.6.6-1.2 1.2-1.2V9.5C9.2 8.1 10.6 7 12 7m0 1.2c-.8 0-1.5.5-1.5 1.3V11h3V9.5c0-.8-.7-1.3-1.5-1.3"/></svg>
-    </div>
-    <h3 class="mp-card__title">Role-Based Access</h3>
-    <p class="mp-card__text">Define roles with granular tool permissions. Agents only discover what their role allows. Wildcard grants full access for admin contexts.</p>
+    <p class="mp-card__text">Schemas loaded once per session are returned as references on subsequent calls. Zero duplicate payloads across the session lifetime.</p>
   </div>
   <div class="mp-card">
     <div class="mp-card__icon mp-card__icon--modes">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0 4.6-4.6-4.6-4.6L16 6l6 6-6 6z"/></svg>
     </div>
     <h3 class="mp-card__title">Wrap or Build</h3>
-    <p class="mp-card__text">Wrap any existing MCP server in one line, or build a new one from scratch with handlers. Same engine, same protocol, your choice.</p>
+    <p class="mp-card__text">Wrap any existing MCP server in one line and add RBAC on top, or build a new server from scratch with roles baked in from the start.</p>
   </div>
 </div>
 
@@ -43,24 +43,24 @@ hide:
 
 <div class="mp-how">
   <div class="mp-step">
-    <h4 class="mp-step__title">Connect</h4>
-    <p class="mp-step__text"><code>tools/list</code> returns one tool: <code>search_tools</code>. No schema dump. No wasted tokens. The agent knows how to search.</p>
+    <h4 class="mp-step__title">Define Roles</h4>
+    <p class="mp-step__text">Map role names to allowed tool lists. <code>'*'</code> for admin access. Each agent session is assigned a role — defaults apply when none is specified.</p>
   </div>
   <div class="mp-step">
-    <h4 class="mp-step__title">Search</h4>
-    <p class="mp-step__text">Agent queries <code>search_tools</code> with natural language. MCPack returns the top matching schemas ranked by relevance, scoped to the agent's role.</p>
+    <h4 class="mp-step__title">Agents Search</h4>
+    <p class="mp-step__text"><code>tools/list</code> returns one tool: <code>search_tools</code>. Agents query with natural language. Results are filtered by role and ranked by relevance.</p>
   </div>
   <div class="mp-step">
-    <h4 class="mp-step__title">Execute</h4>
-    <p class="mp-step__text">Agent calls discovered tools normally. MCPack routes to the right handler and tracks the session. Loaded schemas are cached automatically.</p>
+    <h4 class="mp-step__title">Enforce on Execute</h4>
+    <p class="mp-step__text">Even if an agent guesses a tool name, <code>tools/call</code> returns "Unknown tool" for anything outside their role. No leaking tool names. No "access denied" hints.</p>
   </div>
 </div>
 
 ---
 
-## Measured on Real Infrastructure
+## Token Reduction: A Side Effect Worth Measuring
 
-Tested against **Stripe MCP** — 28 production tools. Not simulated.
+RBAC scopes what agents see — which also dramatically cuts token usage. Measured on **Stripe MCP** (28 tools). Not simulated.
 
 | Query | Without MCPack | With MCPack | Saved |
 |-------|---------------|-------------|-------|
@@ -72,25 +72,6 @@ Tested against **Stripe MCP** — 28 production tools. Not simulated.
 | **Aggregate (5 queries)** | **41,575** | **8,015** | **80.7%** |
 
 <small>Results vary by server size and query breadth. Larger tool surfaces see greater reduction.</small>
-
----
-
-## Quick Start
-
-```bash
-npm install @llvs/mcpack
-```
-
-```typescript
-import { mcpack } from '@llvs/mcpack';
-
-const handle = await mcpack(server, {
-  roles: { default: ['create_payment', 'list_customers'], admin: ['*'] },
-  defaultRole: 'default',
-});
-```
-
-One function call. Your server now exposes `search_tools` instead of dumping every schema.
 
 <div class="mp-footer-cta">
   <a href="docs/" class="mp-btn mp-btn--primary">

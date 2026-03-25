@@ -8,10 +8,11 @@
   <div class="mp-hero__inner">
     <div class="mp-hero__content">
       <div class="mp-hero__badge">MCP Protocol Layer</div>
-      <h1 class="mp-hero__title">Stop dumping<br><span class="mp-hero__accent">every tool schema</span><br>into context.</h1>
+      <h1 class="mp-hero__title">RBAC for<br><span class="mp-hero__accent">MCP Servers</span></h1>
       <p class="mp-hero__tagline">
-        MCPack replaces bulk tool discovery with intelligent, on-demand search.
-        One tool. One query. Only the schemas your agent needs.
+        Give your co-founders a terminal into your shared venture. Not a dashboard.
+        <br><br>
+        Drop-in role-based access control for any MCP server. Agents only see the tools their role permits. Restricted tools don't return "access denied" — they don't exist.
       </p>
       <div class="mp-hero__cta">
         <a href="docs/" class="mp-btn mp-btn--primary">
@@ -28,36 +29,28 @@
       </div>
     </div>
     <div class="mp-hero__visual">
-      <div class="mp-comparison">
-        <div class="mp-comparison__before">
-          <div class="mp-comparison__label"><span class="mp-comparison__dot mp-comparison__dot--red"></span>Without MCPack</div>
-          <div class="mp-comparison__value">
-            <span class="mp-comparison__num">8,315</span>
-            <span class="mp-comparison__unit">tokens</span>
-          </div>
-          <div class="mp-comparison__detail">28 schemas dumped on connect</div>
-          <div class="mp-comparison__bar">
-            <div class="mp-comparison__fill mp-comparison__fill--red"></div>
-          </div>
+      <div class="mp-terminal">
+        <div class="mp-terminal__bar">
+          <span class="mp-terminal__dot mp-terminal__dot--red"></span>
+          <span class="mp-terminal__dot mp-terminal__dot--yellow"></span>
+          <span class="mp-terminal__dot mp-terminal__dot--green"></span>
+          <span class="mp-terminal__title">mcpack.config</span>
         </div>
-        <div class="mp-comparison__divider">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="mp-terminal__body">
+<pre><code><span class="t-dim">const</span> handle <span class="t-dim">=</span> <span class="t-dim">await</span> <span class="t-header">mcpack</span><span class="t-dim">(</span>server<span class="t-dim">, {</span>
+  roles<span class="t-dim">:</span> <span class="t-dim">{</span>
+    <span class="t-green">cofounder</span><span class="t-dim">:</span> <span class="t-dim">[</span><span class="t-accent">'get_deals'</span><span class="t-dim">,</span> <span class="t-accent">'update_deal_status'</span><span class="t-dim">,</span>
+               <span class="t-accent">'list_payments'</span><span class="t-dim">],</span>
+    <span class="t-yellow">advisor</span><span class="t-dim">:  [</span><span class="t-accent">'get_deals'</span><span class="t-dim">],</span>
+    <span class="t-purple">admin</span><span class="t-dim">:    [</span><span class="t-accent">'*'</span><span class="t-dim">]</span>
+  <span class="t-dim">},</span>
+  defaultRole<span class="t-dim">:</span> <span class="t-accent">'advisor'</span>
+<span class="t-dim">});</span>
+
+<span class="t-dim">// advisor calls update_deal_status:</span>
+<span class="t-red">→ "Unknown tool: update_deal_status"</span>
+<span class="t-dim">// Not "access denied". It doesn't exist.</span></code></pre>
         </div>
-        <div class="mp-comparison__after">
-          <div class="mp-comparison__label"><span class="mp-comparison__dot mp-comparison__dot--green"></span>With MCPack</div>
-          <div class="mp-comparison__value">
-            <span class="mp-comparison__num">1,040</span>
-            <span class="mp-comparison__unit">tokens</span>
-          </div>
-          <div class="mp-comparison__detail">5 relevant schemas on demand</div>
-          <div class="mp-comparison__bar">
-            <div class="mp-comparison__fill mp-comparison__fill--green"></div>
-          </div>
-        </div>
-      </div>
-      <div class="mp-hero__reduction">
-        <span class="mp-hero__reduction-num">87.5%</span>
-        <span class="mp-hero__reduction-label">fewer tokens</span>
       </div>
     </div>
   </div>
@@ -66,13 +59,13 @@
 <section class="mp-social-proof">
   <div class="mp-social-proof__inner">
     <div class="mp-proof">
-      <span class="mp-proof__num">80.7%</span>
-      <span class="mp-proof__label">Avg. Reduction</span>
+      <span class="mp-proof__num">2 layers</span>
+      <span class="mp-proof__label">Discovery + Execution</span>
     </div>
     <div class="mp-proof__sep"></div>
     <div class="mp-proof">
-      <span class="mp-proof__num">28 → 5</span>
-      <span class="mp-proof__label">Tools per Query</span>
+      <span class="mp-proof__num">80.7%</span>
+      <span class="mp-proof__label">Token Reduction</span>
     </div>
     <div class="mp-proof__sep"></div>
     <div class="mp-proof">

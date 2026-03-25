@@ -671,11 +671,69 @@
   display: none;
 }
 
-/* ── Terminal colors (for docs page) ─────────────────────── */
+/* ── Terminal Mockup ──────────────────────────────────────── */
+
+.mp-terminal {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--mp-bg);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(139, 92, 246, 0.06);
+  border: 1px solid var(--mp-border);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.mp-terminal__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--mp-surface);
+  border-bottom: 1px solid var(--mp-border);
+}
+
+.mp-terminal__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.mp-terminal__dot--red    { background: #EB3333; }
+.mp-terminal__dot--yellow { background: var(--mp-accent); }
+.mp-terminal__dot--green  { background: var(--mp-green); }
+
+.mp-terminal__title {
+  margin-left: 8px;
+  color: var(--mp-muted);
+  font-size: 0.75rem;
+}
+
+.mp-terminal__body {
+  padding: 1.2rem 1.4rem;
+  overflow-x: auto;
+}
+
+.mp-terminal__body pre {
+  margin: 0;
+  background: transparent !important;
+}
+
+.mp-terminal__body code {
+  background: transparent !important;
+  color: var(--mp-text);
+  font-size: 0.78rem;
+}
+
+/* ── Terminal colors ─────────────────────────────────────── */
 
 .t-green  { color: var(--mp-green-lit); }
 .t-yellow { color: var(--mp-accent-lit); }
 .t-red    { color: var(--mp-red-lit); }
+.t-purple { color: var(--mp-primary-lit); }
+.t-accent { color: #7DD3FC; }
 .t-dim    { color: #4A5568; }
 .t-header { color: var(--mp-bright); font-weight: 700; }
 .t-label  { color: var(--mp-muted); }
