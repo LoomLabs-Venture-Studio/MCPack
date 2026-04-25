@@ -1,0 +1,25 @@
+project_name: MCPack
+mode: agent-teams
+harness: gsd
+knowledge_base: graphify
+remote_enabled: true
+detected_tooling:
+  clis:
+    - gh
+    - npm
+    - bun
+    - node
+    - npx
+    - git
+    - railway
+    - supabase
+    - stripe
+    - redis-cli
+  missing:
+    - tsx (used by npm run harness via npx — no global install required)
+    - clerk
+  harnesses:
+    - gsd-v2
+    - ruflo
+last_setup: 2026-04-23T22:30:00.000Z
+loom_version: 1.2.3

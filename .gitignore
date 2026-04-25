@@ -3,3 +3,11 @@ dist/
 *.tsbuildinfo
 coverage/
 test/harness/report.json
+
+# Loom Labs local configs
+.claude/agents/
+.claude/settings.local.json
+.loom/local.yml
+
+# Graphify output
+graphify-out/
