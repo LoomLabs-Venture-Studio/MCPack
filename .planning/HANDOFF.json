@@ -1,31 +1,52 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-22T00:14:40.067Z",
-  "phase": "03",
-  "phase_name": "build-mode",
-  "phase_dir": ".planning/phases/03-build-mode",
-  "plan": 2,
-  "task": 2,
-  "total_tasks": 2,
-  "status": "phase_complete",
-  "completed_tasks": [
-    {"id": 1, "name": "Types and markToolLoaded", "status": "done", "commit": "5e54d63"},
-    {"id": 2, "name": "Correctness fixes to wrap.ts", "status": "done", "commit": "d41c5fe"},
-    {"id": 3, "name": "Build mode entry point (TDD)", "status": "done", "commit": "167e6fa"},
-    {"id": 4, "name": "Package exports", "status": "done", "commit": "e2d6314"}
+  "timestamp": "2026-04-25T00:00:00.000Z",
+  "milestone": "v1.0",
+  "milestone_name": "MCPack",
+  "status": "milestone_complete",
+  "shipped_at": "2026-03-23",
+  "shipped_as": "@llvs/mcpack@1.0.0",
+  "phase": null,
+  "phase_name": null,
+  "phase_dir": null,
+  "plan": null,
+  "task": null,
+  "completed_phases": [
+    {"id": "01", "name": "foundation-and-leaf-modules", "plans": 2, "status": "done"},
+    {"id": "02", "name": "core-engine-and-wrap-mode", "plans": 2, "status": "done"},
+    {"id": "03", "name": "build-mode", "plans": 2, "status": "done"},
+    {"id": "04", "name": "testing-and-integration-harness", "plans": 2, "status": "done"},
+    {"id": "05", "name": "documentation-and-release-prep", "plans": 2, "status": "done"},
+    {"id": "05.1", "name": "landing-page", "plans": 0, "status": "done", "note": "inserted phase, executed via direct commits"}
   ],
   "remaining_tasks": [],
   "blockers": [],
-  "human_actions_pending": [],
-  "decisions": [
-    {"decision": "Throw on empty tools in both wrap and build mode", "rationale": "MCPack index is static at setup — empty is always a developer mistake", "phase": "03"},
-    {"decision": "MCPackHandlerContext with toolName, sessionId, role — required param", "rationale": "Forward-compatible for multi-MCP wrapping; extensible for future fields", "phase": "03"},
-    {"decision": "Handler returns Promise<unknown>, build.ts normalizes", "rationale": "Flexible DX — handlers don't need to know MCP result format", "phase": "03"},
-    {"decision": "Tool name in error messages for both modes", "rationale": "Debugging context, especially important for multi-MCP scenarios", "phase": "03"},
-    {"decision": "Config snapshot at setup prevents external mutation", "rationale": "Defensive pattern for library code — snapshot roles and defaultRole", "phase": "03"},
-    {"decision": "Mark tools as loaded on direct tools/call", "rationale": "Keeps session registry accurate when agents bypass search_tools", "phase": "03"}
+  "human_actions_pending": [
+    "Decide next milestone direction (v1.1 semantic search, v2.0 binary encoding, or promote Phase 999.1 CI/CD from backlog)"
   ],
-  "uncommitted_files": [".planning/config.json"],
-  "next_action": "Run /gsd:discuss-phase 4 to gather context for Phase 4: Testing and Integration Harness",
-  "context_notes": "Phases 1-3 complete. 91 tests passing across 7 test files. Both mcpack() wrap mode and createMCPackServer() build mode are implemented, tested, and UAT-verified. Phase 4 adds comprehensive unit tests for all modules plus the Stripe MCP integration harness with token reduction comparison. Phase 5 is documentation and release prep. Two phases remain."
+  "v1_metrics": {
+    "phases": 7,
+    "plans": 10,
+    "tasks": 21,
+    "duration_days": 4,
+    "tests": 100,
+    "statement_coverage_pct": 99.56,
+    "stripe_token_reduction_pct": 80.7,
+    "src_loc": 946,
+    "test_loc": 1846
+  },
+  "backlog": [
+    {
+      "id": "999.1",
+      "name": "ci-cd-pipeline",
+      "summary": "GitHub Actions for lint/typecheck/vitest on PRs. Requirements TBD.",
+      "promote_via": "/gsd-review-backlog"
+    }
+  ],
+  "future_milestones": [
+    {"id": "v1.1", "summary": "Semantic/embedding search, tool usage analytics", "status": "idea, no PRD"},
+    {"id": "v2.0", "summary": "Binary encoding layer", "status": "idea, no PRD"}
+  ],
+  "next_action": "Board picks direction. Options: (a) /gsd-review-backlog to promote Phase 999.1 CI/CD, (b) /gsd-new-milestone to open v1.1, (c) leave idle.",
+  "context_notes": "v1.0 shipped 2026-03-23 to npm as @llvs/mcpack@1.0.0. Milestone artifacts archived under .planning/milestones/v1.0-*.md. PROJECT.md, ROADMAP.md, MILESTONES.md, RETROSPECTIVE.md all current. Codebase onboarded to Loom Labs agent kit on 2026-04-25 (commit 5b3ee8b)."
 }
