@@ -46,15 +46,16 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: (none active — v1.0 shipped 2026-03-23)
+### Sprint: (none active)
 **Type:** —
 **Priority:** —
 **PRD Status:** —
-**Harness:** GSD (v2 skills installed; `.planning/` artifacts present from v1.0)
+**Harness:** GSD v2
 
 ### Candidate Next Work
-- **Phase 999.1 (backlog):** CI/CD pipeline — GitHub Actions for lint/typecheck/vitest on PRs. Requirements TBD. Promote via `/gsd-review-backlog`.
+- **Phase 999.1 (backlog):** CI/CD pipeline — GitHub Actions for lint/typecheck/vitest + `npm audit` on PRs. Promote via `/gsd-review-backlog`.
 - **v1.1 milestone:** semantic search, tool usage analytics. No PRD yet.
+- **v2.0 milestone:** binary encoding layer. No PRD yet.
 
 ### Acceptance Criteria
 - [ ] [criterion]
@@ -65,6 +66,17 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ### Implementation Plan
 [CTO fills this with ordered task list and file references when a sprint starts]
+
+---
+
+## Recent Sprints (Log)
+
+### DEPS-1 — Dependabot vuln cleanup ✓ (2026-04-25)
+- **Type:** chore (security)
+- **Outcome:** All 6 transitive CVEs resolved via `npm audit fix` (no `--force`)
+- **Engineer:** delivered commit `08d6bfa`
+- **Result:** `npm audit` → 0 vulns | 100/100 tests pass | 99.56% statement coverage (baseline match) | `package.json` unchanged | 256 lines of `package-lock.json` churn, net -6
+- **Lesson:** Phase 999.1 (CI/CD) should add `npm audit` as a PR gate to catch these at submit time, not via post-push Dependabot
 
 ### Harness Integration
 Harness active: **GSD v2**. Drive work via `/gsd-new-milestone` → `/gsd-plan-phase` → `/gsd-execute-phase`. The Current Sprint section above feeds the harness as the high-level spec; GSD artifacts in `.planning/phases/<phase>/` are the detailed contract.
