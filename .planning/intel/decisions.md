@@ -24,7 +24,21 @@ Target milestone (board-confirmed): **v1.1.0**
 ### DEC-v11-03 — Adapter package pattern: model deps live outside core
 - source: `mcpack-prd-v1.1-gsd.md` (R3.1)
 - scope: `@llvs/mcpack-embeddings`
-- statement: `@xenova/transformers` and any other model deps live exclusively in `@llvs/mcpack-embeddings`. Core ships no embedding implementation.
+- statement: `@huggingface/transformers` and any other model deps live exclusively in `@llvs/mcpack-embeddings`. Core ships no embedding implementation.
+- board-locked: yes
+- clerical-correction (board 2026-04-25, post-research): PRD body cites `@xenova/transformers`. That npm package was renamed to `@huggingface/transformers` in October 2024 and the legacy name is frozen at v2.17.2 (May 2024). Successor is at v4.x, actively maintained by HuggingFace (same repo). API-compatible for our pipeline('feature-extraction', ...) usage. Board approved switch 2026-04-25 — no scope change, just current-name correction.
+
+### DEC-v11-03a — Phase 6 package layout: sibling directory under packages/
+- source: board decision 2026-04-25 (post-research, Phase 6 planning gate)
+- scope: repository layout
+- statement: `@llvs/mcpack-embeddings` lives at `packages/mcpack-embeddings/` as a sibling directory. No monorepo tooling (no npm/pnpm/yarn workspaces) in v1.1. Existing `src/` and root `package.json` are unchanged — `npm run build`, `npm test`, `npm run harness`, `npm run test:coverage` continue to work without script changes. Migrate to npm workspaces in v1.2 when `@llvs/mcpack-google` arrives as the third package.
+- rationale: Lowest-risk path for v1.1. Workspace tooling pays for itself at 3+ packages, not 2.
+- board-locked: yes (revisit at v1.2 milestone open)
+
+### DEC-v11-03b — Core package version bumps to 1.1.0 in Phase 6 (publish at Phase 10)
+- source: board decision 2026-04-25 (post-research, Phase 6 planning gate)
+- scope: `@llvs/mcpack` package.json version field
+- statement: Phase 6 bumps core `package.json` from `1.0.0` to `1.1.0`. This satisfies the adapter's peer-dep declaration (`@llvs/mcpack-embeddings` peer-deps `^1.1.0`) so local install/test resolves cleanly during phases 6–9. The actual `npm publish @llvs/mcpack@1.1.0` happens in Phase 10. Standard "version-in-development" pattern.
 - board-locked: yes
 
 ### DEC-v11-04 — ESM-only with NodeNext, TypeScript strict + verbatimModuleSyntax

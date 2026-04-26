@@ -8,7 +8,7 @@
 
 (none)
 
-### INFO (5)
+### INFO (6)
 
 [INFO] Board-resolved version collision between sibling PRDs
   Found: Both `.planning/inbox/mcpack-prd-v1.1-gsd.md` (§1, §Phase 5) and `.planning/inbox/mcpack-prd-v1.1-final.md` (§1 frontmatter "Version: 1.1.0", §4.2 example "version: '1.1.0'", §5.7 package.json "version: 1.1.0", §12 DoD "@llvs/mcpack@1.1.0", "@llvs/mcpack-google@1.1.0") claim version 1.1.0 for the @llvs/mcpack package and its release artifacts.
@@ -25,6 +25,10 @@
 [INFO] Auto-resolved: search-engine direction sequenced cleanly across milestones
   Found: `.planning/inbox/mcpack-prd-v1.1-gsd.md` §R1.6 + §R1.9 keep the v1.0 5-tier weighted keyword scorer in `src/search.ts` as the keyword leg of a hybrid (semantic + keyword) ranker, with default weights `semanticWeight: 0.7`, `keywordWeight: 0.3`. `.planning/inbox/mcpack-prd-v1.1-final.md` §3.4 + §5.4 propose REPLACING the v1.0 5-tier scorer with a deterministic weighted inverted index (TOOL_NAME=10, DESCRIPTION=5, PARAM_NAME=2) built at startup.
   Note: The two changes target the same module (`src/search.ts`) but in different milestones — board decision places the hybrid (5-tier-preserving) work in v1.1 and the inverted-index proposal in v1.2. Sequential resolution: v1.1 ships hybrid ranker with the v1.0 5-tier scorer untouched as the keyword leg (DEC-v11-13). v1.2 inherits that surface and may either (a) swap the keyword leg to the inverted index, (b) keep both side-by-side, or (c) leave the 5-tier scorer in place. The decision is explicitly **deferred to a v1.2 ADR before phase planning** — captured as REQ-v12-search-engine-direction in `intel/requirements.md` and DEC-v12-09 in `intel/decisions.md`. No contradiction at the v1.1 boundary; no synthesis-time pick required.
+
+[INFO] Clerical correction post-research: @xenova/transformers → @huggingface/transformers
+  Found: PRD body and synthesized intel originally cited `@xenova/transformers` as the v1.1 embedding library peer-dep (per `mcpack-prd-v1.1-gsd.md` §R1.3 and DEC-v11-03). Phase 6 researcher (2026-04-25) verified via npm registry that the package was renamed to `@huggingface/transformers` in October 2024. The legacy `@xenova/transformers` name is frozen at v2.17.2 (May 2024); the successor `@huggingface/transformers` is at v4.2.0 (April 2026), actively maintained by HuggingFace (same repository, same maintainer). API-compatible for MCPack's `pipeline('feature-extraction', ...)` usage.
+  Note: Board approved the switch 2026-04-25. No scope change — this is a clerical correction reflecting the current state of the npm registry. DEC-v11-03 updated to reflect the current package name. Two new sub-decisions captured for Phase 6 planning gate: DEC-v11-03a (sibling-directory package layout) and DEC-v11-03b (core version bump 1.0.0 → 1.1.0 in Phase 6).
 
 [INFO] Mutual cross-references between sibling PRDs (cycle present, not synthesis-blocking)
   Found: `.planning/inbox/mcpack-prd-v1.1-gsd.md` Non-Goals + cross_references reference the Partner Hub PRD (multi-source, OAuth, HTTP/SSE deferred to it). `.planning/inbox/mcpack-prd-v1.1-final.md` cross_references reference the Search & Observability PRD (semantic search deferred to it — note: this deferral was overridden by the board, see prior INFO entry). The cross-ref graph contains a length-2 cycle between the two PRDs.

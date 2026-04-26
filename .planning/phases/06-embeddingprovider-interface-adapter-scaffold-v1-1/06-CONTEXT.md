@@ -46,18 +46,37 @@ The phase is intentionally narrow because every later v1.1 phase depends on the 
 ### Adapter Package — `@llvs/mcpack-embeddings` (REQ-v11-mcpack-embeddings-package)
 - **DEC-v11-03 + DEC-BOARD-05:** All model dependencies live in `@llvs/mcpack-embeddings`. Core ships zero embedding implementation, zero model deps, zero loaders.
 - **Peer dependency:** `@llvs/mcpack ^1.1.0` (the sibling package this adapter plugs into).
-- **Runtime dependency:** `@xenova/transformers` (board pre-approved 2026-04-25). Confined to this package only.
-- **MiniLM** is the v1.1 default model. 384-dim float32 vectors. ~50MB model size — to be documented in the adapter README.
+- **Runtime dependency:** `@huggingface/transformers ^4.0.0` (board-approved 2026-04-25 — clerical correction from PRD-cited `@xenova/transformers` which has been frozen since May 2024). Confined to this package only.
+- **MiniLM** is the v1.1 default model. The de-facto choice is `Xenova/all-MiniLM-L6-v2` (384-dim float32 vectors, ~25 MB). The planner can confirm and lock the exact model identifier.
 - **Adapter exports a factory function** that returns an `EmbeddingProvider` (batch-in / vectors-out). Exact name/shape is the planner's call, but it MUST conform to the locked `EmbeddingProvider` type from core.
 - **No hosted adapter (OpenAI / Voyage) in v1.1.** OQ6 is decided: hosted adapters defer to v1.2.
 
-### Package Layout Decision (REQUIRES PLANNER FRAMING)
-v1.0 was a single-package repository. v1.1 adds a second package. The planner must pick ONE of:
-- **(A) Move to a monorepo** — workspaces or pnpm/turbo layout. Existing `src/` becomes `packages/mcpack/src/`. New `packages/mcpack-embeddings/`.
-- **(B) Keep two separate repos** — `MCPack/` stays as is, `mcpack-embeddings/` lives in a new repository. Higher friction for parallel development.
-- **(C) Sibling directory in same repo, no monorepo tooling** — `@llvs/mcpack` stays where it is; `mcpack-embeddings/` is a sibling directory with its own `package.json`, published independently.
+### Package Layout — LOCKED: Sibling Directory (DEC-v11-03a)
+**Board decision 2026-04-25:** `@llvs/mcpack-embeddings` lives at `packages/mcpack-embeddings/` as a sibling directory. **No monorepo tooling in v1.1** (no npm/pnpm/yarn workspaces).
 
-This is a structural choice the planner needs to surface and pick. The decision belongs in the plan, not in this CONTEXT — but the constraint is: **whichever layout the planner picks must NOT break the v1.0 build, test, harness, or docs pipeline**. Existing `npm run build`, `npm test`, `npm run harness`, `npm run test:coverage` must still work from the project root or have an obvious successor command documented.
+```
+MCPack/
+├── src/                            ← @llvs/mcpack source — UNCHANGED from v1.0
+├── test/                           ← @llvs/mcpack tests — UNCHANGED from v1.0
+├── package.json                    ← @llvs/mcpack — version bumps 1.0.0 → 1.1.0
+├── tsconfig.json                   ← unchanged
+├── vitest.config.ts                ← unchanged
+└── packages/
+    └── mcpack-embeddings/          ← NEW sibling
+        ├── src/
+        ├── test/
+        ├── package.json            ← @llvs/mcpack-embeddings @ 1.1.0
+        └── tsconfig.json           ← extends or mirrors root strict + NodeNext
+```
+
+**Why sibling directory (vs workspaces or separate repo):** Existing v1.0 npm scripts (`npm run build`, `npm test`, `npm run harness`, `npm run test:coverage`) all reference current `src/` and `test/` paths. Workspaces would force every script to be rewritten. Separate repo creates high friction for parallel development. Sibling-directory adds the new package with **zero changes to existing scripts** — the lowest-risk path for a feature milestone.
+
+**Migrate to npm workspaces in v1.2** when `@llvs/mcpack-google` arrives as the third package. That's when the workspace tooling overhead pays for itself.
+
+### Core Version Bump — LOCKED: 1.0.0 → 1.1.0 in Phase 6 (DEC-v11-03b)
+**Board decision 2026-04-25:** Phase 6 bumps `@llvs/mcpack`'s `package.json` version from `1.0.0` to `1.1.0`. This satisfies the adapter's `peerDependencies: { "@llvs/mcpack": "^1.1.0" }` declaration so local `npm install` and tests resolve cleanly during phases 6–9.
+
+**The version bump and the actual `npm publish` are SEPARATE OPERATIONS.** Phase 6 does the bump; Phase 10 does the publish. This is the standard "version-in-development" pattern — the repo's HEAD already says `1.1.0` while the work is in flight, and `npm publish` is what makes that real to the registry.
 
 ### Zero-Dep Core (REQ-v11-zero-core-deps + DEC-v11-02 + DEC-BOARD-04)
 - **`@llvs/mcpack` package.json shows zero new `dependencies` entries vs v1.0.**
