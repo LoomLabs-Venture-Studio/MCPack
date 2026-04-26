@@ -1,0 +1,40 @@
+{
+  "name": "@llvs/mcpack-embeddings",
+  "version": "1.1.0",
+  "description": "Local MiniLM embedding adapter for @llvs/mcpack",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --reporter=verbose",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "@llvs/mcpack": "^1.1.0"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.0"
+  },
+  "devDependencies": {
+    "@llvs/mcpack": "^1.1.0",
+    "@types/node": "^25.5.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "typescript": "~5.8.3",
+    "vitest": "^4.1.0"
+  }
+}
