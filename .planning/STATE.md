@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
 status: in-progress
-stopped_at: Phase 07 plans authored + verified (2/2 plans, plan-checker iter 2 PASSED); ready for /gsd-execute-phase 7
-last_updated: "2026-04-26T18:30:00.000Z"
+stopped_at: Phase 07 plans authored + verified (2 plans, plan-checker iter 2 PASSED, all 3 [BLOCKING] gates encoded with corrected forms — Gate 1 broadened, Gate 2 src-based)
+last_updated: "2026-04-26T21:41:44.655Z"
 progress:
   total_phases: 9
   completed_phases: 6
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
-**Current focus:** Phase 07 — semantic-index-build-pipeline-v1-1 (planned, ready to execute)
+**Current focus:** Phase 07 — semantic-index-build-pipeline-v1-1
 
 ## Current Position
 
-Phase: 07 (semantic-index-build-pipeline-v1-1) — PLANNED, ready to execute
-Plan: 0 of 2 executed (07-01 Wave 1, 07-02 Wave 2)
+Phase: 07 (semantic-index-build-pipeline-v1-1) — EXECUTING
+Plan: 1 of 2
 Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 Phase 06: SHIPPED 2026-04-26 — 11/11 verification dimensions PASS
 
@@ -132,6 +132,7 @@ Resume file: None
 **Next action when resuming:** `/gsd-execute-phase 7` to execute Phase 7 (Semantic Index Build Pipeline). Wave 1 (07-01) lands first — engine extension + helper file. Wave 2 (07-02) runs after — 17 tests across 7 describe groups.
 
 **Active phase artifacts (Phase 7):**
+
 - `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-CONTEXT.md`
 - `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-RESEARCH.md`
 - `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-VALIDATION.md`
