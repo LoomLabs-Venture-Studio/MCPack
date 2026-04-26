@@ -26,11 +26,11 @@
 **Board decisions:** DEC-BOARD-01 (v1.1 slot), DEC-BOARD-03 (semantic ships v1.1), DEC-BOARD-04 (zero-dep core), DEC-BOARD-05 (adapter pattern)
 **GA gate:** Phase 5 complete with all v1.1 Success Criteria passing (see REQUIREMENTS.md → Success Criteria — v1.1)
 
-- [ ] **Phase 1: EmbeddingProvider Interface + Adapter Scaffold** — Define `EmbeddingProvider` type, wire optional `embeddings` config, scaffold `@llvs/mcpack-embeddings` package with MiniLM adapter
-- [ ] **Phase 2: Semantic Index Build Pipeline** — Async, non-blocking startup index build; concatenated indexing string per tool; in-memory vector map
-- [ ] **Phase 3: Hybrid Ranking Query Path** — Query embedding + cosine similarity; hybrid score (0.7 semantic / 0.3 keyword default); role filter applied AFTER ranking
-- [ ] **Phase 4: Tool Usage Analytics** — `AnalyticsStore` (search/call/denial/miss events), `getAnalytics()` API on server handle, role-scoped queries, dead-tool detection
-- [ ] **Phase 5: Harness Verification, Coverage, Docs, npm publish** — ≥120 tests / ≥99% coverage, Stripe harness ≥80.7%, 50-query intent benchmark ≥15% recall, docs update, publish `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0`
+- [ ] **Phase 6: EmbeddingProvider Interface + Adapter Scaffold** — Define `EmbeddingProvider` type, wire optional `embeddings` config, scaffold `@llvs/mcpack-embeddings` package with MiniLM adapter
+- [ ] **Phase 7: Semantic Index Build Pipeline** — Async, non-blocking startup index build; concatenated indexing string per tool; in-memory vector map
+- [ ] **Phase 8: Hybrid Ranking Query Path** — Query embedding + cosine similarity; hybrid score (0.7 semantic / 0.3 keyword default); role filter applied AFTER ranking
+- [ ] **Phase 9: Tool Usage Analytics** — `AnalyticsStore` (search/call/denial/miss events), `getAnalytics()` API on server handle, role-scoped queries, dead-tool detection
+- [ ] **Phase 10: Harness Verification, Coverage, Docs, npm publish** — ≥120 tests / ≥99% coverage, Stripe harness ≥80.7%, 50-query intent benchmark ≥15% recall, docs update, publish `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0`
 
 ### v1.2 — Partner Hub (DEFERRED)
 
@@ -41,15 +41,15 @@
 **Non-goals re-evaluation flag:** PRD §9 non-goals were authored against the original v1.1 framing. Items needing explicit in-scope-vs-slip-to-v1.3 decisions before phase planning: WorkOS resolver, Auth0 resolver, audit log endpoint, rate limiting per role, per-project role scoping, token expiry/refresh automation. The "semantic search deferred" non-goal is stale (board moved it to v1.1) and should be dropped.
 **GA gate:** PRD §12 Definition of Done with versions corrected to 1.2.0.
 
-- [ ] **Phase 1: Multi-Source Composition + Collision Handling + Routing** — `sources[]` config, stdio child spawn, merged index, `source.toolname` collision prefixing, namespace-wildcard role filtering, dispatch routing
-- [ ] **Phase 2: `resolveRole` Hook + `staticResolver` in Core + Transport-Boundary Auth Extraction** — Provider-agnostic `resolveRole(session)` extension point, base64-payload-only `staticResolver`, auth runs at transport BEFORE source composition
-- [ ] **Phase 3: HTTP/SSE Transport + Graceful Shutdown** — `transport: { type: 'sse', port?: 3000, path?: '/sse' }`, `Authorization: Bearer` header extraction, SIGTERM/2s/SIGKILL shutdown lifecycle
-- [ ] **Phase 4: `@llvs/mcpack-google` Package + Google JWKS Verification + Railway Auth Page** — `googleResolver({ roles, fallbackRole, audience })`, JWKS cache + rotation refresh, lightweight Express/Hono auth page (`/auth`, `/auth/callback`)
-- [ ] **Phase 5: Tests, Docs, Harness, npm Publish** — Multi-source/collision/SSE/Google JWT/static resolver/shutdown test suites, all v1.0 tests pass unmodified, docs update (multi-source + Google OAuth + gateway examples), README repositioning (RBAC + gateway primary, token reduction secondary), publish `@llvs/mcpack@1.2.0` and `@llvs/mcpack-google@1.2.0`
+- [ ] **Phase 11: Multi-Source Composition + Collision Handling + Routing** — `sources[]` config, stdio child spawn, merged index, `source.toolname` collision prefixing, namespace-wildcard role filtering, dispatch routing
+- [ ] **Phase 12: `resolveRole` Hook + `staticResolver` in Core + Transport-Boundary Auth Extraction** — Provider-agnostic `resolveRole(session)` extension point, base64-payload-only `staticResolver`, auth runs at transport BEFORE source composition
+- [ ] **Phase 13: HTTP/SSE Transport + Graceful Shutdown** — `transport: { type: 'sse', port?: 3000, path?: '/sse' }`, `Authorization: Bearer` header extraction, SIGTERM/2s/SIGKILL shutdown lifecycle
+- [ ] **Phase 14: `@llvs/mcpack-google` Package + Google JWKS Verification + Railway Auth Page** — `googleResolver({ roles, fallbackRole, audience })`, JWKS cache + rotation refresh, lightweight Express/Hono auth page (`/auth`, `/auth/callback`)
+- [ ] **Phase 15: Tests, Docs, Harness, npm Publish** — Multi-source/collision/SSE/Google JWT/static resolver/shutdown test suites, all v1.0 tests pass unmodified, docs update (multi-source + Google OAuth + gateway examples), README repositioning (RBAC + gateway primary, token reduction secondary), publish `@llvs/mcpack@1.2.0` and `@llvs/mcpack-google@1.2.0`
 
 ## Phase Details
 
-### Phase 1 (v1.1): EmbeddingProvider Interface + Adapter Scaffold
+### Phase 6: EmbeddingProvider Interface + Adapter Scaffold (v1.1)
 **Goal**: Provide a zero-core-dep semantic-search hook plus a scaffolded sibling adapter package, so v1.0 deployments can opt in without changing core.
 **Depends on**: v1.0 (shipped)
 **Requirements**: REQ-v11-semantic-provider-interface, REQ-v11-embeddings-optional-config, REQ-v11-mcpack-embeddings-package, REQ-v11-zero-core-deps, REQ-v11-public-api-lock, REQ-v11-esm-only
@@ -61,9 +61,9 @@
   5. Existing v1.0 calling code compiles unmodified against new types
 **Plans**: TBD
 
-### Phase 2 (v1.1): Semantic Index Build Pipeline
+### Phase 7: Semantic Index Build Pipeline (v1.1)
 **Goal**: Build a non-blocking semantic index at startup so semantic queries have vectors available without any v1.1-added latency on `tools/list`.
-**Depends on**: Phase 1
+**Depends on**: Phase 6
 **Requirements**: REQ-v11-semantic-index-build, REQ-v11-tools-list-no-regression, REQ-v11-perf-budget
 **Success Criteria** (what must be TRUE):
   1. When `EmbeddingProvider` is configured, index build runs async at startup with concatenated `name + description + param-names` per tool, single-batch call
@@ -72,9 +72,9 @@
   4. 50-tool index builds within 5s on commodity hardware with local MiniLM, memory ≤ 2MB
 **Plans**: TBD
 
-### Phase 3 (v1.1): Hybrid Ranking Query Path
+### Phase 8: Hybrid Ranking Query Path (v1.1)
 **Goal**: Combine semantic and keyword scoring into a single ranked output that preserves v1.0 keyword behavior when no embeddings are configured.
-**Depends on**: Phase 2
+**Depends on**: Phase 7
 **Requirements**: REQ-v11-semantic-query-path, REQ-v11-hybrid-ranking, REQ-v11-role-filter-after-rank, REQ-v11-backward-compat, REQ-v11-session-invariants
 **Success Criteria** (what must be TRUE):
   1. Per-query embedding produces semantic score in [-1, 1] via cosine similarity (unit-tested utility)
@@ -84,9 +84,9 @@
   5. Schemas-loaded `{loaded: true}` references and `"Unknown tool: {name}"` denial behavior unchanged
 **Plans**: TBD
 
-### Phase 4 (v1.1): Tool Usage Analytics
+### Phase 9: Tool Usage Analytics (v1.1)
 **Goal**: Give operators in-process visibility into search/call/denial/miss patterns and dead tools without exposing analytics over the MCP wire.
-**Depends on**: Phase 3
+**Depends on**: Phase 8
 **Requirements**: REQ-v11-analytics-events, REQ-v11-analytics-storage, REQ-v11-analytics-privacy, REQ-v11-analytics-api, REQ-v11-analytics-role-scoped-query, REQ-v11-analytics-rbac-integrity, REQ-v11-dead-tool-detection
 **Success Criteria** (what must be TRUE):
   1. `AnalyticsStore` captures four event types — `search`, `call`, `denial`, `miss` — at the correct decision points; counts match a known call sequence in integration test
@@ -97,9 +97,9 @@
   6. `summary.byRole[role].deadTools` lists tools that role can see but has zero `call` events for in the current session
 **Plans**: TBD
 
-### Phase 5 (v1.1): Harness, Coverage, Docs, npm Publish
+### Phase 10: Harness, Coverage, Docs, npm Publish (v1.1)
 **Goal**: Ship v1.1 with measurable regression-free upgrades and the dual-package release.
-**Depends on**: Phase 4
+**Depends on**: Phase 9
 **Requirements**: REQ-v11-test-coverage-floor, REQ-v11-perf-budget, REQ-v11-tools-list-no-regression
 **Success Criteria** (what must be TRUE):
   1. `vitest run` reports ≥120 tests at ≥99% statement coverage
@@ -110,7 +110,7 @@
   6. `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0` published to npm; existing v1.0 deployments upgrade with zero config changes
 **Plans**: TBD
 
-### Phase 1 (v1.2 — DEFERRED): Multi-Source Composition + Collision Handling + Routing
+### Phase 11: Multi-Source Composition + Collision Handling + Routing (v1.2 — DEFERRED)
 **Goal**: Compose multiple upstream MCPs behind one MCPack gateway with deterministic naming and dispatch.
 **Depends on**: v1.1 ship + accepted v1.2 ADR for REQ-v12-search-engine-direction
 **Requirements**: REQ-v12-sources-array, REQ-v12-collision-prefixing, REQ-v12-call-routing, REQ-v12-namespace-wildcard-roles, REQ-v12-public-api-unchanged, REQ-v12-zero-core-deps
@@ -122,9 +122,9 @@
   5. v1.0 + v1.1 public API surface byte-identical; existing tests pass unmodified
 **Plans**: TBD
 
-### Phase 2 (v1.2 — DEFERRED): resolveRole Hook + staticResolver + Transport-Boundary Auth
+### Phase 12: resolveRole Hook + staticResolver + Transport-Boundary Auth (v1.2 — DEFERRED)
 **Goal**: Provider-agnostic dynamic role resolution that runs at the transport layer before source composition (no circular dependency).
-**Depends on**: Phase 1 (v1.2)
+**Depends on**: Phase 11
 **Requirements**: REQ-v12-resolve-role-hook, REQ-v12-static-resolver
 **Success Criteria** (what must be TRUE):
   1. `resolveRole(session) → string | Promise<string>` invoked once per connection, role attached to session BEFORE source composition runs (test asserts ordering)
@@ -133,9 +133,9 @@
   4. Auth provider is never a source — circular dependency rejected by design
 **Plans**: TBD
 
-### Phase 3 (v1.2 — DEFERRED): HTTP/SSE Transport + Graceful Shutdown
+### Phase 13: HTTP/SSE Transport + Graceful Shutdown (v1.2 — DEFERRED)
 **Goal**: Add a remote-callable transport so partner Claude Code clients can connect over HTTPS, with a clean shutdown path for stdio children.
-**Depends on**: Phase 2 (v1.2)
+**Depends on**: Phase 12
 **Requirements**: REQ-v12-sse-transport, REQ-v12-bearer-extraction, REQ-v12-graceful-shutdown
 **Success Criteria** (what must be TRUE):
   1. `transport: { type: 'sse', port?: 3000, path?: '/sse' }` starts SSE server on configured port; stdio remains valid
@@ -144,9 +144,9 @@
   4. Shutdown flow: stop accepting connections → SIGTERM stdio children → wait up to 2s/process → SIGKILL stragglers → close SSE server (test asserts clean exit ≤ 2s, forced exit ≤ 4s)
 **Plans**: TBD
 
-### Phase 4 (v1.2 — DEFERRED): @llvs/mcpack-google Package + JWKS Verification + Auth Page
+### Phase 14: @llvs/mcpack-google Package + JWKS Verification + Auth Page (v1.2 — DEFERRED)
 **Goal**: Ship the first real auth resolver for venture-studio partners using existing Google accounts.
-**Depends on**: Phase 3 (v1.2)
+**Depends on**: Phase 13
 **Requirements**: REQ-v12-google-resolver-package
 **Success Criteria** (what must be TRUE):
   1. `@llvs/mcpack-google@1.2.0` peer-depends on `@llvs/mcpack ^1.2.0`, runtime depends on `google-auth-library ^9.0.0`; core package.json gains zero new deps
@@ -155,9 +155,9 @@
   4. Lightweight Express/Hono auth page deployed on Railway with `/auth` and `/auth/callback` routes — partner copies JWT and pastes into Claude Code config
 **Plans**: TBD
 
-### Phase 5 (v1.2 — DEFERRED): Tests, Docs, Harness, npm Publish at 1.2.0
+### Phase 15: Tests, Docs, Harness, npm Publish at 1.2.0 (v1.2 — DEFERRED)
 **Goal**: Close the v1.2 milestone with the full test matrix, docs repositioning, and the dual-package release.
-**Depends on**: Phase 4 (v1.2)
+**Depends on**: Phase 14
 **Requirements**: REQ-v12-all-v10-tests-pass, REQ-v12-new-test-suite, REQ-v12-publish-versions
 **Success Criteria** (what must be TRUE):
   1. All v1.0 tests pass unmodified (vitest run with zero edits to v1.0 test files); all v1.1 tests pass unmodified

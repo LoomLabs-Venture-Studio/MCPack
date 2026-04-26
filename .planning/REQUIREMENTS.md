@@ -213,28 +213,28 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REQ-v11-semantic-provider-interface | v1.1 Phase 1 | Pending |
-| REQ-v11-embeddings-optional-config | v1.1 Phase 1 | Pending |
-| REQ-v11-mcpack-embeddings-package | v1.1 Phase 1 | Pending |
-| REQ-v11-zero-core-deps | v1.1 Phase 1 | Pending |
-| REQ-v11-public-api-lock | v1.1 Phase 1 | Pending |
-| REQ-v11-esm-only | v1.1 Phase 1 | Pending |
-| REQ-v11-semantic-index-build | v1.1 Phase 2 | Pending |
-| REQ-v11-tools-list-no-regression | v1.1 Phase 2 | Pending |
-| REQ-v11-perf-budget | v1.1 Phase 2 | Pending |
-| REQ-v11-semantic-query-path | v1.1 Phase 3 | Pending |
-| REQ-v11-hybrid-ranking | v1.1 Phase 3 | Pending |
-| REQ-v11-role-filter-after-rank | v1.1 Phase 3 | Pending |
-| REQ-v11-backward-compat | v1.1 Phase 3 | Pending |
-| REQ-v11-session-invariants | v1.1 Phase 3 | Pending |
-| REQ-v11-analytics-events | v1.1 Phase 4 | Pending |
-| REQ-v11-analytics-storage | v1.1 Phase 4 | Pending |
-| REQ-v11-analytics-privacy | v1.1 Phase 4 | Pending |
-| REQ-v11-analytics-api | v1.1 Phase 4 | Pending |
-| REQ-v11-analytics-role-scoped-query | v1.1 Phase 4 | Pending |
-| REQ-v11-analytics-rbac-integrity | v1.1 Phase 4 | Pending |
-| REQ-v11-dead-tool-detection | v1.1 Phase 4 | Pending |
-| REQ-v11-test-coverage-floor | v1.1 Phase 5 | Pending |
+| REQ-v11-semantic-provider-interface | v1.1 Phase 6 | Pending |
+| REQ-v11-embeddings-optional-config | v1.1 Phase 6 | Pending |
+| REQ-v11-mcpack-embeddings-package | v1.1 Phase 6 | Pending |
+| REQ-v11-zero-core-deps | v1.1 Phase 6 | Pending |
+| REQ-v11-public-api-lock | v1.1 Phase 6 | Pending |
+| REQ-v11-esm-only | v1.1 Phase 6 | Pending |
+| REQ-v11-semantic-index-build | v1.1 Phase 7 | Pending |
+| REQ-v11-tools-list-no-regression | v1.1 Phase 7 | Pending |
+| REQ-v11-perf-budget | v1.1 Phase 7 | Pending |
+| REQ-v11-semantic-query-path | v1.1 Phase 8 | Pending |
+| REQ-v11-hybrid-ranking | v1.1 Phase 8 | Pending |
+| REQ-v11-role-filter-after-rank | v1.1 Phase 8 | Pending |
+| REQ-v11-backward-compat | v1.1 Phase 8 | Pending |
+| REQ-v11-session-invariants | v1.1 Phase 8 | Pending |
+| REQ-v11-analytics-events | v1.1 Phase 9 | Pending |
+| REQ-v11-analytics-storage | v1.1 Phase 9 | Pending |
+| REQ-v11-analytics-privacy | v1.1 Phase 9 | Pending |
+| REQ-v11-analytics-api | v1.1 Phase 9 | Pending |
+| REQ-v11-analytics-role-scoped-query | v1.1 Phase 9 | Pending |
+| REQ-v11-analytics-rbac-integrity | v1.1 Phase 9 | Pending |
+| REQ-v11-dead-tool-detection | v1.1 Phase 9 | Pending |
+| REQ-v11-test-coverage-floor | v1.1 Phase 10 | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total / mapped to phases: 26 / unmapped: 0

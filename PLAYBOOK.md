@@ -76,12 +76,12 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 1. Run `/gsd-ingest-docs` — synthesizer classifies both PRDs, detects v1.1.0 collision
 2. Review `INGEST-CONFLICTS.md`; confirm PRD B → v1.1, PRD A → v1.2 holds
 3. `/gsd-new-milestone` to open v1.1 with PRD B as the source of truth
-4. Phase plan per PRD B §"Phase Breakdown":
-   - Phase 1: `EmbeddingProvider` interface + `@llvs/mcpack-embeddings` adapter scaffold
-   - Phase 2: Semantic index build pipeline (async, non-blocking)
-   - Phase 3: Hybrid ranking query path
-   - Phase 4: Tool usage analytics (`AnalyticsStore` + `getAnalytics()`)
-   - Phase 5: Harness verification, ≥120 tests at ≥99% coverage, docs, npm publish
+4. Phase plan per PRD B §"Phase Breakdown" (numbered globally, continuing from v1.0's 1–5.1):
+   - Phase 6: `EmbeddingProvider` interface + `@llvs/mcpack-embeddings` adapter scaffold
+   - Phase 7: Semantic index build pipeline (async, non-blocking)
+   - Phase 8: Hybrid ranking query path
+   - Phase 9: Tool usage analytics (`AnalyticsStore` + `getAnalytics()`)
+   - Phase 10: Harness verification, ≥120 tests at ≥99% coverage, docs, npm publish
 5. Per-phase delegation to engineer via `/gsd-execute-phase`
 
 ---
