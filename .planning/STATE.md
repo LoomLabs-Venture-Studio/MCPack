@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
 status: planning
-stopped_at: Completed 06-01-PLAN.md (plan 1 of 2 in Phase 06)
-last_updated: "2026-04-26T16:19:45.048Z"
+stopped_at: Completed 06-02-PLAN.md (plan 2 of 2 in Phase 06)
+last_updated: "2026-04-26T16:48:30.907Z"
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 100
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.
 | Phase 05 P01 | 1 | 1min | 2 tasks, 2 files |
 | Phase 05 P02 | 1 | 1min | 2 tasks, 3 files |
 | Phase 06 P01 | 9min | 2 tasks | 4 files |
+| Phase 06 P02 | 12min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,11 @@ Full intel: `.planning/intel/decisions.md` (33 decisions); board-pre-resolved co
 - [Phase ?]: [Phase 06-01]: MCPackConfig.embeddings is optional; when omitted, search code path byte-identical to v1.0 (DEC-v11-02 / DEC-BOARD-04)
 - [Phase ?]: [Phase 06-01]: Core version bumped 1.0.0 -> 1.1.0 (DEC-v11-03b); npm publish remains a Phase 10 concern
 - [Phase ?]: [Phase 06-01]: JSDoc comment on EmbeddingProvider rewritten to reference 'sibling adapter package' instead of literal name to honor static-grep adapter-isolation gate
+- [Phase ?]: [Phase 06-02]: Sibling-package layout at packages/mcpack-embeddings/ honored (DEC-v11-03a) — no monorepo tooling, no workspaces field
+- [Phase ?]: [Phase 06-02]: Adapter dep is @huggingface/transformers ^4.0.0 (DEC-v11-03 clerical-correction) — NOT @xenova/transformers
+- [Phase ?]: [Phase 06-02]: Adapter does NOT re-export EmbeddingProvider (Pitfall 1) — consumers import the type from @llvs/mcpack core only
+- [Phase ?]: [Phase 06-02]: Closure-scoped pipeline singleton (research Pattern 2 / Pitfall 2) — extractor cache lives inside factory return, NOT at module scope
+- [Phase ?]: [Phase 06-02]: Local dependency resolution via npm link (NOT npm install) until Phase 10 publishes @llvs/mcpack@1.1.0 to the registry
 
 ### Pending Todos
 
@@ -117,8 +123,8 @@ None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) ca
 
 ## Session Continuity
 
-Last session: 2026-04-26T16:19:45.043Z
-Stopped at: Completed 06-01-PLAN.md (plan 1 of 2 in Phase 06)
+Last session: 2026-04-26T16:48:30.903Z
+Stopped at: Completed 06-02-PLAN.md (plan 2 of 2 in Phase 06)
 Resume file: None
 
 **Next action when resuming:** `/gsd-plan-phase 1` to start v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold).
