@@ -77,8 +77,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Engine build pipeline: extend MCPackEngine with private semantic index state + buildSemanticIndex orchestrator + isIndexReady(); new sibling helper src/semantic-index-builder.ts
-- [ ] 07-02-PLAN.md — Test coverage: new test/semantic-index-build.test.ts (16 tests across 7 groups: kickoff, indexing strings, storage, non-blocking constructor, fallback, build failure + RBAC invariant, perf bounds, regression)
+- [x] 07-01-PLAN.md — Engine build pipeline: extend MCPackEngine with private semantic index state + buildSemanticIndex orchestrator + isIndexReady(); new sibling helper src/semantic-index-builder.ts
+- [x] 07-02-PLAN.md — Test coverage: new test/semantic-index-build.test.ts (16 tests across 7 groups: kickoff, indexing strings, storage, non-blocking constructor, fallback, build failure + RBAC invariant, perf bounds, regression)
 
 ### Phase 8: Hybrid Ranking Query Path (v1.1)
 **Goal**: Combine semantic and keyword scoring into a single ranked output that preserves v1.0 keyword behavior when no embeddings are configured.
