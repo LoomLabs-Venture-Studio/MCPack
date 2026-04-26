@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: between-milestones
-status: shipped
-stopped_at: v1.0 milestone complete (2026-03-23)
+milestone: v1.1
+milestone_name: search-and-observability
+status: planning
+stopped_at: post-ingest, ready for /gsd-plan-phase 1
 last_updated: "2026-04-25T00:00:00.000Z"
 progress:
-  total_phases: 7
+  total_phases: 12
   completed_phases: 7
   total_plans: 10
   completed_plans: 10
@@ -16,20 +16,20 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-23)
+See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
-**Current focus:** None — v1.0 shipped, awaiting next milestone selection.
+**Current focus:** v1.1 Search & Observability — semantic search hook + analytics. PRD ingested 2026-04-25.
 
 ## Current Position
 
-Phase: none
+Phase: v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold) — not yet planned
 Plan: none
-Active milestone: none (v1.0 shipped 2026-03-23 as `@llvs/mcpack@1.0.0`)
+Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 
 ## Performance Metrics
 
-**v1.0 milestone summary:**
+**v1.0 milestone summary (historical):**
 
 - 7 phases, 10 plans, 21 tasks across 4 days (2026-03-19 → 2026-03-23)
 - 100 tests, 99.56% statement coverage
@@ -56,7 +56,7 @@ Active milestone: none (v1.0 shipped 2026-03-23 as `@llvs/mcpack@1.0.0`)
 
 ### Decisions
 
-Decisions are logged in PROJECT.md "Key Decisions" table. v1.0 phase-level decisions:
+Decisions are logged in PROJECT.md "Key Decisions" table. v1.0 phase-level decisions (historical):
 
 - [Roadmap]: Handler replacement over proxy pattern — use `setRequestHandler()` to intercept tools/list and tools/call
 - [Roadmap]: Keyword search only for v1 — semantic search deferred to v1.1
@@ -73,13 +73,31 @@ Decisions are logged in PROJECT.md "Key Decisions" table. v1.0 phase-level decis
 - [Phase 05]: Lean README structure with no badges, logos, or contributing section
 - [Phase 05]: Copy README.md to docs/index.md (not symlink) for CI and MkDocs compatibility
 
+v1.1 + v1.2 ingest decisions (2026-04-25, board-locked):
+
+- DEC-BOARD-01: v1.1 slot = Search & Observability PRD
+- DEC-BOARD-02: v1.2 slot = Partner Hub PRD (version override 1.1.0 → 1.2.0)
+- DEC-BOARD-03: Semantic search ships in v1.1
+- DEC-BOARD-04: Core stays zero-dep through both milestones
+- DEC-BOARD-05: Adapter package pattern is the v1.1+ contract
+
+Full intel: `.planning/intel/decisions.md` (33 decisions); board-pre-resolved conflicts in `.planning/INGEST-CONFLICTS.md` (0 BLOCKERS / 0 WARNINGS / 5 INFO).
+
 ### Pending Todos
 
-None.
+- v1.1 Phase 1 plan generation: `/gsd-plan-phase 1`
+- v1.1 Open Questions OQ1–OQ6 surface in phase planning (see `.planning/intel/requirements.md`):
+  - OQ1: `getAnalytics()` flat on handle vs separate `analytics` property
+  - OQ2: Hybrid weights configurable per-query vs config-only
+  - OQ3: Index rebuild on `listChanged` (defer to v1.2)
+  - OQ4: 50-query intent benchmark source (Stripe / synthetic / community) — pick before Phase 5
+  - OQ5: Denial events record tool name even for operators — confirm in Phase 4
+  - OQ6: `@llvs/mcpack-embeddings` ship hosted adapter (OpenAI/Voyage) in v1.1 or defer — defer to v1.2
+- v1.2 (DEFERRED): author search-engine-direction ADR before Phase 1 plan; resolve PRD §9 non-goals re-evaluation (WorkOS, Auth0, audit log, rate limiting, per-project scoping, token expiry/refresh)
 
 ### Blockers/Concerns
 
-None. v1.0 shipped clean. Retrospective lessons for next milestone (`.planning/RETROSPECTIVE.md`):
+None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) carry forward:
 
 - Verify MCP SDK env var conventions up front before harness work
 - Audit peer deps against actual imports before publishing
@@ -87,15 +105,13 @@ None. v1.0 shipped clean. Retrospective lessons for next milestone (`.planning/R
 ### Backlog & Roadmap
 
 - **Phase 999.1 (backlog):** GitHub Actions CI/CD pipeline — lint/typecheck/vitest on PRs. Requirements TBD. Promote via `/gsd-review-backlog`.
-- **v1.1 milestone (idea):** Semantic/embedding search, tool usage analytics. No PRD yet.
+- **v1.2 milestone:** PRD ingested, deferred until v1.1 ships. Partner Hub (multi-source + Google OAuth + HTTP/SSE + `@llvs/mcpack-google`). 16 requirements / 5 phases. Pre-Phase-1 ADR required for search-engine direction.
 - **v2.0 milestone (idea):** Binary encoding layer. No PRD yet.
 
 ## Session Continuity
 
-Last session: 2026-04-25 (post-milestone state refresh)
-Stopped at: v1.0 milestone complete — no active phase or plan
+Last session: 2026-04-25 (v1.1 + v1.2 PRD ingest, roadmap merge applied)
+Stopped at: post-ingest, ready to start v1.1 Phase 1 planning
 Resume file: None
 
-**Next action when resuming:** Pick a milestone direction with the board.
-- For CI hygiene: `/gsd-review-backlog` to promote Phase 999.1
-- For new feature work: `/gsd-new-milestone` to open v1.1
+**Next action when resuming:** `/gsd-plan-phase 1` to start v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold).

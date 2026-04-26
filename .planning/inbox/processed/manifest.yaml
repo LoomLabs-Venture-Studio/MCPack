@@ -1,0 +1,17 @@
+# Ingest manifest for /gsd-ingest-docs
+# Generated 2026-04-25 — board-approved v1.1 (Search & Observability) priority
+#
+# Both docs are PRDs. Default precedence (ADR > SPEC > PRD > DOC) ties them at
+# the type level; the board decision (2026-04-25) breaks the tie:
+#   - mcpack-prd-v1.1-gsd.md  → primary, target milestone v1.1
+#   - mcpack-prd-v1.1-final.md → deferred, target milestone v1.2 (Partner Hub)
+#
+# Lower precedence value = higher priority in synthesis.
+
+docs:
+  - path: .planning/inbox/mcpack-prd-v1.1-gsd.md
+    type: PRD
+    precedence: 0   # v1.1 — board-approved primary
+  - path: .planning/inbox/mcpack-prd-v1.1-final.md
+    type: PRD
+    precedence: 1   # v1.2 — deferred Partner Hub

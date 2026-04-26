@@ -1,0 +1,149 @@
+{
+  "source_path": "/Users/zaid/Projects/MCPack/.planning/inbox/mcpack-prd-v1.1-gsd.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "PRD: MCPack v1.1",
+  "summary": "v1.1 milestone PRD adding semantic search via optional EmbeddingProvider hook and tool-usage analytics via getAnalytics(), preserving all v1.0 invariants.",
+  "target_milestone": "v1.1",
+  "scope_summary": "MCPack v1.1 (Search & Observability) introduces two additive capabilities: (1) optional semantic search via a minimal EmbeddingProvider interface with hybrid keyword+semantic ranking, plus a separate @llvs/mcpack-embeddings adapter package for local MiniLM; and (2) in-memory, role-scoped tool-usage analytics surfaced via a getAnalytics() method on the server handle. Both features are strictly additive — public API signatures remain byte-for-byte identical, the core package adds zero new runtime dependencies, ESM-only output is preserved, opaque denial semantics are maintained, and v1.0 keyword-only behavior is the exact fallback when no embeddings are configured.",
+  "scope": [
+    "semantic search",
+    "EmbeddingProvider interface",
+    "@llvs/mcpack-embeddings adapter package",
+    "MiniLM local embeddings",
+    "hybrid ranking (semantic + keyword)",
+    "cosine similarity scoring",
+    "async semantic index build",
+    "tool usage analytics",
+    "AnalyticsStore",
+    "getAnalytics() server handle method",
+    "role-scoped analytics",
+    "dead tool detection",
+    "RBAC integrity for analytics",
+    "MCPackConfig.embeddings",
+    "MCPackConfig.analytics"
+  ],
+  "locked_decisions": [
+    "Public API (mcpack(), createMCPackServer() signatures) is byte-for-byte identical to v1.0 — zero breaking changes",
+    "@llvs/mcpack core package adds zero new runtime dependencies in v1.1",
+    "Core peer dependency remains @modelcontextprotocol/sdk only",
+    "v1.1 remains ESM-only with NodeNext module resolution, TypeScript strict + verbatimModuleSyntax — no CommonJS output",
+    "MCPack core ships no embedding implementation — EmbeddingProvider is a user-supplied hook",
+    "@xenova/transformers and any model dependencies live exclusively in @llvs/mcpack-embeddings, never in core",
+    "google-auth-library and any auth dependencies live in resolver packages, never in core",
+    "Role filtering is applied after ranking, not before — preserves opaque denial invariant",
+    "Out-of-role tools/call still returns 'Unknown tool: {name}' — opaque denial preserved",
+    "tools/list always returns exactly one tool (search_tools) with no v1.1-added latency",
+    "Schemas loaded once per session still return as {loaded: true} references — session invariant preserved",
+    "All analytics data is in-memory only — no disk writes, no network egress, resets on process restart",
+    "Analytics for a given role must never expose the existence of tools outside that role",
+    "getAnalytics() is on the server handle, not exposed as an MCP tool — never callable by agents",
+    "Stripe MCP harness must show at least 80.7% aggregate token reduction with hybrid ranking — no regression vs v1.0",
+    "When no EmbeddingProvider is configured, search path is identical to v1.0 at the code level — no performance regression",
+    "Test count must reach at least 120 with at least 99% statement coverage",
+    "Default hybrid weights: semanticWeight 0.7, keywordWeight 0.3"
+  ],
+  "requirements": [
+    "R1.1",
+    "R1.2",
+    "R1.3",
+    "R1.4",
+    "R1.5",
+    "R1.6",
+    "R1.7",
+    "R1.8",
+    "R1.9",
+    "R2.1",
+    "R2.2",
+    "R2.3",
+    "R2.4",
+    "R2.5",
+    "R2.6",
+    "R2.7",
+    "R3.1",
+    "R3.2",
+    "R3.3",
+    "R3.4",
+    "R3.5",
+    "R3.6"
+  ],
+  "success_criteria": [
+    "Test count is at least 120 with at least 99% statement coverage",
+    "Stripe MCP harness shows at least 80.7% aggregate token reduction with hybrid ranking enabled (no regression vs v1.0)",
+    "Semantic search recall improves at least 15% on the held-out 50-query intent benchmark vs v1.0 keyword baseline when MiniLM adapter is configured",
+    "search_tools p99 latency with local MiniLM adapter is at most 50ms above v1.0 baseline on commodity hardware",
+    "Semantic index build completes within 5 seconds for a 50-tool server using local MiniLM adapter",
+    "mcpack() and createMCPackServer() signatures are byte-for-byte identical to v1.0",
+    "@llvs/mcpack package.json lists zero new runtime dependencies",
+    "getAnalytics() returns accurate event counts matching a known call sequence in integration tests",
+    "Analytics for a given role contain zero references to tools outside that role",
+    "getAnalytics() is not callable via any MCP tool — verified by integration test attempting to call it as an agent"
+  ],
+  "non_goals": [
+    "Binary encoding or MessagePack layer (v2.0)",
+    "Persistent session storage — v1.1 stays fully in-memory (v2.0)",
+    "Standalone proxy server process — MCPack remains a library (v2.0)",
+    "OTEL exporter or structured log output for analytics (v1.2)",
+    "File export of analytics data (v1.2)",
+    "Webhook or callback hook for analytics events (v1.2)",
+    "Multi-source / multi-MCP gateway mode (tracked separately in multi-source PRD)",
+    "Google OAuth or any auth resolver (tracked separately in partner hub PRD)",
+    "HTTP/SSE transport (tracked separately in partner hub PRD)",
+    "Shipping a default embedding model inside @llvs/mcpack core",
+    "CommonJS build output",
+    "Analytics persistence across process restarts"
+  ],
+  "open_questions": [
+    "Should getAnalytics() be on the server handle returned by mcpack() / createMCPackServer(), or on a separate analytics property of that handle? Separate property is cleaner for tree-shaking; flat handle is simpler.",
+    "Should hybrid ranking weights be configurable per-query or only at config time? Per-query is more flexible but adds API surface.",
+    "Should the semantic index be rebuilt if the upstream server's tool list changes at runtime (via listChanged notification)? v1.0 builds the keyword index once at startup — semantic could follow the same pattern and defer dynamic rebuild to v1.2.",
+    "What is the target benchmark for the 50-query intent recall test — built from Stripe MCP, a generic synthetic set, or contributed by the community?",
+    "Should denial events in analytics record the denied tool name at all, even for operators? Operator queries with no role filter would see all denial events including tool names — intentional for debugging but should be explicitly decided.",
+    "Should @llvs/mcpack-embeddings ship a hosted API adapter (OpenAI, Voyage) in addition to the local MiniLM adapter for v1.1, or defer all hosted adapters to v1.2?"
+  ],
+  "cross_references": [
+    "partner hub PRD (sibling) — referenced re: Google OAuth / auth resolver scope",
+    "partner hub PRD (sibling) — referenced re: HTTP/SSE transport scope",
+    "multi-source PRD — referenced re: multi-MCP gateway mode scope"
+  ],
+  "cross_refs": [
+    "partner hub PRD",
+    "multi-source PRD"
+  ],
+  "risks": [
+    {
+      "risk": "@xenova/transformers + MiniLM model weight adds significant install size to @llvs/mcpack-embeddings",
+      "impact": "Medium — operators installing the adapter package see a large download",
+      "mitigation": "Keep adapter in separate package so core users are unaffected. Document model size clearly in adapter README."
+    },
+    {
+      "risk": "Embedding query latency exceeds 50ms budget on low-powered Railway instances",
+      "impact": "High — degrades search_tools UX",
+      "mitigation": "Benchmark on Railway free tier before GA. If latency exceeds budget, cache query embeddings for repeated identical queries within a session."
+    },
+    {
+      "risk": "Semantic search quality regresses keyword baseline on tool surfaces with very short or cryptic names",
+      "impact": "Medium — hybrid ranking helps but short names have poor embedding signal",
+      "mitigation": "Hybrid ranking with 0.7/0.3 default weights preserves keyword floor. Operators can tune weights toward keyword-heavy if needed."
+    },
+    {
+      "risk": "Analytics memory growth unbounded in long-running sessions with high call volume",
+      "impact": "Low for typical use, Medium for high-throughput production",
+      "mitigation": "Cap event arrays at a configurable maxEvents (default 10,000). Oldest events dropped when cap is reached."
+    },
+    {
+      "risk": "MCP SDK internal _requestHandlers Map (used by wrap mode) changes in a future SDK release",
+      "impact": "High if it breaks wrap mode entirely",
+      "mitigation": "Already tracked in v1.0 known risks. v1.1 adds a startup assertion that verifies the handler map is accessible and throws a clear error if not."
+    },
+    {
+      "risk": "Semantic index not ready when first query arrives",
+      "impact": "Low — startup is typically fast",
+      "mitigation": "Fall back to keyword scoring for queries that arrive before index is ready. Log a warning. Never block search_tools response."
+    }
+  ],
+  "locked": false,
+  "precedence": 0,
+  "notes": "Manifest-authoritative classification (MANIFEST_TYPE=PRD, MANIFEST_PRECEDENCE=0). Heuristic+content signals also strongly indicate PRD: H1 begins 'PRD:', frontmatter-less but contains canonical PRD sections (Problem, Goals, Non-Goals, Users & Use Cases, Requirements with R1.x/R2.x/R3.x identifiers, Success Criteria, Open Questions, Risks & Mitigations, Phase Breakdown). 'locked' field follows schema rule (true only for Accepted ADRs); locked decisions enumerated in dedicated locked_decisions field per caller request. Cross-references to sibling 'partner hub PRD' and 'multi-source PRD' are textual mentions, not file paths."
+}

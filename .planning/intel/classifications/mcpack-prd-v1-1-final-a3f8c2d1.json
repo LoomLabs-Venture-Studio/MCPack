@@ -1,0 +1,183 @@
+{
+  "source_path": "/Users/zaid/Projects/MCPack/.planning/inbox/mcpack-prd-v1.1-final.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "MCPack — Product Requirements Document v1.1",
+  "summary": "PRD covering multi-source composition, dynamic role resolution (Google OAuth), token-based deterministic inverted-index search, and HTTP/SSE transport — board-deferred from v1.1 to v1.2 milestone.",
+  "scope": [
+    "multi-source composition",
+    "stdio child process spawning",
+    "namespace-prefixed tool routing",
+    "dynamic role resolution",
+    "Google OAuth JWT resolver",
+    "static resolver",
+    "token-based inverted index search",
+    "HTTP/SSE transport",
+    "Railway deployment",
+    "@llvs/mcpack-google package",
+    "transport-layer auth",
+    "graceful shutdown of stdio children",
+    "namespace wildcard role syntax (crm.*)"
+  ],
+  "cross_refs": [
+    "mcpack-prd-v1.1-gsd.md"
+  ],
+  "locked": false,
+  "precedence": 1,
+  "target_milestone": "v1.2",
+  "doc_claimed_milestone": "v1.1",
+  "milestone_override_reason": "Board decision 2026-04-25 deferred this PRD to v1.2 (Partner Hub). Sibling PRD mcpack-prd-v1.1-gsd.md takes the v1.1 slot.",
+  "version_conflict_flag": true,
+  "locked_decisions": [
+    {
+      "id": "LD-1",
+      "decision": "Replace v1.0 5-tier keyword scorer with deterministic weighted inverted index built at startup (TOOL_NAME=10, DESCRIPTION=5, PARAM_NAME=2).",
+      "section": "§3.4, §5.4",
+      "conflict_with_sibling": "Sibling PRD (v1.1) keeps the v1.0 5-tier scorer as the keyword leg of a hybrid (semantic+keyword) ranker. Conflict likely resolves cleanly because changes target different milestones (v1.2 vs v1.1) — but synthesizer must verify ordering: v1.1 hybrid retains 5-tier scorer; v1.2 may replace it with the inverted index."
+    },
+    {
+      "id": "LD-2",
+      "decision": "Auth resolution happens at the transport layer BEFORE source composition runs. Auth provider is never a source. Resolves circular dependency.",
+      "section": "§2.3, §4.1",
+      "conflict_with_sibling": "none — architectural invariant scoped to multi-source/transport, not present in sibling"
+    },
+    {
+      "id": "LD-3",
+      "decision": "resolveRole(session) is the provider-agnostic extension point. Built-in resolvers ship in separate packages (@llvs/mcpack-google, @llvs/mcpack-workos, @llvs/mcpack-auth0) to keep core zero-dependency.",
+      "section": "§3.2, §7"
+    },
+    {
+      "id": "LD-4",
+      "decision": "Tool name collisions are prefixed with source.toolname; non-collisions keep original names.",
+      "section": "§3.1, §5.3"
+    },
+    {
+      "id": "LD-5",
+      "decision": "Role config supports namespace wildcards: 'crm.*', 'crm.get_deals', '*'.",
+      "section": "§5.2"
+    },
+    {
+      "id": "LD-6",
+      "decision": "Graceful shutdown: SIGTERM all stdio children, wait up to 2s per process, then SIGKILL.",
+      "section": "§5.5"
+    },
+    {
+      "id": "LD-7",
+      "decision": "@llvs/mcpack-google peer-depends on @llvs/mcpack ^1.1.0 and uses google-auth-library ^9.0.0; core stays zero-dependency.",
+      "section": "§5.7"
+    },
+    {
+      "id": "LD-8",
+      "decision": "Static resolver does NOT verify JWT signatures — base64-decodes payload only. Use only when transport is trusted (local stdio, internal network).",
+      "section": "§5.6"
+    },
+    {
+      "id": "LD-9",
+      "decision": "Version number 1.1.0 claimed in §12 Definition of Done for both @llvs/mcpack and @llvs/mcpack-google.",
+      "section": "§12",
+      "conflict_with_sibling": "VERSION COLLISION — sibling PRD also claims v1.1.0. Per board decision (2026-04-25), this PRD is deferred to v1.2; synthesizer must rewrite all 1.1.0 references in this doc to 1.2.0 and reassign the v1.1.0 version to the sibling PRD's deliverables."
+    }
+  ],
+  "requirements": [
+    "Multi-source mode: createMCPackServer accepts sources[] of named MCP server instances",
+    "Spawn each source as stdio child process at startup",
+    "Pull tool definitions via tools/list from each source",
+    "Prefix tool names with source name only on collision",
+    "Build merged inverted index across all sources",
+    "Route tools/call to correct source by tool name prefix",
+    "Apply role filtering across full merged surface using namespace-aware wildcards",
+    "Warn on tool name collision with explicit message",
+    "Dynamic role resolution via resolveRole(session) hook on config",
+    "Auth resolution at transport layer before source composition",
+    "Ship @llvs/mcpack-google with Google JWT verification via JWKS",
+    "Ship built-in staticResolver in core (no JWT signature verification)",
+    "Token-based inverted index built at startup (zero runtime overhead)",
+    "Tokenize: lowercase, strip punctuation, length>1 filter, weighted by field",
+    "HTTP/SSE transport on configured port (default 3000, default path /sse)",
+    "Extract Authorization Bearer header at transport boundary",
+    "Pass headers to resolveRole(session) for role attachment",
+    "Graceful shutdown: SIGTERM children, 2s wait, SIGKILL stragglers",
+    "All v1.0 wrap mode and build mode behavior unchanged",
+    "All v1.0 tests must continue to pass"
+  ],
+  "acceptance_criteria": [
+    "createMCPackServer accepts sources array and spawns stdio child processes at startup",
+    "Tool name collisions prefixed with source.toolname — non-collisions keep original names",
+    "tools/call routes to correct source via routing map",
+    "Role filtering applies at both search and execution layers",
+    "Namespace wildcard crm.* matches all crm tools",
+    "Inverted index built at startup — not at query time",
+    "Same query returns same results every time",
+    "Auth resolution happens at transport layer before source composition",
+    "resolveRole(session) receives headers including Authorization",
+    "@llvs/mcpack-google verifies Google JWT and maps email to role",
+    "Partners authenticate with existing Google accounts — no new accounts required",
+    "staticResolver maps identifier to role from config object",
+    "HTTP/SSE transport starts on configured port",
+    "Bearer token from Authorization header passed to session context",
+    "Partner connects via Claude Code URL config with Bearer token",
+    "Graceful shutdown kills all child processes cleanly",
+    "All v1.0 wrap mode and build mode behavior unchanged",
+    "All v1.0 tests pass",
+    "New tests: multi-source composition, collision handling, inverted index, deterministic search, Google JWT resolution, static resolver, SSE transport, graceful shutdown",
+    "@llvs/mcpack@1.1.0 and @llvs/mcpack-google@1.1.0 published to npm"
+  ],
+  "acceptance_criteria_format_note": "This PRD uses an unstructured §8 checklist instead of R-IDs. Captured as-is.",
+  "non_goals": [
+    "Token expiry and refresh automation (return clear error, partner re-visits auth page)",
+    "Audit log exposure endpoint (deferred to v1.2)",
+    "Rate limiting per role (deferred to v1.2)",
+    "Per-project role scoping (deferred to v1.2)",
+    "WorkOS and Auth0 resolvers (deferred to v1.2 — required for enterprise targets)",
+    "Shared hosted gateway with team management dashboard (Layer 3 — future product)",
+    "Cluster / multi-node deployment (single Railway instance sufficient)",
+    "Semantic / embedding-based search (inverted index deemed sufficient)",
+    "Commercial pricing model (to be defined jointly with any enterprise partner)"
+  ],
+  "non_goals_scope_note": "These non-goals were authored against the original v1.1 framing in §9. Per board decision, this PRD is now scoped to v1.2 — synthesizer should re-evaluate which 'deferred to v1.2' items are now in-scope (e.g., WorkOS/Auth0 resolvers may move into this milestone) and which slip to v1.3.",
+  "definition_of_done": [
+    "@llvs/mcpack@1.1.0 published to npm",
+    "@llvs/mcpack-google@1.1.0 published to npm",
+    "Lightweight Google OAuth auth page deployed on Railway",
+    "W2exits partner hub deployed on Railway using v1.1",
+    "Brian authenticates with his Google account and connects via Claude Code",
+    "Brian sees only co-founder scoped tools across all sources",
+    "Smush connects to Virtus hub with his Google account and sees partner scoped tools",
+    "All acceptance criteria pass",
+    "Docs site updated with multi-source, Google OAuth, and gateway examples",
+    "README repositioned: RBAC and gateway first, token reduction secondary"
+  ],
+  "definition_of_done_version_note": "DoD references @llvs/mcpack@1.1.0 and @llvs/mcpack-google@1.1.0. Both must be rewritten to 1.2.0 by synthesizer per board's milestone reassignment.",
+  "cross_references": [
+    {
+      "doc": "mcpack-prd-v1.1-gsd.md",
+      "relationship": "complement",
+      "note": "Sibling v1.1 PRD covers the v1.1 milestone (semantic search overlay, hybrid ranker keeping v1.0 scorer as keyword leg, plus other v1.1 work). This PRD covers multi-source composition, auth/resolver hook, Google OAuth, HTTP/SSE transport — the complementary set the sibling explicitly defers. Two PRDs are sequential (v1.1 → v1.2), not overlapping in feature surface, but DO collide on (a) version number 1.1.0 and (b) search-engine direction (sibling preserves v1.0 5-tier scorer; this doc replaces it with inverted index)."
+    }
+  ],
+  "risks": [
+    "MCPack depends on MCP SDK's low-level Server class for setRequestHandler — monitor SDK releases for breaking changes",
+    "Google JWKS keys rotate periodically — cache with TTL and refresh on verification failure",
+    "Source MCP servers spawn at startup; if a source goes down post-startup, calls to that source fail — return isError:true rather than crash gateway",
+    "Graceful shutdown takes up to 4 seconds per stdio process — 10+ sources could exceed Railway's shutdown timeout; document max recommended sources",
+    "Google JWT lifetime ~1 hour — partners need re-authentication when token expires; mid-session expiry disconnects the partner",
+    "MCP protocol gateway patterns are actively being standardized — monitor SDK releases for gateway-related updates that could conflict"
+  ],
+  "version_conflict_flag": true,
+  "synthesis_conflict_flags": [
+    {
+      "type": "version_collision",
+      "severity": "high",
+      "description": "Both this PRD (§12 DoD, §5.7 package.json snippet) and sibling mcpack-prd-v1.1-gsd.md claim v1.1.0. Per board decision 2026-04-25, this PRD is deferred to v1.2.0; sibling retains v1.1.0. Synthesizer must rewrite version references in this doc.",
+      "loci": ["§5.7 package.json", "§12 Definition of Done", "§4.2 example config (version: '1.1.0')"]
+    },
+    {
+      "type": "search_engine_direction",
+      "severity": "medium",
+      "description": "This PRD §3.4 + §5.4 REPLACES v1.0 5-tier scorer with deterministic inverted index. Sibling PRD KEEPS v1.0 5-tier scorer as keyword leg of hybrid (semantic+keyword) ranker. Likely resolves cleanly because changes are sequenced (v1.1 hybrid keeps scorer; v1.2 may swap to inverted index) — but synthesizer must explicitly order them in REQUIREMENTS/ADRs and reconcile against existing v1.0 src/search.ts.",
+      "resolution_hypothesis": "v1.1: hybrid ranker = semantic_overlay + v1.0_5tier_scorer. v1.2: optionally replace 5-tier leg with inverted index, OR keep both side-by-side. Decision must be deferred to a v1.2 ADR rather than locked here."
+    }
+  ],
+  "notes": "PRD type confirmed by manifest (manifest_override=true). Document is internally titled v1.1 with status 'Ready for Development' (2026-03-28), but board decision (2026-04-25) deferred to v1.2. Two material synthesis conflicts flagged: (1) version-number collision with sibling PRD — must be resolved by rewriting 1.1.0 → 1.2.0; (2) search-engine direction — sibling preserves v1.0 5-tier scorer for hybrid ranker, this PRD replaces it with inverted index. Conflicts likely resolve cleanly given sequential milestones but require explicit ordering in synthesized artifacts. Locked is false because this is a PRD, not an Accepted ADR — locked_decisions array captures load-bearing decisions for downstream synthesis but they do not get ADR-level precedence until promoted."
+}
