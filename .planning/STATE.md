@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
 status: planning
-stopped_at: post-ingest, ready for /gsd-plan-phase 1
-last_updated: "2026-04-25T00:00:00.000Z"
+stopped_at: Completed 06-01-PLAN.md (plan 1 of 2 in Phase 06)
+last_updated: "2026-04-26T16:19:45.048Z"
 progress:
-  total_phases: 12
-  completed_phases: 7
-  total_plans: 10
-  completed_plans: 10
+  total_phases: 8
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -19,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
-**Current focus:** v1.1 Search & Observability — semantic search hook + analytics. PRD ingested 2026-04-25.
+**Current focus:** Phase 06 — embeddingprovider-interface-adapter-scaffold-v1-1
 
 ## Current Position
 
-Phase: v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold) — not yet planned
-Plan: none
+Phase: 06 (embeddingprovider-interface-adapter-scaffold-v1-1) — EXECUTING
+Plan: 2 of 2
 Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 
 ## Performance Metrics
@@ -51,6 +52,7 @@ Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.
 | Phase 04 P02 | 1 | 2min | 2 tasks, 3 files |
 | Phase 05 P01 | 1 | 1min | 2 tasks, 2 files |
 | Phase 05 P02 | 1 | 1min | 2 tasks, 3 files |
+| Phase 06 P01 | 9min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -83,6 +85,11 @@ v1.1 + v1.2 ingest decisions (2026-04-25, board-locked):
 
 Full intel: `.planning/intel/decisions.md` (33 decisions); board-pre-resolved conflicts in `.planning/INGEST-CONFLICTS.md` (0 BLOCKERS / 0 WARNINGS / 5 INFO).
 
+- [Phase ?]: [Phase 06-01]: EmbeddingProvider type signature locked verbatim per DEC-v11-01: (texts: string[]) => Promise<number[][]>
+- [Phase ?]: [Phase 06-01]: MCPackConfig.embeddings is optional; when omitted, search code path byte-identical to v1.0 (DEC-v11-02 / DEC-BOARD-04)
+- [Phase ?]: [Phase 06-01]: Core version bumped 1.0.0 -> 1.1.0 (DEC-v11-03b); npm publish remains a Phase 10 concern
+- [Phase ?]: [Phase 06-01]: JSDoc comment on EmbeddingProvider rewritten to reference 'sibling adapter package' instead of literal name to honor static-grep adapter-isolation gate
+
 ### Pending Todos
 
 - v1.1 Phase 1 plan generation: `/gsd-plan-phase 1`
@@ -110,8 +117,8 @@ None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) ca
 
 ## Session Continuity
 
-Last session: 2026-04-25 (v1.1 + v1.2 PRD ingest, roadmap merge applied)
-Stopped at: post-ingest, ready to start v1.1 Phase 1 planning
+Last session: 2026-04-26T16:19:45.043Z
+Stopped at: Completed 06-01-PLAN.md (plan 1 of 2 in Phase 06)
 Resume file: None
 
 **Next action when resuming:** `/gsd-plan-phase 1` to start v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold).

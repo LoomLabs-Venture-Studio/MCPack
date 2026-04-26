@@ -61,8 +61,8 @@
 
 ### Semantic Search (R1)
 
-- [ ] **REQ-v11-semantic-provider-interface** (R1.1): Define `EmbeddingProvider = (texts: string[]) => Promise<number[][]>`. Batch-in, parallel-array-out. Core ships no implementation.
-- [ ] **REQ-v11-embeddings-optional-config** (R1.2): `EmbeddingProvider` passed via optional `embeddings` field on `MCPackConfig`. With no `embeddings`, v1.0 keyword-only behavior preserved exactly with no performance penalty.
+- [x] **REQ-v11-semantic-provider-interface** (R1.1): Define `EmbeddingProvider = (texts: string[]) => Promise<number[][]>`. Batch-in, parallel-array-out. Core ships no implementation.
+- [x] **REQ-v11-embeddings-optional-config** (R1.2): `EmbeddingProvider` passed via optional `embeddings` field on `MCPackConfig`. With no `embeddings`, v1.0 keyword-only behavior preserved exactly with no performance penalty.
 - [ ] **REQ-v11-mcpack-embeddings-package** (R1.3): Ship a separate adapter package using `@xenova/transformers` as optional peer dep, exposing a local MiniLM adapter. Never required by core.
 - [ ] **REQ-v11-semantic-index-build** (R1.4): When `EmbeddingProvider` is configured, build a semantic index at startup. Concatenate `name + description + param-names` per tool. Single batch call. Store vectors in-memory keyed by tool name. Async — does not delay `tools/list`.
 - [ ] **REQ-v11-semantic-query-path** (R1.5): On each `search_tools` call, embed the query (single-item batch), compute cosine similarity to each tool vector, produce a semantic score per tool.
@@ -83,9 +83,9 @@
 
 ### Cross-Cutting (R3)
 
-- [ ] **REQ-v11-zero-core-deps** (R3.1): Zero new runtime deps in core. `@xenova/transformers` confined to `@llvs/mcpack-embeddings`. Auth deps confined to resolver packages. Peer dep stays only `@modelcontextprotocol/sdk`.
-- [ ] **REQ-v11-public-api-lock** (R3.2): `mcpack(server, config)` and `createMCPackServer(config)` signatures byte-identical to v1.0. `MCPackConfig` gains optional `embeddings` and `analytics` fields only.
-- [ ] **REQ-v11-esm-only** (R3.3): ESM-only, NodeNext, strict, verbatimModuleSyntax. No CommonJS.
+- [x] **REQ-v11-zero-core-deps** (R3.1): Zero new runtime deps in core. `@xenova/transformers` confined to `@llvs/mcpack-embeddings`. Auth deps confined to resolver packages. Peer dep stays only `@modelcontextprotocol/sdk`.
+- [x] **REQ-v11-public-api-lock** (R3.2): `mcpack(server, config)` and `createMCPackServer(config)` signatures byte-identical to v1.0. `MCPackConfig` gains optional `embeddings` and `analytics` fields only.
+- [x] **REQ-v11-esm-only** (R3.3): ESM-only, NodeNext, strict, verbatimModuleSyntax. No CommonJS.
 - [ ] **REQ-v11-test-coverage-floor** (R3.4): ≥120 tests at ≥99% statement coverage. New tests cover embedding interface, hybrid ranking, semantic index build, query path, analytics events, analytics API, role-scoped analytics, dead tool detection, RBAC integrity.
 - [ ] **REQ-v11-tools-list-no-regression** (R3.5): `tools/list` always returns one tool with no v1.1-added latency. Index build is async, non-blocking.
 - [ ] **REQ-v11-session-invariants** (R3.6): Schemas-loaded references unchanged. Out-of-role `tools/call` still returns `"Unknown tool: {name}"`. No v1.0 invariant modified.
@@ -213,12 +213,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REQ-v11-semantic-provider-interface | v1.1 Phase 6 | Pending |
-| REQ-v11-embeddings-optional-config | v1.1 Phase 6 | Pending |
+| REQ-v11-semantic-provider-interface | v1.1 Phase 6 | Complete |
+| REQ-v11-embeddings-optional-config | v1.1 Phase 6 | Complete |
 | REQ-v11-mcpack-embeddings-package | v1.1 Phase 6 | Pending |
-| REQ-v11-zero-core-deps | v1.1 Phase 6 | Pending |
-| REQ-v11-public-api-lock | v1.1 Phase 6 | Pending |
-| REQ-v11-esm-only | v1.1 Phase 6 | Pending |
+| REQ-v11-zero-core-deps | v1.1 Phase 6 | Complete |
+| REQ-v11-public-api-lock | v1.1 Phase 6 | Complete |
+| REQ-v11-esm-only | v1.1 Phase 6 | Complete |
 | REQ-v11-semantic-index-build | v1.1 Phase 7 | Pending |
 | REQ-v11-tools-list-no-regression | v1.1 Phase 7 | Pending |
 | REQ-v11-perf-budget | v1.1 Phase 7 | Pending |
