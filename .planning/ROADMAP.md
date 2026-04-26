@@ -59,7 +59,11 @@
   3. `@llvs/mcpack-embeddings` package scaffolded with MiniLM adapter using `@xenova/transformers` as optional peer dep — never required by core
   4. `@llvs/mcpack` package.json shows zero new `dependencies` entries vs v1.0
   5. Existing v1.0 calling code compiles unmodified against new types
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Core type plumbing: add EmbeddingProvider type + MCPackConfig.embeddings field; bump @llvs/mcpack to 1.1.0; type-contract tests
+- [ ] 06-02-PLAN.md — Adapter package scaffold: create packages/mcpack-embeddings/ with MiniLM factory against @huggingface/transformers ^4.0.0; gated smoke tests
 
 ### Phase 7: Semantic Index Build Pipeline (v1.1)
 **Goal**: Build a non-blocking semantic index at startup so semantic queries have vectors available without any v1.1-added latency on `tools/list`.
