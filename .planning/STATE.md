@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
 status: ready_to_plan
-stopped_at: Phase 07 plans authored + verified (2 plans, plan-checker iter 2 PASSED, all 3 [BLOCKING] gates encoded with corrected forms — Gate 1 broadened, Gate 2 src-based)
-last_updated: "2026-04-26T21:41:44.655Z"
+stopped_at: "Phase 8 context gathered (4 decisions locked: weight scope, normalization, hasVectors, plan slicing)"
+last_updated: "2026-04-26T23:44:07.978Z"
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 7
   total_plans: 14
-  completed_plans: 12
-  percent: 78
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -126,9 +126,9 @@ None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) ca
 
 ## Session Continuity
 
-Last session: 2026-04-26T18:30:00.000Z
-Stopped at: Phase 07 plans authored + verified (2 plans, plan-checker iter 2 PASSED, all 3 [BLOCKING] gates encoded with corrected forms — Gate 1 broadened, Gate 2 src-based)
-Resume file: None
+Last session: 2026-04-26T23:44:07.973Z
+Stopped at: Phase 8 context gathered (4 decisions locked: weight scope, normalization, hasVectors, plan slicing)
+Resume file: .planning/phases/08-hybrid-ranking-query-path-v1-1/08-CONTEXT.md
 
 **Next action when resuming:** `/gsd-execute-phase 7` to execute Phase 7 (Semantic Index Build Pipeline). Wave 1 (07-01) lands first — engine extension + helper file. Wave 2 (07-02) runs after — 17 tests across 7 describe groups.
 
