@@ -1,6 +1,6 @@
 {
   "name": "@llvs/mcpack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lazy, queryable, session-aware tool discovery for MCP servers",
   "type": "module",
   "main": "dist/index.js",

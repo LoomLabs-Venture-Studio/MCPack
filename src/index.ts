@@ -14,4 +14,5 @@ export type {
   SearchResult,
   ToolCallResult,
   MCPackHandle,
+  EmbeddingProvider,
 } from './types.js';

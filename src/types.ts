@@ -4,6 +4,21 @@ import type { Server } from '@modelcontextprotocol/sdk/server/index.js';
 // ─── Public Types ───────────────────────────────────────────────────────────
 
 /**
+ * EmbeddingProvider — semantic-search hook (v1.1).
+ *
+ * Batch-in / parallel-array-out contract:
+ *   input.length === output.length, and output[i] is the vector for input[i].
+ * All vectors in a single call MUST have the same dimensionality.
+ * Order is contractual: input order maps directly to output order.
+ *
+ * Core ships no implementation. See the sibling adapter package for a local
+ * MiniLM implementation, or implement against this signature for hosted providers.
+ *
+ * @since v1.1
+ */
+export type EmbeddingProvider = (texts: string[]) => Promise<number[][]>;
+
+/**
  * Configuration for MCPack wrap mode.
  */
 export interface MCPackConfig {
@@ -11,6 +26,23 @@ export interface MCPackConfig {
   defaultRole?: string;
   index?: IndexConfig;
   session?: SessionConfig;
+  /**
+   * Optional semantic-search configuration (v1.1).
+   *
+   * When omitted, the search code path is byte-identical to v1.0 keyword-only
+   * behavior (per DEC-v11-02 / DEC-BOARD-04). When provided, Phases 7–8 use
+   * `provider` to embed tools and queries; default weights (semantic 0.7,
+   * keyword 0.3 — per DEC-v11-12) are applied in Phase 8.
+   *
+   * @since v1.1
+   */
+  embeddings?: {
+    provider: EmbeddingProvider;
+    weights?: {
+      semanticWeight: number;
+      keywordWeight: number;
+    };
+  };
 }
 
 /**
