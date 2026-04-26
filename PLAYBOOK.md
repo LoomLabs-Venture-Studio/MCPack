@@ -46,43 +46,46 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: v1.1 Ingest — Search & Observability
-**Type:** milestone bootstrap (PRD ingest → roadmap)
+### Sprint: Phase 7 — Semantic Index Build Pipeline (v1.1)
+**Type:** v1.1 milestone phase 2 of 5
 **Priority:** P0
-**PRD Status:** `.planning/inbox/mcpack-prd-v1.1-gsd.md` — approved as v1.1 (board, 2026-04-25)
+**PRD Status:** `.planning/inbox/processed/mcpack-prd-v1.1-gsd.md` — board-approved 2026-04-25
 **Harness:** GSD v2
+**Status:** PLANNED, ready for `/gsd-execute-phase 7`
 
-### Board Decision (2026-04-25)
+### Board Locks (still active across all v1.1 phases)
 - **v1.1 = Search & Observability** (PRD B): semantic search via `EmbeddingProvider` hook + `getAnalytics()` API. Adapter package `@llvs/mcpack-embeddings`.
-- **v1.2 = Partner Hub** (PRD A): multi-source, dynamic role resolution, Google OAuth, HTTP/SSE transport. Deferred — PRD stays in inbox until v1.1 ships.
-- **Pre-approved dep:** `@xenova/transformers` as peer dep of `@llvs/mcpack-embeddings` only. Core `@llvs/mcpack` stays zero-dep — non-negotiable.
-- **Rationale:** lower blast radius than Partner Hub, no new auth/transport surface, exercises the adapter-package pattern before we reuse it for `mcpack-google` in v1.2.
+- **v1.2 = Partner Hub** (PRD A): multi-source, dynamic role resolution, Google OAuth, HTTP/SSE transport. **Deferred** — locked at the planning artifact level; do not start until v1.1 ships.
+- **Embedding library:** `@huggingface/transformers ^4.0.0` (DEC-v11-03 clerical-correction; `@xenova/transformers` was renamed and frozen).
+- **Core stays zero-dep** through both milestones — non-negotiable. Three [BLOCKING] gates enforce this on every phase.
+
+### What's Done in v1.1 So Far
+- ✅ **Phase 6 — EmbeddingProvider Interface + Adapter Scaffold** (2026-04-26): types + version bump 1.0.0→1.1.0 + sibling package `@llvs/mcpack-embeddings`. 11/11 verification dimensions PASS.
+
+### Active Sprint — Phase 7 plans authored
+- 07-01 (Wave 1) — engine pipeline: extend `MCPackEngine` with `private semanticIndex`, `isIndexReady()`, `private async buildSemanticIndex()`, constructor kickoff. New helper file `src/semantic-index-builder.ts`.
+- 07-02 (Wave 2) — test coverage: new `test/semantic-index-build.test.ts` with 17 tests across 7 describe groups (incl. negative-control test for Pitfall 7 — proves `handleSearchTools` emits zero new console.warn calls during build-pending).
+- Plan-checker iter 1: 2 BLOCKERS + 3 WARNINGs. Iter 2: VERIFICATION PASSED.
+- Three [BLOCKING] gates corrected from Phase 6's inheritance — Gate 1 jq broadened, Gate 2 src-based (was broken — dist/ is gitignored).
+
+### Acceptance Criteria (Phase 7 execution)
+- [ ] All 3 phase REQ-IDs delivered (`semantic-index-build`, `tools-list-no-regression`, `perf-budget`)
+- [ ] 107 v1.0+Phase-6 baseline tests pass byte-identically; +17 new tests (124 total)
+- [ ] Coverage ≥99% statement coverage maintained
+- [ ] All 3 [BLOCKING] gates pass against `bec3f6f` baseline
+- [ ] `npm run typecheck && npm run build && npm test` all green
+- [ ] `MCPackEngine.isIndexReady()` exists; constructor returns synchronously; `tools/list` latency unchanged
+- [ ] Build-failure path: `console.warn` fires once with locked message format ("MCPack: semantic index build failed:"), no tool names leaked (RBAC invariant)
 
 ### Candidate Next Work
-- **In-flight:** `/gsd-ingest-docs` to formalize both PRDs in `.planning/inbox/` and produce `INGEST-CONFLICTS.md`
-- **After ingest:** open v1.1 milestone via `/gsd-new-milestone`, then phase planning per PRD B's 5-phase breakdown
-- **Phase 999.1 (backlog):** CI/CD pipeline — still parked, promote post-v1.1 unless dep-vuln pressure returns
-
-### Acceptance Criteria (Ingest Sprint)
-- [ ] `/gsd-ingest-docs` runs cleanly against both PRDs in `.planning/inbox/`
-- [ ] `INGEST-CONFLICTS.md` produced with v1.1.0 version-collision flagged and resolved (PRD B wins v1.1, PRD A → v1.2)
-- [ ] `ROADMAP.md` updated with v1.1 milestone (5 phases per PRD B §"Phase Breakdown")
-- [ ] `REQUIREMENTS.md` extended with v1.1 requirements (R1.x semantic search, R2.x analytics, R3.x cross-cutting)
-- [ ] `PROJECT.md` "Current State" reflects v1.1 in flight
-- [ ] PRD A preserved in inbox or moved to a `deferred/` subfolder — not deleted
-- [ ] No code changes in this sprint — planning artifacts only
+- **After Phase 7 ships:** `/gsd-plan-phase 8` (Hybrid Ranking Query Path — embed query, cosine similarity, hybrid score 0.7·semantic + 0.3·keyword, role-filter-after-rank)
+- **Phase 999.1 (backlog):** CI/CD pipeline — still parked, promote post-v1.1
 
 ### Implementation Plan
-1. Run `/gsd-ingest-docs` — synthesizer classifies both PRDs, detects v1.1.0 collision
-2. Review `INGEST-CONFLICTS.md`; confirm PRD B → v1.1, PRD A → v1.2 holds
-3. `/gsd-new-milestone` to open v1.1 with PRD B as the source of truth
-4. Phase plan per PRD B §"Phase Breakdown" (numbered globally, continuing from v1.0's 1–5.1):
-   - Phase 6: `EmbeddingProvider` interface + `@llvs/mcpack-embeddings` adapter scaffold
-   - Phase 7: Semantic index build pipeline (async, non-blocking)
-   - Phase 8: Hybrid ranking query path
-   - Phase 9: Tool usage analytics (`AnalyticsStore` + `getAnalytics()`)
-   - Phase 10: Harness verification, ≥120 tests at ≥99% coverage, docs, npm publish
-5. Per-phase delegation to engineer via `/gsd-execute-phase`
+1. `/gsd-execute-phase 7` — Wave 1 (07-01) lands first; Wave 2 (07-02) after 07-01 commits
+2. After both waves: spawn gsd-verifier for goal-backward verification (target: 11/11 dimensions like Phase 6)
+3. Update ROADMAP.md / STATE.md / PLAYBOOK Recent Sprints with Phase 7 close-out
+4. Plan Phase 8 next
 
 ---
 

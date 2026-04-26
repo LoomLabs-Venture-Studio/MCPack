@@ -99,15 +99,16 @@ Full intel: `.planning/intel/decisions.md` (33 decisions); board-pre-resolved co
 
 ### Pending Todos
 
-- v1.1 Phase 1 plan generation: `/gsd-plan-phase 1`
-- v1.1 Open Questions OQ1–OQ6 surface in phase planning (see `.planning/intel/requirements.md`):
-  - OQ1: `getAnalytics()` flat on handle vs separate `analytics` property
-  - OQ2: Hybrid weights configurable per-query vs config-only
-  - OQ3: Index rebuild on `listChanged` (defer to v1.2)
-  - OQ4: 50-query intent benchmark source (Stripe / synthetic / community) — pick before Phase 5
-  - OQ5: Denial events record tool name even for operators — confirm in Phase 4
-  - OQ6: `@llvs/mcpack-embeddings` ship hosted adapter (OpenAI/Voyage) in v1.1 or defer — defer to v1.2
-- v1.2 (DEFERRED): author search-engine-direction ADR before Phase 1 plan; resolve PRD §9 non-goals re-evaluation (WorkOS, Auth0, audit log, rate limiting, per-project scoping, token expiry/refresh)
+- **Next:** `/gsd-execute-phase 7` — Phase 7 plans authored + verified, ready to execute (Wave 1: 07-01 engine pipeline, Wave 2: 07-02 17 tests)
+- After Phase 7 ships: `/gsd-plan-phase 8` (Hybrid Ranking Query Path)
+- v1.1 Open Questions still open at later-phase boundaries (see `.planning/intel/requirements.md`):
+  - OQ1: `getAnalytics()` flat on handle vs separate `analytics` property — Phase 9 decision
+  - OQ2: Hybrid weights configurable per-query vs config-only — Phase 8 decision
+  - OQ3: Index rebuild on `listChanged` — DEFERRED to v1.2 (locked Phase 7 CONTEXT)
+  - OQ4: 50-query intent benchmark source (Stripe / synthetic / community) — Phase 10 decision
+  - OQ5: Denial events record tool name even for operators — Phase 9 decision
+  - OQ6: `@llvs/mcpack-embeddings` ship hosted adapter — DEFERRED to v1.2 (locked Phase 6 CONTEXT)
+- v1.2 (DEFERRED): author search-engine-direction ADR before Phase 11; resolve PRD §9 non-goals re-evaluation (WorkOS, Auth0, audit log, rate limiting, per-project scoping, token expiry/refresh)
 
 ### Blockers/Concerns
 
@@ -124,8 +125,15 @@ None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) ca
 
 ## Session Continuity
 
-Last session: 2026-04-26T16:48:30.903Z
-Stopped at: Completed 06-02-PLAN.md (plan 2 of 2 in Phase 06)
+Last session: 2026-04-26T18:30:00.000Z
+Stopped at: Phase 07 plans authored + verified (2 plans, plan-checker iter 2 PASSED, all 3 [BLOCKING] gates encoded with corrected forms — Gate 1 broadened, Gate 2 src-based)
 Resume file: None
 
-**Next action when resuming:** `/gsd-plan-phase 1` to start v1.1 Phase 1 (EmbeddingProvider Interface + Adapter Scaffold).
+**Next action when resuming:** `/gsd-execute-phase 7` to execute Phase 7 (Semantic Index Build Pipeline). Wave 1 (07-01) lands first — engine extension + helper file. Wave 2 (07-02) runs after — 17 tests across 7 describe groups.
+
+**Active phase artifacts (Phase 7):**
+- `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-CONTEXT.md`
+- `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-RESEARCH.md`
+- `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-VALIDATION.md`
+- `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-01-PLAN.md`
+- `.planning/phases/07-semantic-index-build-pipeline-v1-1/07-02-PLAN.md`
