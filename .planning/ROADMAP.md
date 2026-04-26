@@ -74,7 +74,11 @@ Plans:
   2. `tools/list` returns one tool with no v1.1-added latency (within v1.0 noise floor on benchmark)
   3. If a query arrives before the index is ready, search falls back to v1.0 keyword scoring and logs a warning — `search_tools` is never blocked
   4. 50-tool index builds within 5s on commodity hardware with local MiniLM, memory ≤ 2MB
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Engine build pipeline: extend MCPackEngine with private semantic index state + buildSemanticIndex orchestrator + isIndexReady(); new sibling helper src/semantic-index-builder.ts
+- [ ] 07-02-PLAN.md — Test coverage: new test/semantic-index-build.test.ts (16 tests across 7 groups: kickoff, indexing strings, storage, non-blocking constructor, fallback, build failure + RBAC invariant, perf bounds, regression)
 
 ### Phase 8: Hybrid Ranking Query Path (v1.1)
 **Goal**: Combine semantic and keyword scoring into a single ranked output that preserves v1.0 keyword behavior when no embeddings are configured.
