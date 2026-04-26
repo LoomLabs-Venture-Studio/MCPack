@@ -14,7 +14,7 @@ Three landmines surfaced during research:
 2. **`@huggingface/transformers` carries a hard `sharp` dependency** (image processing library with native binaries). [VERIFIED: npm view] For text-only feature extraction this is dead weight, but it is a hard install dep, not optional. Adapter-package consumers will pull it in. Acceptable but should be documented.
 3. **The "byte-identical search code path when no embeddings configured" invariant** (DEC-v11-02 / DEC-BOARD-04) is much easier to preserve at the type level if the new field is added as a single additive property on the existing `MCPackConfig` interface (vs a discriminated union). The existing v1.0 type structure supports this with one extra optional property.
 
-**Primary recommendation:** Use **Option C — sibling directory in same repo, no monorepo tooling** for the package layout. It is the only option that preserves every v1.0 npm script verbatim (`npm run build`, `npm test`, `npm run harness`, `npm run test:coverage`) without churning paths. Convert to npm workspaces later if/when a third package (`@llvs/mcpack-google` in v1.2) makes the convenience worth the migration. For the dep, surface the `@xenova/transformers` vs `@huggingface/transformers` choice to the board before plan execution and document the recommendation: pin `@huggingface/transformers ^3.0.0` and treat the PRD's `@xenova/transformers` reference as historical naming.
+**Primary recommendation:** Use **Option C — sibling directory in same repo, no monorepo tooling** for the package layout. It is the only option that preserves every v1.0 npm script verbatim (`npm run build`, `npm test`, `npm run harness`, `npm run test:coverage`) without churning paths. Convert to npm workspaces later if/when a third package (`@llvs/mcpack-google` in v1.2) makes the convenience worth the migration. For the dep, surface the `@xenova/transformers` vs `@huggingface/transformers` choice to the board before plan execution and document the recommendation: pin `@huggingface/transformers ^4.0.0` and treat the PRD's `@xenova/transformers` reference as historical naming.
 
 ## Architectural Responsibility Map
 
@@ -120,7 +120,7 @@ From `.planning/phases/06-embeddingprovider-interface-adapter-scaffold-v1-1/06-C
 ### Supporting (adapter package only)
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| `@huggingface/transformers` | `^3.0.0` (current major: 4.2.0) | ONNX-runtime sentence embedding via `pipeline('feature-extraction', ...)` | Use in `@llvs/mcpack-embeddings` only. `^3.0.0` is the conservative pin; v4 introduces breaking changes per `next` dist-tag history. See Discussion Points below. [VERIFIED: npm view @huggingface/transformers, dist-tags latest=4.2.0 / next=4.0.0-next.11] |
+| `@huggingface/transformers` | `^4.0.0` (board-locked 2026-04-25) | ONNX-runtime sentence embedding via `pipeline('feature-extraction', ...)` | Use in `@llvs/mcpack-embeddings` only. `^4.0.0` matches the latest stable; v3 line is frozen. Board approved this pin per DEC-v11-03 clerical-correction. [VERIFIED: npm view @huggingface/transformers, dist-tags latest=4.2.0] |
 | `Xenova/all-MiniLM-L6-v2` | model on Hugging Face Hub | 384-dim sentence embeddings | The default v1.1 model; ~90MB ONNX model file (CONTEXT says "~50MB" — actual non-quantized is 90.4MB, quantized is smaller; document accurately) [VERIFIED: HF model page, see Sources] |
 | `vitest` (peer in adapter) | `^4.1.0` | Tests inside adapter package | Same runner for both packages |
 
@@ -194,7 +194,7 @@ Verified at research time (2026-04-26):
 │                    + mean-pool + L2-normalize via { pooling, normalize }    │
 │                                                                             │
 │   peerDependencies: { "@llvs/mcpack": "^1.1.0" }                            │
-│   dependencies:     { "@huggingface/transformers": "^3.0.0" }               │
+│   dependencies:     { "@huggingface/transformers": "^4.0.0" }               │
 └──────────────────────────────────┬──────────────────────────────────────────┘
                                    │ runtime
                                    ▼
@@ -527,7 +527,7 @@ export interface MCPackConfig {
     "@llvs/mcpack": "^1.1.0"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.0.0"
+    "@huggingface/transformers": "^4.0.0"
   },
   "devDependencies": {
     "@llvs/mcpack": "^1.1.0",
@@ -718,30 +718,24 @@ describe('createMiniLMProvider', () => {
 | A4 | The `tensor.tolist()` method on transformers.js feature-extraction output for a batched input returns `number[][]` (not a flat `number[]` requiring reshape) | Code Examples §"Adapter src/minilm.ts" | LOW — model card output example explicitly shows `dims: [N, 384]` and `.tolist()` returning nested arrays for batched inputs. [CITED: Xenova/all-MiniLM-L6-v2 model card] |
 | A5 | The default test isolation in vitest 4.x re-imports modules per test file, preventing cross-file singleton leak | Pitfall 2 | LOW — vitest 4.x default is `isolate: true` (vitest docs). Even so, recommendation is closure-scoped singleton (Pattern 2) which doesn't depend on isolation behavior. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-These are not blockers — Phase 6 can plan around them — but the planner should pick a stance.
+All five questions resolved by board decision 2026-04-25 and locked in CONTEXT.md / decisions.md prior to plan-phase 6 spawn. Listed here for audit trail; the plan reflects the resolved values.
 
 1. **`@xenova/transformers` vs `@huggingface/transformers` (highest priority).**
-   - What we know: PRD/CONTEXT cite `@xenova/transformers` as board-approved 2026-04-25. Current canonical name is `@huggingface/transformers@4.2.0`. Legacy name is at `2.17.2` (May 2024). They are NOT 1:1 drop-in replacements — v3 introduced breaking changes from v2 (e.g., quantization config, output tensor shapes for some pipelines).
-   - What's unclear: Did the board intend the legacy name specifically, or did they approve the dep concept and the planner can pick the current name?
-   - Recommendation: Surface to the board as a one-question Slack/email check before plan execution. Default-recommend `@huggingface/transformers ^3.0.0` with explicit rationale.
+   - **RESOLVED:** `@huggingface/transformers ^4.0.0`. Board approved switch 2026-04-25 (DEC-v11-03 clerical-correction). Legacy `@xenova/transformers` is frozen at v2.17.2 since May 2024; current name at v4.2.0 is the active successor under HuggingFace org. API-compatible for our `pipeline('feature-extraction', ...)` usage. INFO entry added to `.planning/INGEST-CONFLICTS.md`.
 
 2. **Peer-dep version sequencing for `@llvs/mcpack` ^1.1.0 in adapter.**
-   - What we know: Adapter peer-deps `@llvs/mcpack ^1.1.0` (per CONTEXT). Core is at `1.0.0` today. `1.1.0` is published in Phase 10.
-   - What's unclear: Bump core's `package.json` version to `1.1.0` (or `1.1.0-alpha.0`) in Phase 6, or leave at `1.0.0` and defer to Phase 10?
-   - Recommendation: Bump core to `1.1.0` in Phase 6 so devDependencies and peerDependencies in the adapter resolve via `npm link`. The `.npmignore`/`files` field controls what publishes — version bump is in-repo bookkeeping until Phase 10 actually publishes.
+   - **RESOLVED:** Bump core `package.json` `1.0.0 → 1.1.0` in Phase 6 (DEC-v11-03b). Standard "version-in-development" pattern. Phase 10 still does the actual `npm publish`. The bump and the publish are separate operations.
 
 3. **Where in `src/types.ts` to place the new types.**
-   - What we know: CONTEXT explicitly leaves this to "Claude's Discretion".
-   - Recommendation: Place `EmbeddingProvider` immediately above `MCPackConfig` (it's referenced from there). Add a `// ─── v1.1 Public Types ────` divider comment to mirror the existing `// ─── Public Types ─────` and `// ─── Internal Types ─────` separators.
+   - **RESOLVED:** Place `EmbeddingProvider` immediately above `MCPackConfig` (it's referenced from there). Add a `// ─── v1.1 Public Types ────` divider comment to mirror the existing `// ─── Public Types ─────` and `// ─── Internal Types ─────` separators. Plan 06-01 Task 1 Step 1(a) implements this.
 
 4. **Adapter factory naming.**
-   - What we know: CONTEXT says `createMiniLMProvider`, `miniLMEmbeddings`, etc. are all acceptable. Recommendation: `createMiniLMProvider` matches the v1.0 pattern (`createMCPackServer`) and HF's tutorial nomenclature (`MyClassificationPipeline.getInstance`). Lowest cognitive load.
+   - **RESOLVED:** `createMiniLMProvider`. Matches the v1.0 `createMCPackServer` pattern and HF's tutorial nomenclature. Plan 06-02 Task 1 implements this.
 
 5. **Whether to add `vitest.config.ts` files to either package.**
-   - What we know: v1.0 has no `vitest.config` — relies on defaults. The `test` script is `vitest run --reporter=verbose`.
-   - Recommendation: Don't add config files for Phase 6. If coverage-floor tuning needs them in Phase 10, add then.
+   - **RESOLVED:** No `vitest.config.ts` in Phase 6. Both packages rely on vitest defaults (matches v1.0 convention). If coverage-floor tuning needs configuration in Phase 10, add it then.
 
 ## Environment Availability
 
@@ -876,7 +870,7 @@ These are NOT decisions Claude can make unilaterally — they need the board's n
 
 **What is NOT changing:** Either way, the dep lives ONLY in the adapter package. Either way, core stays zero-dep. The board's intent — "adapter package can take a model dep" — is preserved by either choice.
 
-**Recommendation:** Surface to the board with a one-line question: *"CONTEXT.md cites `@xenova/transformers` (board-approved 2026-04-25). The package was renamed to `@huggingface/transformers` in Oct 2024 and the legacy name is frozen at 2.17.2. Confirm whether to (a) pin legacy as written, or (b) pin current `@huggingface/transformers ^3.0.0`."* If no answer in time for plan execution, default to (b) and document; the cost of switching back is one `package.json` edit.
+**Recommendation:** Surface to the board with a one-line question: *"CONTEXT.md cites `@xenova/transformers` (board-approved 2026-04-25). The package was renamed to `@huggingface/transformers` in Oct 2024 and the legacy name is frozen at 2.17.2. Confirm whether to (a) pin legacy as written, or (b) pin current `@huggingface/transformers ^4.0.0`."* If no answer in time for plan execution, default to (b) and document; the cost of switching back is one `package.json` edit.
 
 ### DP2: Bump core `@llvs/mcpack` package.json version to `1.1.0` in Phase 6?
 
