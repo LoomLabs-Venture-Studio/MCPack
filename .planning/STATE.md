@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
-status: in-progress
+status: ready_to_plan
 stopped_at: Phase 07 plans authored + verified (2 plans, plan-checker iter 2 PASSED, all 3 [BLOCKING] gates encoded with corrected forms — Gate 1 broadened, Gate 2 src-based)
 last_updated: "2026-04-26T21:41:44.655Z"
 progress:
   total_phases: 9
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 14
   completed_plans: 12
-  percent: 86
+  percent: 78
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 ## Current Position
 
-Phase: 07 (semantic-index-build-pipeline-v1-1) — EXECUTING
-Plan: 1 of 2
+Phase: 999.1
+Plan: Not started
 Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 Phase 06: SHIPPED 2026-04-26 — 11/11 verification dimensions PASS
 
@@ -55,6 +55,7 @@ Phase 06: SHIPPED 2026-04-26 — 11/11 verification dimensions PASS
 | Phase 05 P02 | 1 | 1min | 2 tasks, 3 files |
 | Phase 06 P01 | 9min | 2 tasks | 4 files |
 | Phase 06 P02 | 12min | 2 tasks | 6 files |
+| 07 | 2 | - | - |
 
 ## Accumulated Context
 
