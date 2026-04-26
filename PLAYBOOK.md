@@ -46,12 +46,12 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: Phase 7 — Semantic Index Build Pipeline (v1.1)
-**Type:** v1.1 milestone phase 2 of 5
+### Sprint: Phase 8 — Hybrid Ranking Query Path (v1.1) — UNPLANNED
+**Type:** v1.1 milestone phase 3 of 5
 **Priority:** P0
 **PRD Status:** `.planning/inbox/processed/mcpack-prd-v1.1-gsd.md` — board-approved 2026-04-25
 **Harness:** GSD v2
-**Status:** PLANNED, ready for `/gsd-execute-phase 7`
+**Status:** Phase 7 SHIPPED 2026-04-26 — Phase 8 needs `/gsd-plan-phase 8`
 
 ### Board Locks (still active across all v1.1 phases)
 - **v1.1 = Search & Observability** (PRD B): semantic search via `EmbeddingProvider` hook + `getAnalytics()` API. Adapter package `@llvs/mcpack-embeddings`.
@@ -61,35 +61,53 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ### What's Done in v1.1 So Far
 - ✅ **Phase 6 — EmbeddingProvider Interface + Adapter Scaffold** (2026-04-26): types + version bump 1.0.0→1.1.0 + sibling package `@llvs/mcpack-embeddings`. 11/11 verification dimensions PASS.
+- ✅ **Phase 7 — Semantic Index Build Pipeline** (2026-04-26): non-blocking startup index build, `isIndexReady()`, RBAC-safe failure path. 11/11 verification dimensions PASS, 124/124 tests, 99.61% coverage.
 
-### Active Sprint — Phase 7 plans authored
-- 07-01 (Wave 1) — engine pipeline: extend `MCPackEngine` with `private semanticIndex`, `isIndexReady()`, `private async buildSemanticIndex()`, constructor kickoff. New helper file `src/semantic-index-builder.ts`.
-- 07-02 (Wave 2) — test coverage: new `test/semantic-index-build.test.ts` with 17 tests across 7 describe groups (incl. negative-control test for Pitfall 7 — proves `handleSearchTools` emits zero new console.warn calls during build-pending).
-- Plan-checker iter 1: 2 BLOCKERS + 3 WARNINGs. Iter 2: VERIFICATION PASSED.
-- Three [BLOCKING] gates corrected from Phase 6's inheritance — Gate 1 jq broadened, Gate 2 src-based (was broken — dist/ is gitignored).
+### Open Code Review Items (carry forward to Phase 8)
+- **WR-01** — `isIndexReady()` returns `true` for empty-tools no-op path. Phase 8's hybrid router must not treat `isIndexReady() === true` as "vectors are present" — gate on `semanticIndex.size > 0` instead, or refactor to an `indexBuildState` enum during Phase 8 planning.
+- **WR-02** — No regression test asserts the unhandled-rejection invariant (removing the `.catch` in `core.ts:74-80` would silently pass current suite). Add an `unhandledRejection` listener test in Phase 8 or as a tiny standalone fix.
+- **WR-03** — RBAC "no tool names in warn" test is fixture-name-coupled; tighten to assert locked warn format directly + iterate actual fixture names.
 
-### Acceptance Criteria (Phase 7 execution)
-- [ ] All 3 phase REQ-IDs delivered (`semantic-index-build`, `tools-list-no-regression`, `perf-budget`)
-- [ ] 107 v1.0+Phase-6 baseline tests pass byte-identically; +17 new tests (124 total)
-- [ ] Coverage ≥99% statement coverage maintained
-- [ ] All 3 [BLOCKING] gates pass against `bec3f6f` baseline
-- [ ] `npm run typecheck && npm run build && npm test` all green
-- [ ] `MCPackEngine.isIndexReady()` exists; constructor returns synchronously; `tools/list` latency unchanged
-- [ ] Build-failure path: `console.warn` fires once with locked message format ("MCPack: semantic index build failed:"), no tool names leaked (RBAC invariant)
+### Next Sprint — Phase 8 Plan Phase
+- **Goal:** Combine semantic and keyword scoring into a single ranked output. Per-query embedding → cosine similarity → hybrid score (0.7·semantic + 0.3·keyword default) → role filter applied AFTER ranking.
+- **Requirements:** REQ-v11-semantic-query-path, REQ-v11-hybrid-ranking, REQ-v11-role-filter-after-rank, REQ-v11-backward-compat, REQ-v11-session-invariants
+- **Open question:** OQ2 — hybrid weights configurable per-query vs config-only — Phase 8 decision
+- **Pre-plan asks for the engineer/researcher:**
+  1. Backward-compat invariant: when `embeddings` is unset, scoring path must remain byte-identical to v1.0 (Gate 1 still applies).
+  2. Role filter ordering: rank semantic+keyword across the FULL tool set first, THEN drop role-blocked tools — never blend filtered + unfiltered ranks.
+  3. Carry forward Phase 7's locked warn message format for any new failure paths.
 
-### Candidate Next Work
-- **After Phase 7 ships:** `/gsd-plan-phase 8` (Hybrid Ranking Query Path — embed query, cosine similarity, hybrid score 0.7·semantic + 0.3·keyword, role-filter-after-rank)
-- **Phase 999.1 (backlog):** CI/CD pipeline — still parked, promote post-v1.1
+### Acceptance Criteria (Phase 8 — to be locked during plan-phase)
+Will be authored by `/gsd-plan-phase 8`. Provisional must-haves:
+- [ ] Per-query embedding produces cosine similarity scores in [-1, 1] (unit-tested utility)
+- [ ] Hybrid score formula uses 0.7 semantic + 0.3 keyword default (configurable hook TBD per OQ2)
+- [ ] Role filter applied strictly AFTER ranking, never before
+- [ ] When `embeddings` unset → query path byte-identical to v1.0
+- [ ] All 3+ [BLOCKING] gates pass against `bec3f6f` baseline (zero-dep, public-API additive-only, adapter-isolation)
+- [ ] Coverage stays ≥99% statement
+- [ ] No regression on the 124-test baseline
 
 ### Implementation Plan
-1. `/gsd-execute-phase 7` — Wave 1 (07-01) lands first; Wave 2 (07-02) after 07-01 commits
-2. After both waves: spawn gsd-verifier for goal-backward verification (target: 11/11 dimensions like Phase 6)
-3. Update ROADMAP.md / STATE.md / PLAYBOOK Recent Sprints with Phase 7 close-out
-4. Plan Phase 8 next
+1. `/gsd-plan-phase 8` — author plans + plan-checker verification cycle
+2. `/gsd-execute-phase 8` — wave-based execution
+3. After Phase 8 ships → Phase 9 (Tool Usage Analytics)
+4. Phase 10 = npm publish + harness verification + 50-query intent benchmark
 
 ---
 
 ## Recent Sprints (Log)
+
+### Phase 7 — Semantic Index Build Pipeline ✓ (2026-04-26)
+- **Type:** v1.1 milestone phase 2 of 5
+- **Outcome:** Non-blocking startup semantic-index build wired into `MCPackEngine`. Constructor returns synchronously; `tools/list` byte-identical to v1.0 when query path unchanged.
+- **Engineer:** delivered 5 commits across 2 waves (972ad77, 61b5aea, f2df1f7 → Wave 1; 6d4f208, 2c9a249 → Wave 2)
+- **Plans:** 07-01 (engine pipeline + helper file), 07-02 (17-test suite across 7 describe groups)
+- **Result:** 124/124 tests pass (107 baseline + 17 new) | **99.61% statement coverage** (up from 99.56% Phase 6 baseline; `core.ts` and `semantic-index-builder.ts` both 100%) | All 4 [BLOCKING] gates pass against `bec3f6f` (zero-dep, public-API additive, adapter-isolation, baseline tests byte-identical) | 11/11 verification dimensions PASS | RBAC invariant proved via Pitfall 7 negative-control test (zero new `console.warn` during build-pending) | Build-failure path emits exactly one warn matching `^MCPack: semantic index build failed: ` with no tool names leaked
+- **Notable observations:**
+  - Wave 2 executor committed directly to `main` from inside its worktree rather than to the worktree branch — irregular but the commits landed correctly with no conflicts; cleanup needed only the stale branch
+  - Wave 1 executor had to rewrite its own JSDoc to avoid tripping the plan's adapter-literals grep (clerical fix, behavior unchanged) — same pattern as Phase 6's adapter-isolation gate
+- **Code review:** 0 critical, 3 warnings, 5 info — all carry forward to Phase 8 as guardrails (see Open Code Review Items above)
+- **Lesson:** When orchestrator-owned files (STATE.md, ROADMAP.md) need to be re-protected during worktree merge, the snapshot-restore-amend dance works but adds noise to history; consider whether the orchestrator can write tracking updates AFTER all worktree merges land in a single commit instead of per-wave.
 
 ### Phase 6 — EmbeddingProvider Interface + Adapter Scaffold ✓ (2026-04-26)
 - **Type:** v1.1 milestone phase 1 of 5
