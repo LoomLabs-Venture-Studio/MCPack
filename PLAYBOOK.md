@@ -88,6 +88,15 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Recent Sprints (Log)
 
+### Phase 6 — EmbeddingProvider Interface + Adapter Scaffold ✓ (2026-04-26)
+- **Type:** v1.1 milestone phase 1 of 5
+- **Outcome:** Type-only plumbing + new sibling package `@llvs/mcpack-embeddings` scaffolded
+- **Engineer:** delivered 6 commits (e10e25c → 9571d8b)
+- **Plans:** 06-01 (core types + version bump 1.0.0→1.1.0), 06-02 (adapter package + MiniLM via @huggingface/transformers ^4.0.0)
+- **Result:** 107/107 root tests pass + 5 adapter tests pass | 99.56% statement coverage (v1.0 baseline preserved) | All 3 [BLOCKING] gates pass (zero-deps, public-API additive-only, adapter-isolation) | 11/11 verification dimensions PASS
+- **Notable deviation:** `npm install` in adapter couldn't resolve `@llvs/mcpack@^1.1.0` from registry (not yet published) — used `npm link` per plan's documented fallback. Phase 10 publish resolves it. Recorded in 06-02-SUMMARY.md.
+- **Lesson:** Pre-Phase-6 PRD ingest carried forward a stale `@xenova/transformers` reference (frozen since May 2024). Researcher caught it before plan execution; corrected to `@huggingface/transformers ^4.0.0` via DEC-v11-03 clerical-correction. Future PRD ingests should `npm view <pkg>` for active maintenance status before locking dep names.
+
 ### DEPS-1 — Dependabot vuln cleanup ✓ (2026-04-25)
 - **Type:** chore (security)
 - **Outcome:** All 6 transitive CVEs resolved via `npm audit fix` (no `--force`)

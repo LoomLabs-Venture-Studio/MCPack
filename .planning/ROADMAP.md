@@ -26,7 +26,7 @@
 **Board decisions:** DEC-BOARD-01 (v1.1 slot), DEC-BOARD-03 (semantic ships v1.1), DEC-BOARD-04 (zero-dep core), DEC-BOARD-05 (adapter pattern)
 **GA gate:** Phase 5 complete with all v1.1 Success Criteria passing (see REQUIREMENTS.md → Success Criteria — v1.1)
 
-- [ ] **Phase 6: EmbeddingProvider Interface + Adapter Scaffold** — Define `EmbeddingProvider` type, wire optional `embeddings` config, scaffold `@llvs/mcpack-embeddings` package with MiniLM adapter
+- [x] **Phase 6: EmbeddingProvider Interface + Adapter Scaffold** — Define `EmbeddingProvider` type, wire optional `embeddings` config, scaffold `@llvs/mcpack-embeddings` package with MiniLM adapter (completed 2026-04-26, 11/11 verification)
 - [ ] **Phase 7: Semantic Index Build Pipeline** — Async, non-blocking startup index build; concatenated indexing string per tool; in-memory vector map
 - [ ] **Phase 8: Hybrid Ranking Query Path** — Query embedding + cosine similarity; hybrid score (0.7 semantic / 0.3 keyword default); role filter applied AFTER ranking
 - [ ] **Phase 9: Tool Usage Analytics** — `AnalyticsStore` (search/call/denial/miss events), `getAnalytics()` API on server handle, role-scoped queries, dead-tool detection
