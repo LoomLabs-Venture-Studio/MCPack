@@ -46,12 +46,12 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: Phase 8 — Hybrid Ranking Query Path (v1.1)
-**Type:** v1.1 milestone phase 3 of 5
+### Sprint: Phase 9 — Tool Usage Analytics (v1.1) — UNPLANNED
+**Type:** v1.1 milestone phase 4 of 5
 **Priority:** P0
 **PRD Status:** `.planning/inbox/processed/mcpack-prd-v1.1-gsd.md` — board-approved 2026-04-25
 **Harness:** GSD v2
-**Status:** PLANNED + VERIFIED, ready for `/gsd-execute-phase 8`
+**Status:** Phase 8 SHIPPED 2026-04-27 — Phase 9 needs `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
 
 ### Board Locks (still active across all v1.1 phases)
 - **v1.1 = Search & Observability** (PRD B): semantic search via `EmbeddingProvider` hook + `getAnalytics()` API. Adapter package `@llvs/mcpack-embeddings`.
@@ -62,47 +62,69 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 ### What's Done in v1.1 So Far
 - ✅ **Phase 6 — EmbeddingProvider Interface + Adapter Scaffold** (2026-04-26): types + version bump 1.0.0→1.1.0 + sibling package `@llvs/mcpack-embeddings`. 11/11 verification dimensions PASS.
 - ✅ **Phase 7 — Semantic Index Build Pipeline** (2026-04-26): non-blocking startup index build, `isIndexReady()`, RBAC-safe failure path. 11/11 verification dimensions PASS, 124/124 tests, 99.61% coverage.
+- ✅ **Phase 8 — Hybrid Ranking Query Path** (2026-04-27): per-query embedding + cosine similarity + hybrid scoring (0.7·sem + 0.3·kw) + role-filter-after-rank pivot + `hasVectors()` helper. 11/11 verification dimensions PASS, 187/187 tests, 99.73% coverage. Code review surfaced 1 BLOCKER (CR-01 — Infinity-clamp bug in v1.0 keyword-fallback path); auto-fix loop resolved with 13 net new regression tests.
 
 ### Open Code Review Items (carry forward to Phase 8)
 - **WR-01** — `isIndexReady()` returns `true` for empty-tools no-op path. Phase 8's hybrid router must not treat `isIndexReady() === true` as "vectors are present" — gate on `semanticIndex.size > 0` instead, or refactor to an `indexBuildState` enum during Phase 8 planning.
 - **WR-02** — No regression test asserts the unhandled-rejection invariant (removing the `.catch` in `core.ts:74-80` would silently pass current suite). Add an `unhandledRejection` listener test in Phase 8 or as a tiny standalone fix.
 - **WR-03** — RBAC "no tool names in warn" test is fixture-name-coupled; tighten to assert locked warn format directly + iterate actual fixture names.
 
-### Phase 8 Locked Decisions (from /gsd-discuss-phase 8)
-- **DEC-v11-08-01** — Hybrid weights = config-only (no per-query overrides on `search_tools` args). Resolves OQ2.
-- **DEC-v11-08-02** — Score normalization = per-query min-max to [0,1] for both tracks before combine. Degenerate `max == min` → all zeros.
-- **DEC-v11-08-03** — WR-01 fix = additive `hasVectors(): boolean` helper on `MCPackEngine`. Phase 7's `isIndexReady()` API stays unchanged.
-- **DEC-v11-08-04** — Plan structure = 2 plans, each ships its own tests (no coverage trough mid-phase).
+### Open Code Review Items from Phase 8 (advisory, IN-scope deferred)
+Phase 8 fix-loop closed all critical+warnings (5/5). Three INFOs were OUT of fix scope:
+- **IN-01** — keyword fallback called from two sites in `core.ts`; could be centralized to a single helper.
+- **IN-02** — `scoreAndRank` and `keywordScoreForEntry` duplicate the 5-tier loop; extract into a shared helper to keep them in sync.
+- **IN-03** — P9 RBAC test passes by construction (test-controlled error message); the truly adversarial provider-error-contains-tool-names case isn't tested.
 
-### Active Sprint — Phase 8 plans authored + verified
-- **08-01 (Wave 1)** — Scoring kernel + unit tests: pure functions in `src/hybrid-scoring.ts` (`cosineSimilarity`, `minMaxNormalize`, `combineHybrid`) + additive `keywordScoreForEntry` in `src/search.ts` + 24 unit tests in `test/hybrid-scoring.test.ts`.
-- **08-02 (Wave 2)** — Query path integration + integration tests: Wave 0 empirical check (BLOCKING) → async refactor of `handleSearchTools` → `hasVectors()` gate → per-query embedding with warn-once-per-instance error handling → role-filter-after-rank pivot → 21 integration tests in `test/hybrid-ranking.test.ts` (incl. P7 + P8 + P9 + P10 negative controls + WR-02 unhandled-rejection regression).
-- **Plan-checker iter 1:** 0 BLOCKERS + 2 WARNINGS (RESEARCH `## Open Questions` missing RESOLVED markers; Wave 0 verify was placeholder echo).
-- **Plan-checker iter 2:** VERIFICATION PASSED — all 12 dimensions clean.
-- **Carry-forward fixes encoded:** WR-01 → `hasVectors()` (DEC-v11-08-03); WR-02 → `process.on('unhandledRejection', listener)` regression covers BOTH Phase 7 build path AND Phase 8 query path; WR-03 → rename-safe `tools.map(t => t.name)` pattern at all NEW Phase 8 RBAC test sites.
-- **4 BLOCKING gates (carry-forward, baseline advanced to `cd1fc52`):** zero-new-core-deps (broadened jq), public-API additive-only (src-based), adapter-isolation (src+test), baseline tests byte-identical (9-file explicit list).
+Promote any of these to a Phase 999.x backlog item if they accumulate weight before v1.1 ships.
 
-### Acceptance Criteria (Phase 8 execution)
-- [ ] All 5 phase REQ-IDs delivered (`semantic-query-path`, `hybrid-ranking`, `role-filter-after-rank`, `backward-compat`, `session-invariants`)
-- [ ] 124 baseline tests pass byte-identically; +45 new tests (24 unit + 21 integration) → ~169 total
-- [ ] Coverage ≥99.61% statement maintained
-- [ ] All 4 [BLOCKING] gates pass against `cd1fc52` baseline
-- [ ] `npm run typecheck && npm run build && npm test` all green
-- [ ] `MCPackEngine.hasVectors()` exists; `isIndexReady()` API unchanged from Phase 7
-- [ ] `handleSearchTools` async signature change does not affect public API (wrap.ts/build.ts already await — verified empirically by plan-checker)
-- [ ] Wave 0 empirical check passes: 124 baseline tests pass against unified rank-then-filter pipeline (or paths split if any fail)
-- [ ] Query-embedding-failure: single locked-format warn `^MCPack: query embedding failed: `, no tool names leaked, fallback to v1.0 keyword
-- [ ] All 4 pitfall negative controls (P7, P8, P9, P10) pass
+### Next Sprint — Phase 9 Discuss + Plan Phase
+- **Goal:** `AnalyticsStore` (search/call/denial/miss events), `getAnalytics()` API on server handle, role-scoped queries, dead-tool detection.
+- **Requirements:** REQ-v11-analytics-events, REQ-v11-analytics-storage, REQ-v11-analytics-privacy, REQ-v11-analytics-api, REQ-v11-analytics-role-scoped-query, REQ-v11-analytics-rbac-integrity, REQ-v11-dead-tool-detection
+- **Open questions to resolve in discuss-phase:**
+  - **OQ1** — `getAnalytics()` flat on handle vs separate `analytics` property
+  - **OQ5** — denial events record tool name even for operators (RBAC-sensitive)
+- **Pre-plan asks for the engineer/researcher:**
+  1. Storage shape: in-memory only, configurable `maxEvents` cap, oldest-dropped on overflow.
+  2. `getAnalytics()` is a server-handle API, NEVER an MCP tool — direct call from the host process.
+  3. Role-scoped queries respect RBAC: callers see only events from sessions they have role visibility into.
+  4. Dead-tool detection: tools with zero `call` events over a window → flag for removal.
+
+### Provisional Phase 9 acceptance criteria (locked during plan-phase)
+- [ ] `AnalyticsStore` captures 4 event types at correct decision points (search/call/denial/miss)
+- [ ] In-memory only; resets on process restart; bounded by `maxEvents`
+- [ ] `getAnalytics()` on server handle, role-scoped, NEVER exposed as an MCP tool
+- [ ] RBAC integrity: out-of-role callers can't see other roles' events
+- [ ] All 4 BLOCKING gates pass (zero-new-core-deps, public-API additive, adapter-isolation, baseline tests byte-identical)
+- [ ] Coverage stays ≥99.61% (currently 99.73% post-Phase-8)
+- [ ] No regression on the 187-test baseline
 
 ### Implementation Plan
-1. `/gsd-execute-phase 8` — Wave 1 (08-01) lands first; Wave 2 (08-02) after, with Task 1 = Wave 0 empirical check (BLOCKING — halts on any baseline-test failure)
-2. After both waves: spawn gsd-verifier for goal-backward verification (target: 11/11 dimensions like Phase 6/7)
-3. Update ROADMAP.md / STATE.md / PLAYBOOK Recent Sprints with Phase 8 close-out
-4. Plan Phase 9 next (Tool Usage Analytics — `getAnalytics()`, AnalyticsStore)
+1. `/gsd-discuss-phase 9` — lock OQ1 + OQ5 + storage shape decisions
+2. `/gsd-plan-phase 9` — author plans + plan-checker verification cycle
+3. `/gsd-execute-phase 9` — wave-based execution
+4. After Phase 9 ships → Phase 10 (Harness Verification + Coverage + Docs + npm publish — the v1.1 GA gate)
 
 ---
 
 ## Recent Sprints (Log)
+
+### Phase 8 — Hybrid Ranking Query Path ✓ (2026-04-27)
+- **Type:** v1.1 milestone phase 3 of 5
+- **Outcome:** Per-query embedding + cosine similarity + hybrid scoring (0.7·sem + 0.3·kw default) + role-filter-after-rank pivot. `MCPackEngine.hasVectors()` helper added; `isIndexReady()` API unchanged. `handleSearchTools` returns `ToolCallResult | Promise<ToolCallResult>` (sync on no-vectors path to preserve Gate 4 byte-identicality; Promise on hybrid path).
+- **Engineer:** delivered 11 commits across 2 waves + 1 fix loop (08-01: 4 commits 83e8225/2ecf6f8/9363a06/5daea4e; 08-02: 3 commits c963cc5/4bf8a5e/a6c570b + 1 merge 059aaf4; fix loop: 4 commits 4566261/072af42/f144588/8f5361e)
+- **Plans:** 08-01 (scoring kernel + 25 unit tests, including 1 deviation coverage test), 08-02 (engine integration + 25 integration tests, Wave 0 BLOCKING empirical check passed)
+- **Result:** 187/187 tests pass (124 baseline + 63 new = 32 in `hybrid-scoring.test.ts` + 31 in `hybrid-ranking.test.ts`) | **99.73% statement coverage** (up from 99.61% Phase 7 baseline; `core.ts`/`hybrid-scoring.ts`/`search.ts` all 100%) | All 4 [BLOCKING] gates pass against `cd1fc52` (zero-deps, public-API additive, adapter-isolation, baseline tests byte-identical) | 11/11 verification dimensions PASS | Wave 0 empirical check passed (149 tests against unified rank-then-filter on disposable spike) | RBAC invariants proved across 14 RBAC sites using rename-safe `tools.map(t => t.name)` pattern
+- **Code review:** 1 BLOCKER + 4 WARN + 3 INFO. Auto-fix loop closed all critical+warnings (5/5).
+  - **CR-01 (BLOCKER):** `scoreAndRank(query, this.index, Infinity)` was clamped to MAX_LIMIT=10 — broke role-filter-after-rank for >10-tool servers where top-10 keyword matches are role-blocked. Fix: Infinity sentinel honored in `scoreAndRank` (preserves Gate 4 byte-identicality with `test/search.test.ts`'s `limit=20` clamp). +2 regression tests with ≥11-tool fixture.
+  - **WR-01:** Cosine dimension mismatch propagated rejection → fixed with per-tool try/catch returning 0 (silent fall-through to keyword via min-max). +2 tests.
+  - **WR-02:** `combineHybrid` didn't validate weights → fixed with two-layer defense (canonical contract + ergonomic boundary). +9 tests.
+  - **WR-03:** Added `// LOCKED: per DEC-v11-08-02` comment above `score > 0` filter (algorithmic change would need board-approved DEC update).
+  - **WR-04:** Auto-resolved by CR-01.
+- **3 executor deviations (all auto-fixed, documented):**
+  1. Plan's pure async signature broke 11 baseline tests (sync callers). Pivoted to union return type — sync on no-vectors, Promise on hybrid. Plan-checker missed this even with the wrap.ts/build.ts grep.
+  2. Single-tool fixture in session-invariants test degenerated min-max (per DEC-v11-08-02 single-element returns [0]); fixed with 2-tool fixture.
+  3. Coverage dipped to 99.45% from new defensive guards; added 4 white-box tests → 99.72% pre-fix-loop, 99.73% post.
+- **Lesson:** Plan-checker can verify async signature is "callable" (callers await) but can't catch BREAK on sync test assertions. Future async-introduction phases need an explicit "all baseline tests pass with new signature" empirical check at planning time, not just plan-checker grep verification. Wave 0 caught this implicitly via test re-run, but at execution time. Cheaper to catch in plan-phase.
 
 ### Phase 7 — Semantic Index Build Pipeline ✓ (2026-04-26)
 - **Type:** v1.1 milestone phase 2 of 5
