@@ -1501,32 +1501,24 @@ describe('MCPackEngine — hybrid ranking query path (Phase 8)', () => {
 | A10 | The `process.on('unhandledRejection', listener)` test pattern works in vitest's default runner (vitest 4.1.x) | Pitfall 9, Code Examples §"WR-02 fix" | LOW — vitest runs in Node, and `process` is the global Node process object. The listener semantics are standard Node. Verify in Wave 0 by writing the test first; if it doesn't work, fall back to `Promise.allSettled([(engine as any).indexBuildPromise])` checking. |
 | A11 | The `total_available` field in `SearchToolResponse` continues to reflect the role-allowed surface count (not the full surface) post-Phase-8 | Pattern 6 §"handleSearchTools refactor sketch" step 6 | LOW — REQ-v11-session-invariants requires this. The current code reads it from `allowed.length` (`src/core.ts:162`); Phase 8's refactor preserves this read. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All five questions were answered during planning. Plan-checker iter 1 (2026-04-26) confirmed the plans honor each resolution.
 
 1. **Should the v1.0 keyword path also use rank-then-filter, or stay on filter-then-rank?**
-   - What we know: REQ-v11-role-filter-after-rank locks rank-then-filter for the hybrid path. REQ-v11-backward-compat says "byte-identical to v1.0" for the no-embeddings path. v1.0 was filter-then-rank.
-   - What's unclear: whether unifying both paths into rank-then-filter produces observable-byte-identical results for all 124 baseline tests. Reasoning says yes (the keyword scorer is deterministic per-tool); empirical proof requires running the tests.
-   - Recommendation: Wave 0 empirical check. If all baseline tests pass with the unified rank-then-filter pipeline, ship it. If any fail, split the paths — v1.0 path stays filter-then-rank, hybrid path uses rank-then-filter. Surface this to plan-checker.
+   - RESOLVED: Wave 0 empirical check decides at execution time. If all 124 baseline tests pass against unified rank-then-filter, ship unified; otherwise split paths. Implemented as Plan 08-02 Task 1 (BLOCKING — halts plan if baseline tests fail).
 
 2. **Should `keywordScoreForEntry` live in `src/search.ts` (additive export) or in `src/hybrid-scoring.ts`?**
-   - What we know: the function logic mirrors the inner scoring loop in `scoreAndRank` (lines 39-66 of `src/search.ts`). Reusing it from `src/search.ts` avoids duplication. Adding it to `src/hybrid-scoring.ts` keeps the keyword leg's logic in one module.
-   - What's unclear: the convention. v1.0 modules each own their concern (`search.ts` = scoring); Phase 7 added a sibling helper file. Phase 8 could go either way.
-   - Recommendation: add to `src/search.ts` as an additive export. Reusing the logic from where it lives is the lower-risk move (no copy-paste drift). The hybrid-scoring module stays focused on the math layer (cosine + normalize + combine).
+   - RESOLVED: `src/search.ts` (additive export). Plan 08-01 Task 2 implements; reusing the logic from where it lives avoids copy-paste drift. The hybrid-scoring module stays focused on the math layer (cosine + normalize + combine).
 
 3. **Should the test file split be 2 files (`hybrid-scoring.test.ts` for pure functions + `hybrid-ranking.test.ts` for engine) or 1 file?**
-   - What we know: both shapes pass Gate 4 (both are new files). Phase 7 used 1 file with 17 tests; Phase 8 has more surface area (~20-25 tests).
-   - What's unclear: stylistic preference.
-   - Recommendation: 2 files. Pure-function tests are fast and focused; engine integration tests are slower and need engine setup. Splitting clarifies intent and matches the source split (`src/hybrid-scoring.ts` separate from `src/core.ts` changes).
+   - RESOLVED: 2 files. `test/hybrid-scoring.test.ts` ships in Plan 08-01 (unit tests for pure math); `test/hybrid-ranking.test.ts` ships in Plan 08-02 (integration tests for engine). Splitting clarifies intent and matches the source split.
 
 4. **Should the WR-02 unhandled-rejection test live in `test/hybrid-ranking.test.ts` (Phase 8) or in a separate `test/unhandled-rejection.test.ts`?**
-   - What we know: the test covers BOTH Phase 7's build path AND Phase 8's query path. Putting it in `test/semantic-index-build.test.ts` would violate Gate 4. A standalone file is cleanest.
-   - What's unclear: whether to bundle with Phase 8's other engine tests or separate.
-   - Recommendation: include in `test/hybrid-ranking.test.ts` under a `describe('WR-02 fix: unhandled-rejection regression test')` block. Single test, single file = lower complexity. If a future Phase 9 or 10 adds more cross-cutting regression tests, factor out to a sibling file then.
+   - RESOLVED: bundled in `test/hybrid-ranking.test.ts` under a `describe('WR-02 fix: unhandled-rejection regression test')` block. Single test, single file = lower complexity. If future phases add more cross-cutting regression tests, factor out to a sibling file.
 
 5. **Should the WR-03 (Phase 7 RBAC test fixture-coupling) tightening land in Phase 8?**
-   - What we know: 08-CONTEXT.md says "Planner's call. If skipped, surface as a v1.1 polish phase candidate." Phase 7's `test:256-276` asserts `not.toContain` against three hardcoded fixture names.
-   - What's unclear: whether the planner has bandwidth in Phase 8 to also touch `test/semantic-index-build.test.ts`. Doing so would technically violate Gate 4 (baseline tests byte-identical) — the gate has to be relaxed to permit the WR-03 fix, OR the fix is deferred.
-   - Recommendation: DEFER. Phase 8's own RBAC test (the `query-embedding-failure log contains NO tool names` test in the sketch above) DOES use the rename-safe pattern (iterate `tools.forEach(...)`), proactively addressing the WR-03 concern at the new test site. Phase 7's existing test stays as-is for v1.1 polish or v1.2.
+   - RESOLVED: DEFER for Phase 7's existing test; PROACTIVELY APPLY at NEW Phase 8 RBAC test sites. Phase 8's own tests use the rename-safe pattern (`tools.map((t) => t.name)`); Phase 7's `test:256-276` stays as-is for v1.1 polish or v1.2 to preserve Gate 4 (baseline tests byte-identical).
 
 ## Environment Availability
 
