@@ -164,9 +164,10 @@ export async function mcpack(
     destroy: () => engine.destroy(),
     stats: () => engine.stats(),
     // Phase 9: operator-only analytics surface — REQ-v11-analytics-api.
-    // Architectural boundary: never wire-protocol exposed, never appears in
-    // tools/list. The closure here delegates to engine.getAnalytics(options)
-    // which composes config.roles + index + analytics.snapshot() — see core.ts.
+    // Architectural boundary: never wire-protocol exposed; never appears in
+    // the engine's discovery response. The closure here delegates to
+    // engine.getAnalytics(options) which composes config.roles + index +
+    // analytics.snapshot() — see core.ts.
     getAnalytics: (options) => engine.getAnalytics(options),
   };
 }
