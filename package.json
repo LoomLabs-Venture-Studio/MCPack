@@ -23,7 +23,9 @@
     "test": "vitest run --reporter=verbose",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "harness": "npx tsx test/harness/stripe-harness.ts"
+    "harness": "npx tsx test/harness/stripe-harness.ts",
+    "benchmark": "npx tsx test/harness/intent-benchmark.ts",
+    "perf-bench": "npx tsx test/harness/perf-bench.ts"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"
