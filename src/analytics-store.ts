@@ -138,13 +138,26 @@ export class AnalyticsStore {
   }
 
   /**
-   * Test-only: reset the event log.
+   * Reset the event log to empty.
    *
-   * Public per Claude's discretion (research recommends; matches Phase 7/8
-   * conventions where test fixtures need a way to reset state for sequential
-   * scenarios). Production code does not call this.
+   * Public surface — callable from any holder of the AnalyticsStore reference,
+   * which in practice is host-process code that holds an `MCPackHandle`. The
+   * MCP wire protocol cannot reach this method (not registered as a request
+   * handler, not in `tools/list`), so it is operator-only by virtue of the
+   * architectural boundary that already protects `getAnalytics`.
    *
-   * @internal For test fixtures only.
+   * Production callers MAY use this to wipe in-memory analytics state at
+   * meaningful checkpoints (e.g., per-deployment rollover). It is also the
+   * canonical reset hook for test fixtures running sequential scenarios — the
+   * convention Phase 7/8 established for SessionRegistry.destroy and similar
+   * state resets.
+   *
+   * WR-05 fix: previous JSDoc claimed "Production code does not call this"
+   * while the method was declared `public`. The mismatch was a hygiene issue
+   * — clarified contract above and removed the @internal tag (which signaled
+   * intent inconsistent with the visibility modifier).
+   *
+   * @since v1.1 (Phase 9)
    */
   clear(): void {
     this.events = [];
