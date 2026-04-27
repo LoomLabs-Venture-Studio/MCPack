@@ -198,3 +198,30 @@ Plans:
 
 Plans:
 - [ ] TBD (promote with /gsd:review-backlog when ready)
+
+### Phase 999.2: MCP Inspector Integration / Demo Asset (BACKLOG)
+
+**Goal:** Make MCPack's value prop tangible via the official `@modelcontextprotocol/inspector` — interactive proof that a `mcpack()`-wrapped server returns exactly `search_tools` on `tools/list`, with session-gated schema delivery visible live.
+
+**Rationale (logged 2026-04-27):**
+- Phase 10 board check raised this — Inspector wasn't used in v1.0/v1.1 verification (scripted vitest + Stripe harness covered the wire surface). But Inspector adds a different KIND of value: tangible, demonstrable, screencast-able.
+- Library users who don't yet trust MCPack ("does wrap mode actually preserve passthrough?") get a 30-second answer when they spin up Inspector against a wrapped server.
+- Onboarding asset for the docs site — a screencast/gif of Inspector connecting to a `mcpack()`-wrapped server makes the 80%+ token reduction concrete.
+- Possible v1.2 board-demo prop: connect Inspector to the freshly-published artifact before flipping the `latest` tag.
+
+**Candidate scopes (one or more — promote individually):**
+- **999.2a — Docs walkthrough page:** new `docs/inspector-walkthrough.md` with step-by-step screenshots: install Inspector, run `npx @modelcontextprotocol/inspector npx tsx test/harness/wrapped-server.ts` (or similar), point at the dropdown to confirm one tool listed, click `search_tools`, query "create customer", see role-filtered results live. Cross-links from main docs.
+- **999.2b — Demo asset (screencast/gif):** ~30-second screen recording embedded in README "See it in action" section. Asset hosted in `docs/assets/`. Captures: connecting → tools/list shows one tool → query → schema-on-demand response → second query for already-loaded tool returns reference-only (`loaded: true`).
+- **999.2c — Bundled demo server:** small `examples/inspector-demo.ts` that wraps a synthetic 28-tool fixture (or shells out to `@stripe/mcp` if STRIPE_SECRET_KEY present) — single command for new users to try MCPack with Inspector without writing wrapper code first.
+- **999.2d — Pre-publish smoke gate:** add Inspector-based smoke test to Phase 10's pre-publish checklist for v1.2+ — operator visually confirms `tools/list` returns one tool against the published artifact before flipping `latest`.
+
+**Out of scope:**
+- Forking or modifying Inspector itself. We use it as-is; it's already MCP-spec-compliant.
+- Replacing scripted harness/benchmark tests with Inspector-driven manual checks. Automation stays primary.
+
+**Requirements:** TBD (depends on which scope(s) get promoted)
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd:review-backlog when ready; recommended after v1.1 ships and we have real users to interview about onboarding pain)
