@@ -148,6 +148,19 @@ describe('AnalyticsStore — snapshot operator-unscoped', () => {
     expect(snap.searches[0]).not.toHaveProperty('type');
     expect(snap.searches[0]).toMatchObject({ query: 'q', role: 'admin', tools: ['tool1'] });
   });
+
+  it('WR-03 regression: mutating snap.searches[i].tools does NOT corrupt the stored event', () => {
+    const store = new AnalyticsStore();
+    store.record(searchEvent('admin', ['tool1', 'tool2']));
+    const snap1 = store.snapshot(undefined, FOUR_TOOL_INDEX);
+    // Mutate the snapshot's tools array — should NOT bleed into the stored event.
+    snap1.searches[0]?.tools.push('mutated-injection');
+    snap1.searches[0]?.tools.sort();
+    // Re-snapshot: stored event must still reflect the original tools array.
+    const snap2 = store.snapshot(undefined, FOUR_TOOL_INDEX);
+    expect(snap2.searches[0]?.tools).toEqual(['tool1', 'tool2']);
+    expect(snap2.searches[0]?.tools).not.toContain('mutated-injection');
+  });
 });
 
 // ─── role-scoped filtering — Pr1/Pr2/Pr4 unit-level (3 tests) ──────────────

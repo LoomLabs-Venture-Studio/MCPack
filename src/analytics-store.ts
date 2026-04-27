@@ -108,7 +108,10 @@ export class AnalyticsStore {
     const misses: AnalyticsSnapshot['misses'] = [];
     for (const e of filtered) {
       if (e.type === 'search') {
-        searches.push({ query: e.query, role: e.role, tools: e.tools, ts: e.ts });
+        // WR-03 fix: copy tools[] so external mutation of snap.searches[i].tools
+        // (push/sort/length-assign) cannot corrupt the stored event. O(k) where
+        // k is search result count (≤ maxResults, typically ≤ 10) — negligible.
+        searches.push({ query: e.query, role: e.role, tools: e.tools.slice(), ts: e.ts });
       } else if (e.type === 'call') {
         calls.push({ tool: e.tool, role: e.role, ts: e.ts });
       } else if (e.type === 'denial') {
