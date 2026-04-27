@@ -119,6 +119,14 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
 
     // Role check
     if (!isToolAllowed(name, defaultRole, roles)) {
+      // Phase 9: emit denial event BEFORE the opaque "Unknown tool" return
+      // (REQ-v11-analytics-events — capture denials at the rejection branch).
+      engine.analytics.record({
+        type: 'denial',
+        tool: name,
+        role: defaultRole ?? '',
+        ts: Date.now(),
+      });
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
         isError: true,
@@ -128,6 +136,15 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
     // Dispatch to handler
     const handler = dispatch.get(name);
     if (!handler) {
+      // Phase 9: emit denial event here too — user-facing message is identical
+      // "Unknown tool" (this branch is reached when build mode has no dispatch
+      // entry for the named tool — semantically equivalent to a denial).
+      engine.analytics.record({
+        type: 'denial',
+        tool: name,
+        role: defaultRole ?? '',
+        ts: Date.now(),
+      });
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
         isError: true,
@@ -144,6 +161,14 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
       };
       const result = await handler(args, ctx);
       engine.markToolLoaded(name, sessionId);
+      // Phase 9: emit call event AFTER markToolLoaded, BEFORE return
+      // (success path only — failures in the catch branch DO NOT emit per CONTEXT.md).
+      engine.analytics.record({
+        type: 'call',
+        tool: name,
+        role: defaultRole ?? '',
+        ts: Date.now(),
+      });
       return normalizeResult(result);
     } catch (err: any) {
       return {
@@ -164,6 +189,11 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
     handle: {
       destroy: () => engine.destroy(),
       stats: () => engine.stats(),
+      // Phase 9: operator-only analytics surface — REQ-v11-analytics-api.
+      // Architectural boundary: never wire-protocol exposed, never appears in
+      // tools/list. The closure here delegates to engine.getAnalytics(options)
+      // which composes config.roles + index + analytics.snapshot() — see core.ts.
+      getAnalytics: (options) => engine.getAnalytics(options),
     },
   };
 }
