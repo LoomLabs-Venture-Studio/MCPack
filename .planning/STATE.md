@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: search-and-observability
 status: ready_to_plan
 stopped_at: Phase 10 plans authored + verified (3/3 plans, plan-checker iter 1 PASSED — first-pass clean across all v1.1 phases)
-last_updated: "2026-04-27T15:43:29.327Z"
+last_updated: "2026-04-27T16:03:53.093Z"
 progress:
   total_phases: 12
   completed_phases: 9
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
-**Current focus:** Phase 09 — tool-usage-analytics-v1-1
+**Current focus:** Phase 10 — harness-coverage-docs-npm-publish-v1-1
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 10 (harness-coverage-docs-npm-publish-v1-1) — EXECUTING
+Plan: 1 of 3
 Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 Phase 06: SHIPPED 2026-04-26 — 11/11 verification dimensions PASS
 

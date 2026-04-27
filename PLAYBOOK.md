@@ -46,12 +46,12 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: Phase 10 — Harness, Coverage, Docs, npm Publish (v1.1 GA) — UNPLANNED
+### Sprint: Phase 10 — Harness, Coverage, Docs, npm Publish (v1.1 GA)
 **Type:** v1.1 milestone phase 5 of 5 — **THE V1.1 GA GATE**
 **Priority:** P0
 **PRD Status:** `.planning/inbox/processed/mcpack-prd-v1.1-gsd.md` — board-approved 2026-04-25
 **Harness:** GSD v2
-**Status:** Phase 9 SHIPPED 2026-04-27 — Phase 10 needs `/gsd-discuss-phase 10` then `/gsd-plan-phase 10`
+**Status:** PLANNED + VERIFIED (plan-checker iter 1 PASSED — first-pass clean), ready for `/gsd-execute-phase 10`. **Plan 10-03 has BOARD APPROVAL CHECKPOINT before npm publish.**
 
 ### Board Locks (still active across all v1.1 phases)
 - **v1.1 = Search & Observability** (PRD B): semantic search via `EmbeddingProvider` hook + `getAnalytics()` API. Adapter package `@llvs/mcpack-embeddings`.
@@ -84,7 +84,50 @@ Phase 9 fix-loop closed all 6 warnings; 4 INFOs deferred:
 
 Promote any of these to Phase 999.x backlog if they accumulate weight before v1.1 ships.
 
-### Next Sprint — Phase 10 Discuss + Plan Phase (THE V1.1 GA GATE)
+### Phase 10 Locked Decisions (from /gsd-discuss-phase 10)
+- **DEC-v11-10-01** — 50-query intent benchmark = Stripe-derived (28 real Stripe tools + 50 hand-authored queries: 10 easy / 20 paraphrased / 10 abbreviation / 10 typo-or-partial; recall@5 metric; ≥15% improvement target)
+- **DEC-v11-10-02** — 3 plans (Measurement / Docs / Publish); only Plan 10-03 board-gated
+- **DEC-v11-10-03** — Docs minimal deltas + CHANGELOG (NO full restructure — defer to v1.2)
+- **DEC-v11-10-04** — Direct publish to `latest` tag, no RC/beta dance
+- **DEC-v11-10-05** — Gate 3 REVISED for Phase 10 with `--exclude-dir=harness` (researcher caught: harness must import adapter for measurement; src/ + non-harness test/ stay isolated)
+
+### Active Sprint — Phase 10 plans authored + verified
+- **10-01 (Wave 1)** — Harness + Benchmark + Perf Measurement (autonomous): Stripe rerun with hybrid ON; 50-query intent benchmark; real-MiniLM perf measurement; release report. 3 tasks; 7 files (4 NEW under `test/harness/`).
+- **10-02 (Wave 2)** — Docs Update (autonomous, depends on 10-01): README v1.1 quick-start, CHANGELOG.md NEW, docs/semantic-search.md NEW, docs/analytics.md NEW, adapter README. 2 tasks; 5 files.
+- **10-03 (Wave 3)** — Pre-Publish + BOARD CHECKPOINT + Sequential Publish (**autonomous: false**, depends on 10-01 + 10-02): packaging fix (LICENSE + files: arrays) → 11-check pre-publish checklist → BOARD APPROVAL CHECKPOINT → root publish → adapter publish → Gate 7 registry smoke test → git tag v1.1.0 → state close. 7 tasks; 6 files.
+- **Plan-checker:** iter 1 VERIFICATION PASSED — all 11 dimensions clean on first pass.
+- **Researcher caught two pre-execution gaps:** (a) Pitfall A — root + adapter `npm pack --dry-run` missing LICENSE/README; Plan 10-03 Task 1 fixes BEFORE publish; (b) Pitfall B/DEC-v11-10-05 — Gate 3 grep needed `--exclude-dir=harness` to allow harness adapter imports.
+- **7 BLOCKING gates encoded:** 5 carry-forward (zero-deps, public-API additive, Gate 3 REVISED, baseline tests byte-identical, wire-protocol exposure ban) + Gate 6 (PRD numerical targets, sub-checks 6a/6b/6c/6d) + Gate 7 (registry resolution proof).
+
+### Acceptance Criteria (Phase 10 execution — v1.1 GA)
+- [ ] All 3 phase REQ-IDs delivered (`test-coverage-floor`, `perf-budget`, `tools-list-no-regression`)
+- [ ] Stripe harness ≥80.7% token reduction with hybrid ON (Gate 6a)
+- [ ] 50-query intent benchmark ≥15% recall@5 improvement over v1.0 (Gate 6b)
+- [ ] search_tools p99 within 50ms of v1.0 baseline with local MiniLM (Gate 6c)
+- [ ] Index build ≤5s for 50-tool MiniLM (Gate 6d)
+- [ ] All 7 BLOCKING gates pass against `d732eaa` baseline
+- [ ] `npm run typecheck && npm run build && npm test` all green; **234+ tests passing, ≥99.73% coverage** (already exceeded; preserve)
+- [ ] Phase 10 makes ZERO source/test changes (Gates 2/4 — only NEW files in `test/harness/` and docs)
+- [ ] `package.json files:` arrays include LICENSE + README in BOTH packages
+- [ ] Adapter has LICENSE file (currently missing — Plan 10-03 Task 1 fixes)
+- [ ] **BOARD APPROVAL** received before `npm publish` (governance gate; checkpoint cannot auto-approve under `_auto_chain_active`)
+- [ ] `@llvs/mcpack@1.1.0` published to `latest` (root first)
+- [ ] `@llvs/mcpack-embeddings@1.1.0` published to `latest` (adapter second)
+- [ ] Gate 7: fresh `npm install` in temp dir + 5-line smoke test resolves both packages, instantiates engine with MiniLM, runs `search_tools` + `getAnalytics` without error
+- [ ] Git tag `v1.1.0` pushed to remote
+- [ ] Both publish commands use `--access public` (Pitfall E)
+
+### Implementation Plan
+1. `/gsd-execute-phase 10` — Wave 1 (10-01) measurement, then Wave 2 (10-02) docs, then Wave 3 (10-03) which **PAUSES at BOARD CHECKPOINT** before publish
+2. Board responds with `approved` (or rejection rationale) at the checkpoint
+3. Plan 10-03 resumes: sequential publish → smoke test → git tag → STATE close
+4. After Phase 10 ships → **v1.1 milestone CLOSED** → v1.2 (Partner Hub) opens for planning
+
+### Open Questions surfaced AT board checkpoint (RESEARCH §"Open Questions")
+- **OQ-10-07** — Whether board (zmarji) executes publish directly OR delegates with OTP token
+- **OQ-10-08** — Confirm `npm publish --access public` flag for first-time scoped publish of adapter
+
+### Old "Next Sprint" notes (now active above) ↓
 - **Goal:** Harness verification + coverage gate + docs update + npm publish for `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0`. This is the v1.1 GA cut.
 - **Requirements:** REQ-v11-test-coverage-floor + harness/benchmark success criteria from PRD §"Success Criteria — v1.1"
 - **Provisional success criteria (from PRD):**
