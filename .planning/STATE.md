@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: search-and-observability
 status: ready_to_plan
 stopped_at: Phase 8 plans authored + verified (2/2 plans, plan-checker iter 2 PASSED — RESEARCH RESOLVED markers added, Wave 0 verify tightened)
-last_updated: "2026-04-27T00:44:22.235Z"
+last_updated: "2026-04-27T01:04:15.997Z"
 progress:
   total_phases: 10
   completed_phases: 7
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Agents discover only the tool schemas they need, when they need them — reducing token waste from bulk tool discovery by 80%+ on servers with large tool surfaces.
-**Current focus:** Phase 07 — semantic-index-build-pipeline-v1-1
+**Current focus:** Phase 08 — hybrid-ranking-query-path-v1-1
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 08 (hybrid-ranking-query-path-v1-1) — EXECUTING
+Plan: 1 of 2
 Active milestone: v1.1.0 Search & Observability (PRD ingested 2026-04-25 from `.planning/inbox/mcpack-prd-v1.1-gsd.md`)
 Phase 06: SHIPPED 2026-04-26 — 11/11 verification dimensions PASS
 
