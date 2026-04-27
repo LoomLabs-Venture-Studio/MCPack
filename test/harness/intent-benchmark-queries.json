@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "description": "50 hand-authored intent queries against the Stripe MCP tool surface. Used by intent-benchmark.ts to measure recall@5 for v1.0 keyword-only vs v1.1 hybrid ranking.",
+    "categories": {
+      "easy_keyword": "Direct keyword match — both engines should hit",
+      "paraphrased": "Same intent, different surface form — hybrid should win",
+      "abbreviation": "Domain abbreviation or shorthand — hybrid should win",
+      "typo_or_partial": "Typo, partial spelling, or ambiguous noun — hybrid should help disambiguate"
+    },
+    "expectedTool_naming_note": "Tool names follow common Stripe MCP convention (snake_case, resource_action). The benchmark runner matches on case-insensitive substring of the actual tool name returned by the live @stripe/mcp surface — so 'create_customer' will match a real tool named 'CreateCustomer' or 'customers.create'. If neither engine finds the expected tool, the query is excluded from recall computation (zero-information case).",
+    "recall_threshold_pp": 15
+  },
+  "queries": [
+    { "category": "easy_keyword", "query": "create customer", "expectedTool": "create_customer" },
+    { "category": "easy_keyword", "query": "list customers", "expectedTool": "list_customers" },
+    { "category": "easy_keyword", "query": "create invoice", "expectedTool": "create_invoice" },
+    { "category": "easy_keyword", "query": "list invoices", "expectedTool": "list_invoices" },
+    { "category": "easy_keyword", "query": "create payment intent", "expectedTool": "create_payment_intent" },
+    { "category": "easy_keyword", "query": "list payment intents", "expectedTool": "list_payment_intents" },
+    { "category": "easy_keyword", "query": "create refund", "expectedTool": "create_refund" },
+    { "category": "easy_keyword", "query": "list refunds", "expectedTool": "list_refunds" },
+    { "category": "easy_keyword", "query": "create subscription", "expectedTool": "create_subscription" },
+    { "category": "easy_keyword", "query": "create product", "expectedTool": "create_product" },
+
+    { "category": "paraphrased", "query": "set up a new buyer", "expectedTool": "create_customer" },
+    { "category": "paraphrased", "query": "add a person to my customer list", "expectedTool": "create_customer" },
+    { "category": "paraphrased", "query": "show all my buyers", "expectedTool": "list_customers" },
+    { "category": "paraphrased", "query": "send a bill to a client", "expectedTool": "create_invoice" },
+    { "category": "paraphrased", "query": "show outstanding bills", "expectedTool": "list_invoices" },
+    { "category": "paraphrased", "query": "charge a credit card", "expectedTool": "create_payment_intent" },
+    { "category": "paraphrased", "query": "show all charges", "expectedTool": "list_payment_intents" },
+    { "category": "paraphrased", "query": "give a buyer their money back", "expectedTool": "create_refund" },
+    { "category": "paraphrased", "query": "show recent money returns", "expectedTool": "list_refunds" },
+    { "category": "paraphrased", "query": "set up recurring billing for a buyer", "expectedTool": "create_subscription" },
+    { "category": "paraphrased", "query": "stop a recurring billing arrangement", "expectedTool": "cancel_subscription" },
+    { "category": "paraphrased", "query": "list all my recurring billing arrangements", "expectedTool": "list_subscriptions" },
+    { "category": "paraphrased", "query": "create a new item I can sell", "expectedTool": "create_product" },
+    { "category": "paraphrased", "query": "show all items I sell", "expectedTool": "list_products" },
+    { "category": "paraphrased", "query": "set the cost for an item", "expectedTool": "create_price" },
+    { "category": "paraphrased", "query": "show all my pricing", "expectedTool": "list_prices" },
+    { "category": "paraphrased", "query": "create a discount voucher", "expectedTool": "create_coupon" },
+    { "category": "paraphrased", "query": "create a payment link I can share", "expectedTool": "create_payment_link" },
+    { "category": "paraphrased", "query": "show all my balance transactions", "expectedTool": "list_balance_transactions" },
+    { "category": "paraphrased", "query": "look up resources for a question", "expectedTool": "search_documentation" },
+
+    { "category": "abbreviation", "query": "revoke sub", "expectedTool": "cancel_subscription" },
+    { "category": "abbreviation", "query": "list subs", "expectedTool": "list_subscriptions" },
+    { "category": "abbreviation", "query": "new cust", "expectedTool": "create_customer" },
+    { "category": "abbreviation", "query": "list custs", "expectedTool": "list_customers" },
+    { "category": "abbreviation", "query": "new inv", "expectedTool": "create_invoice" },
+    { "category": "abbreviation", "query": "list invs", "expectedTool": "list_invoices" },
+    { "category": "abbreviation", "query": "new pi", "expectedTool": "create_payment_intent" },
+    { "category": "abbreviation", "query": "list pis", "expectedTool": "list_payment_intents" },
+    { "category": "abbreviation", "query": "new prod", "expectedTool": "create_product" },
+    { "category": "abbreviation", "query": "list prods", "expectedTool": "list_products" },
+
+    { "category": "typo_or_partial", "query": "creat costumer", "expectedTool": "create_customer" },
+    { "category": "typo_or_partial", "query": "lst invocies", "expectedTool": "list_invoices" },
+    { "category": "typo_or_partial", "query": "subscriptn", "expectedTool": "list_subscriptions" },
+    { "category": "typo_or_partial", "query": "refnd money", "expectedTool": "create_refund" },
+    { "category": "typo_or_partial", "query": "stripe customer search", "expectedTool": "list_customers" },
+    { "category": "typo_or_partial", "query": "stripe ballance", "expectedTool": "retrieve_balance" },
+    { "category": "typo_or_partial", "query": "send invoie to customer", "expectedTool": "finalize_invoice" },
+    { "category": "typo_or_partial", "query": "creat new prodct", "expectedTool": "create_product" },
+    { "category": "typo_or_partial", "query": "discout coupon", "expectedTool": "create_coupon" },
+    { "category": "typo_or_partial", "query": "documantation lookup", "expectedTool": "search_documentation" }
+  ]
+}

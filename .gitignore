@@ -3,6 +3,8 @@ dist/
 *.tsbuildinfo
 coverage/
 test/harness/report.json
+test/harness/intent-benchmark-report.json
+test/harness/perf-bench-report.json
 
 # Loom Labs local configs
 .claude/agents/
