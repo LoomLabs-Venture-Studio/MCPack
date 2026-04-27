@@ -21,9 +21,20 @@ const MAX_LIMIT = 10;
  * Uses substring matching (includes()) with 5-tier weighted scoring.
  * Returns a new array — never mutates the input index.
  *
+ * Limit semantics:
+ *   - omitted: defaults to DEFAULT_LIMIT=5, capped at MAX_LIMIT=10.
+ *   - finite number: clamped to MAX_LIMIT=10 (v1.0 contract — keeps the
+ *     user-facing slice bounded for callers that pass a user-supplied limit).
+ *   - `Infinity` (sentinel): explicit opt-out of the cap — returns the FULL
+ *     ranked list of score>0 entries. Used by Phase 8's
+ *     `scoreAndRankKeywordWithRoleAfter` rank-then-filter path so that role
+ *     filtering can be applied AFTER ranking against the full surface
+ *     (REQ-v11-role-filter-after-rank). Without this opt-out, callers passing
+ *     `Infinity` would silently get top-10 only — see CR-01 fix.
+ *
  * @param query - Search query string (case-insensitive)
  * @param index - Tool index entries to search
- * @param limit - Maximum results to return (default 5, capped at 10)
+ * @param limit - Maximum results: number (capped at 10), `Infinity` (no cap), or undefined (default 5)
  * @returns Ranked array of matching ToolIndexEntry objects
  */
 export function scoreAndRank(
@@ -31,7 +42,14 @@ export function scoreAndRank(
   index: ToolIndexEntry[],
   limit?: number,
 ): ToolIndexEntry[] {
-  const effectiveLimit = Math.min(limit ?? DEFAULT_LIMIT, MAX_LIMIT);
+  // Resolve effective limit. `Infinity` is a sentinel for "rank the full
+  // surface; the caller will slice after applying role filter" — required by
+  // the rank-then-filter pivot in src/core.ts (CR-01 fix). Any finite
+  // user-supplied limit remains clamped to MAX_LIMIT=10 (v1.0 contract).
+  const effectiveLimit =
+    limit === Infinity
+      ? Number.POSITIVE_INFINITY
+      : Math.min(limit ?? DEFAULT_LIMIT, MAX_LIMIT);
   const queryTokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   if (queryTokens.length === 0) return [];
@@ -68,11 +86,12 @@ export function scoreAndRank(
     return { entry, score };
   });
 
-  return scored
+  const ranked = scored
     .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, effectiveLimit)
-    .map((s) => s.entry);
+    .sort((a, b) => b.score - a.score);
+
+  // `slice(0, Infinity)` returns all elements (verified) — no special-case needed.
+  return ranked.slice(0, effectiveLimit).map((s) => s.entry);
 }
 
 /**

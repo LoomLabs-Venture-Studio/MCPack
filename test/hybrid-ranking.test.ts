@@ -647,6 +647,94 @@ describe('MCPackEngine — Phase 8 hybrid ranking query path', () => {
     });
   });
 
+  // ─── Group 7b: CR-01 regression — rank-then-filter must score full surface ─
+
+  describe('CR-01 regression — keyword fallback rank-then-filter against full surface', () => {
+    it('CR-01: with >10 keyword matches where top-10 are role-blocked, role-allowed lower-scored tools STILL appear', async () => {
+      // Reproduces the exact CR-01 scenario from REVIEW.md:
+      //   - 10 tools with HIGH keyword score, ALL role-blocked
+      //   - 1 tool with LOW keyword score, role-allowed
+      //
+      // Pre-fix behavior (broken): scoreAndRank internally clamped at MAX_LIMIT=10
+      //   regardless of caller's Infinity. allRanked was top-10 (all blocked) →
+      //   filter → []. Caller saw 0 results — silent correctness regression vs v1.0.
+      //
+      // Post-fix behavior: scoreAndRank honors Infinity sentinel — returns full
+      //   ranked surface. Role filter then keeps the 1 allowed tool. Caller
+      //   sees 1 result.
+      //
+      // No embeddings configured → keyword fallback path (the path with the bug).
+
+      // 10 tools with EXACT_NAME match on token "customer" (each scores 10).
+      // Names are role-blocked.
+      const blockedTools = Array.from({ length: 10 }, (_, i) =>
+        makeTool(`customer${i}`, 'unrelated description'),
+      );
+      // 1 tool with a low keyword score: SCHEMA_PROPERTY=1 (schemaKeywords-only
+      // match via inputSchema.properties.customer_id). Description does NOT
+      // contain "customer" so it doesn't earn DESCRIPTION=3. Name is also
+      // unrelated so no NAME match. Only the schemaKeyword "customer_id"
+      // contains "customer" → SCHEMA_PROPERTY=1.
+      const allowedLowScore = makeTool(
+        'lowscore_allowed',
+        'unrelated description',
+        { customer_id: { type: 'string' } },
+      );
+      const tools = [...blockedTools, allowedLowScore];
+
+      // Restricted role allows ONLY the low-score tool.
+      const allowedNames = ['lowscore_allowed'];
+      engine = new MCPackEngine(tools, {
+        roles: { restricted: allowedNames },
+        defaultRole: 'restricted',
+      });
+
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-cr01-1',
+      );
+      const response = parseSearchResponse(result);
+      const returnedNames = response.tools.map((t) => t.name);
+
+      // The CR-01 invariant: the role-allowed lower-scored tool MUST appear
+      // in results despite the top-10 keyword matches all being role-blocked.
+      expect(returnedNames).toContain('lowscore_allowed');
+
+      // None of the role-blocked tools may appear (RBAC opaque-denial invariant).
+      // WR-03 rename-safe iteration over actual fixture names.
+      for (const blocked of blockedTools.map((t) => t.name)) {
+        expect(returnedNames).not.toContain(blocked);
+      }
+
+      // total_available reflects role-allowed surface count (1, not 11).
+      expect(response.total_available).toBe(1);
+    });
+
+    it('CR-01: scoreAndRank honors Infinity sentinel and returns full ranked surface beyond MAX_LIMIT=10', async () => {
+      // Direct test of the search.ts contract change: passing Infinity opts out
+      // of the MAX_LIMIT=10 cap. Finite limits still get clamped (v1.0 contract).
+      // This is exercised end-to-end via the keyword fallback path: with 15 tools
+      // all matching the query, keyword fallback (which calls scoreAndRank with
+      // Infinity) must rank ALL 15 internally so role filter sees them all.
+      const tools = Array.from({ length: 15 }, (_, i) =>
+        makeTool(`tool_match_${i}`, 'matches the customer query'),
+      );
+      // No role config → all tools allowed.
+      engine = new MCPackEngine(tools, {});
+
+      // Without explicit limit arg → defaults to 5 (v1.0 default).
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-cr01-2',
+      );
+      const response = parseSearchResponse(result);
+      // 5 results returned (default limit), but total_available reflects the
+      // full role-allowed surface (15) — not the keyword-match cap.
+      expect(response.tools).toHaveLength(5);
+      expect(response.total_available).toBe(15);
+    });
+  });
+
   // ─── Group 8: WR-02 unhandled-rejection regression ──────────────────────
 
   describe('WR-02 unhandled-rejection regression (carry-forward — covers BOTH Phase 7 build path AND Phase 8 query path)', () => {
