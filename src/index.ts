@@ -15,4 +15,9 @@ export type {
   ToolCallResult,
   MCPackHandle,
   EmbeddingProvider,
+  // NEW Phase 9 — additive analytics types (REQ-v11-analytics-api):
+  AnalyticsEvent,
+  AnalyticsByRoleSummary,
+  AnalyticsSnapshot,
+  AnalyticsOptions,
 } from './types.js';
