@@ -49,6 +49,20 @@ export class AnalyticsStore {
    * Pre-push check guarantees `events.length <= maxEvents` always (Pitfall 4
    * mitigation — no transient overshoot).
    *
+   * WR-06 note (v1.2 concern): `maxEvents` bounds event COUNT but not event
+   * SIZE. A noisy or malformed agent calling `tools/call` with a multi-MB
+   * `name` argument (or `search_tools` with a multi-MB `query`) creates events
+   * that retain those strings until eviction. With maxEvents=10000, a 1MB
+   * query in every event consumes ~10GB of resident memory. This interacts
+   * badly with the in-memory durability model: a single noisy day can OOM the
+   * host process even though `maxEvents` looks bounded.
+   *
+   * Phase 9 does NOT enforce per-field length caps — the typical MCP traffic
+   * envelope stays well under reasonable lengths and trusted hosts won't see
+   * this. v1.2 will add per-field truncation at emission time (e.g.,
+   * `tool: name.slice(0, 256)`, `query: query.slice(0, 1024)`) as
+   * defense-in-depth for hosts running MCPack against untrusted agent traffic.
+   *
    * @param event - One of the four AnalyticsEvent variants.
    */
   record(event: AnalyticsEvent): void {
