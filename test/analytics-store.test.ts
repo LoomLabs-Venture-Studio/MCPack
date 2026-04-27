@@ -233,6 +233,25 @@ describe('AnalyticsStore — summary', () => {
     });
   });
 
+  it('WR-01 regression: byRole[role].denialCount counts denials whose actor was THIS role (non-wildcard)', () => {
+    // Reader (non-wildcard) gets denied 3 times: 2x for tool3 (out-of-role), 1x for tool4 (out-of-role).
+    // Analyst gets denied 1x for tool1.
+    // Operator-unscoped summary.byRole.reader.denialCount MUST be 3 — without the
+    // WR-01 fix it would be 0, since denials are emitted only when the tool is NOT
+    // in the actor's allowed set, so isToolAllowed(event.tool, 'reader', ...) is
+    // always false for reader-actor denials.
+    const store = new AnalyticsStore();
+    store.record(denialEvent('tool3', 'reader'));
+    store.record(denialEvent('tool3', 'reader'));
+    store.record(denialEvent('tool4', 'reader'));
+    store.record(denialEvent('tool1', 'analyst'));
+    const op = store.snapshot(ROLES_CONFIG, FOUR_TOOL_INDEX);
+    expect(op.summary.byRole.reader?.denialCount).toBe(3);
+    expect(op.summary.byRole.analyst?.denialCount).toBe(1);
+    // admin had no denial events authored by admin → 0
+    expect(op.summary.byRole.admin?.denialCount).toBe(0);
+  });
+
   it('WR-02: non-string options.role coerced to undefined (operator-unscoped, no throw)', () => {
     const store = new AnalyticsStore();
     store.record(callEvent('tool1', 'admin'));

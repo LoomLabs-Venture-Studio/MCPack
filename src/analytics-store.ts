@@ -182,6 +182,25 @@ export class AnalyticsStore {
    * Pitfall 5 mitigation: deadTools reads ONLY `call` events — search-emitted
    * tools (in `event.tools[]` of a search event) without an actual `call` event
    * REMAIN in deadTools (CONTEXT.md DEC-v11-09-03 edge case 3).
+   *
+   * WR-01 fix: per-axis predicate semantics (see also `eventVisibleTo` for the
+   * role-scoped EVENT-array filter, which uses the same axis split):
+   *   - search/miss: `event.role === role` ("authored by this role")
+   *   - call:        `isToolAllowed(event.tool, role, rolesConfig)` ("involves
+   *     a tool visible to this role" — DEC-v11-09-02 — a successful call by ANY
+   *     role for tool T is counted in role X's callCount if X can see T)
+   *   - denial:      `event.role === role` ("THIS role tried and got denied")
+   *     A denial event is recorded BECAUSE the tool was NOT in the actor's
+   *     allowed set, so `isToolAllowed(event.tool, role, ...)` would force
+   *     denialCount to 0 for any non-wildcard role. The diagnostic operators
+   *     want from `byRole[X].denialCount` is "how many times did role X try a
+   *     tool and get denied" — which is `event.role === role`.
+   *
+   * Note this DIFFERS intentionally from the role-scoped event-array filter for
+   * denials (which uses tool-visibility per DEC-v11-09-02 privacy invariant):
+   * the role-scoped EVENTS exclude denials whose tools the role cannot see, but
+   * the role's COUNT still includes its own denials. The two semantics serve
+   * different purposes (privacy vs operator diagnostics) and are not collapsible.
    */
   private summarizeForRole(
     role: string,
@@ -209,7 +228,10 @@ export class AnalyticsStore {
           );
         }
       } else if (e.type === 'denial') {
-        if (isToolAllowed(e.tool, role, rolesConfig)) {
+        // WR-01 fix: count denials whose ACTOR was this role, not denials
+        // whose tool is in this role's allowed set (the latter is always 0
+        // since denials are emitted precisely when the tool is NOT allowed).
+        if (e.role === role) {
           denialCount++;
         }
       }
