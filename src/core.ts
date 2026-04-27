@@ -444,6 +444,17 @@ export class MCPackEngine {
     indexed.sort((a, b) => b.score - a.score);
 
     // Drop zero-score entries (no signal at all on either track after normalization).
+    //
+    // LOCKED: per DEC-v11-08-02 — single/two-tool surface degenerates
+    // intentionally. Min-max normalization sends the per-query MINIMUM raw
+    // score to 0 even when that score was non-zero, and `max === min`
+    // (single-tool / all-equal-on-track) yields all-zeros. The strict `> 0`
+    // filter therefore drops entries that had real raw signal but were the
+    // per-query minimum on both tracks. This is documented behavior, not a
+    // bug — see CONTEXT.md DEC-v11-08-02 + REVIEW.md WR-03. Do NOT relax to
+    // `>= 0` or change to a pre-normalization signal indicator without a
+    // board-approved DEC update; doing so changes the observable contract for
+    // every existing test and consumer.
     const withSignal = indexed.filter((x) => x.score > 0);
 
     // Apply role filter AFTER ranking (rank-then-filter pivot — REQ-v11-role-filter-after-rank).
