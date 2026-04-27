@@ -182,6 +182,71 @@ describe('Phase 9 — handler failures do NOT emit call events', () => {
     expect(snap.calls).toEqual([]); // failure path does NOT emit
     handle.destroy();
   });
+
+  it('WR-02 regression (build mode): a handler returning {isError: true, content: [...]} does NOT emit a call event AND does NOT markToolLoaded', async () => {
+    const cleanErrorDef: MCPackToolDefinition = {
+      name: 'cleanError',
+      description: 'tool that reports failure via isError without throwing',
+      inputSchema: { type: 'object' },
+      handler: async () => ({
+        content: [{ type: 'text', text: 'validation failed' }],
+        isError: true,
+      }),
+    };
+    const { server, handle } = createMCPackServer({
+      name: 'test',
+      version: '1.0.0',
+      tools: [cleanErrorDef],
+      roles: { admin: '*' },
+      defaultRole: 'admin',
+    });
+    // First call returns isError — must not emit call AND must not consume the
+    // session's "schema delivered" gate.
+    const result1 = await callHandler(server, 'cleanError');
+    expect(result1.isError).toBe(true);
+    expect(result1.content[0].text).toBe('validation failed');
+    const snap1 = handle.getAnalytics();
+    expect(snap1.calls).toEqual([]);
+    // Verify markToolLoaded was NOT called by issuing a search and checking
+    // the schema is delivered (not gated to {loaded: true}).
+    const searchResult = await callHandler(server, 'search_tools', {
+      query: 'tool that reports failure',
+    });
+    const parsed = JSON.parse(searchResult.content[0].text);
+    const cleanErrorEntry = parsed.tools.find(
+      (t: { name: string }) => t.name === 'cleanError',
+    );
+    // Schema delivered (loaded: false with full schema) — proves the failed
+    // call did NOT prematurely flip the session's loadedTools gate.
+    expect(cleanErrorEntry?.loaded).toBe(false);
+    expect(cleanErrorEntry).toHaveProperty('schema');
+    handle.destroy();
+  });
+
+  it('WR-02 regression (wrap mode): a handler returning {isError: true} via the wrapped tools/call does NOT emit a call event', async () => {
+    const server = new Server(
+      { name: 'test', version: '1.0.0' },
+      { capabilities: { tools: {} } },
+    );
+    server.setRequestHandler(ListToolsRequestSchema, async () => ({
+      tools: [
+        { name: 'cleanError', description: 'fails cleanly', inputSchema: { type: 'object' } },
+      ],
+    }));
+    server.setRequestHandler(CallToolRequestSchema, async () => ({
+      content: [{ type: 'text', text: 'validation failed' }],
+      isError: true,
+    }));
+    const handle = await mcpack(server, {
+      roles: { admin: '*' },
+      defaultRole: 'admin',
+    });
+    const result = await callHandler(server, 'cleanError');
+    expect(result.isError).toBe(true);
+    const snap = handle.getAnalytics();
+    expect(snap.calls).toEqual([]); // clean-error path does NOT emit
+    handle.destroy();
+  });
 });
 
 // ─── Tests 8-9: Handle API ────────────────────────────────────────────────

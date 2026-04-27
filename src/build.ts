@@ -160,16 +160,33 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
         role: defaultRole,
       };
       const result = await handler(args, ctx);
-      engine.markToolLoaded(name, sessionId);
-      // Phase 9: emit call event AFTER markToolLoaded, BEFORE return
-      // (success path only — failures in the catch branch DO NOT emit per CONTEXT.md).
-      engine.analytics.record({
-        type: 'call',
-        tool: name,
-        role: defaultRole ?? '',
-        ts: Date.now(),
-      });
-      return normalizeResult(result);
+      const normalized = normalizeResult(result);
+      // WR-02 fix: handlers may cleanly report failure via `{ isError: true,
+      // content: [...] }` without throwing — MCP convention. Treat that as a
+      // failure (do NOT emit `call` event AND do NOT markToolLoaded), matching
+      // the catch-branch contract. Otherwise:
+      //   1. topTools/callCount inflate by clean-error returns.
+      //   2. markToolLoaded prematurely consumes the session's "schema delivered"
+      //      gate, so the next successful call returns {loaded: true} without
+      //      delivering the schema.
+      // Inspect the NORMALIZED result so isError detection is consistent
+      // regardless of how the handler returned (string/object/null/etc.).
+      const isCleanError =
+        normalized &&
+        typeof normalized === 'object' &&
+        (normalized as { isError?: unknown }).isError === true;
+      if (!isCleanError) {
+        engine.markToolLoaded(name, sessionId);
+        // Phase 9: emit call event AFTER markToolLoaded, BEFORE return
+        // (success path only — failures in the catch branch DO NOT emit per CONTEXT.md).
+        engine.analytics.record({
+          type: 'call',
+          tool: name,
+          role: defaultRole ?? '',
+          ts: Date.now(),
+        });
+      }
+      return normalized;
     } catch (err: any) {
       return {
         content: [
