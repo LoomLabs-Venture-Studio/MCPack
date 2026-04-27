@@ -110,7 +110,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — AnalyticsStore module + additive analytics types in src/types.ts + re-exports in src/index.ts + ≥14 unit tests in test/analytics-store.test.ts
+- [x] 09-01-PLAN.md — AnalyticsStore module + additive analytics types in src/types.ts + re-exports in src/index.ts + ≥14 unit tests in test/analytics-store.test.ts
 - [ ] 09-02-PLAN.md — Wave 0 empirical check + engine integration (analytics field, getAnalytics method, search/miss emission) + wrap.ts/build.ts denial+call emission + handle API + ≥12 integration tests covering Pr1-Pr6 + Gate 5 architectural
 
 ### Phase 10: Harness, Coverage, Docs, npm Publish (v1.1)
