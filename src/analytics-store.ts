@@ -260,15 +260,32 @@ export class AnalyticsStore {
   /**
    * Collect all known role names for the operator-unscoped summary.
    *
-   * Union of: roles appearing in any event + roles defined in rolesConfig.
-   * Empty-string role (the SessionRegistry's `role ?? ''` convention) is
-   * included if any event used it — it represents "no role configured."
+   * Union of: roles appearing in any event + roles defined in rolesConfig,
+   * EXCLUDING the empty string. Empty-string role is the `role ?? ''`
+   * normalization convention used at every emission site (core.ts, wrap.ts,
+   * build.ts) when no `defaultRole` is configured. It is NOT a real role
+   * name — exposing it as a `byRole[""]` key produces non-obvious JSON
+   * output (`"": {...}`) and pollutes the role list when `rolesConfig` is
+   * undefined (every event has `role: ''` and the empty key is the only key).
+   *
+   * WR-04 fix: skip empty-string roles in summary aggregation. Operator-
+   * unscoped consumers who want to inspect no-role-configured behavior can
+   * still read the raw events arrays (`searches`, `calls`, `denials`,
+   * `misses`) where `event.role === ''` is preserved verbatim.
+   *
+   * Note this only affects `summary.byRole` keys. Role-scoped queries
+   * (`getAnalytics({ role: '' })`) are still honored verbatim — operator
+   * intent is unambiguous in that case.
    */
   private collectRoles(rolesConfig: RoleConfig | undefined): string[] {
     const set = new Set<string>();
-    for (const e of this.events) set.add(e.role);
+    for (const e of this.events) {
+      if (e.role !== '') set.add(e.role);
+    }
     if (rolesConfig) {
-      for (const k of Object.keys(rolesConfig)) set.add(k);
+      for (const k of Object.keys(rolesConfig)) {
+        if (k !== '') set.add(k);
+      }
     }
     return Array.from(set);
   }

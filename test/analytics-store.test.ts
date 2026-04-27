@@ -132,6 +132,28 @@ describe('AnalyticsStore — snapshot operator-unscoped', () => {
     expect(snap.summary.byRole).toEqual({});
   });
 
+  it('WR-04 regression: empty-string role is excluded from summary.byRole keys', () => {
+    const store = new AnalyticsStore();
+    // Emit events with role: '' (the `role ?? ''` normalization at all emission
+    // sites when no defaultRole is configured).
+    store.record(searchEvent('', ['tool1']));
+    store.record(callEvent('tool1', ''));
+    store.record(denialEvent('tool2', ''));
+    store.record(missEvent(''));
+    const snap = store.snapshot(ROLES_CONFIG, FOUR_TOOL_INDEX);
+    // Raw event arrays still preserve the empty-string role verbatim
+    expect(snap.searches[0]?.role).toBe('');
+    expect(snap.calls[0]?.role).toBe('');
+    // But byRole key '' is excluded — produces non-obvious JSON output
+    expect(Object.keys(snap.summary.byRole)).not.toContain('');
+    // Configured roles still summarized
+    expect(Object.keys(snap.summary.byRole).sort()).toEqual([
+      'admin',
+      'analyst',
+      'reader',
+    ]);
+  });
+
   it('returns full event data with tool names visible in denials (Pr3 unit-level)', () => {
     const store = new AnalyticsStore();
     store.record(denialEvent('tool3', 'reader')); // reader cannot see tool3
