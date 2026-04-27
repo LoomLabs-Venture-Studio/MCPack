@@ -7,11 +7,14 @@ import type {
   SearchToolResponse,
   SearchResult,
   Session,
+  AnalyticsOptions,
+  AnalyticsSnapshot,
 } from './types.js';
 import { buildIndex } from './index-builder.js';
 import { scoreAndRank, keywordScoreForEntry } from './search.js';
 import { SessionRegistry, STDIO_SESSION_ID } from './session.js';
 import { resolveRoleAccess } from './roles.js';
+import { AnalyticsStore } from './analytics-store.js';
 import { buildIndexingString } from './semantic-index-builder.js';
 import {
   cosineSimilarity,
@@ -39,6 +42,16 @@ export class MCPackEngine {
   private readonly index: ToolIndexEntry[];
   private readonly sessions: SessionRegistry;
   private readonly searchToolDefinition: Tool;
+  // ─── Phase 9: analytics state (additive — bounded in-memory event log) ───
+  /**
+   * In-memory analytics store capturing search/call/denial/miss events.
+   * Public read-only access so wrap.ts/build.ts can call `engine.analytics.record(...)`
+   * directly at the four decision points (Pattern 2 — no abstraction layer).
+   * MCPackEngine itself is internal (Phase 02 DEC), so this is not a public-API change.
+   *
+   * @since v1.1 (Phase 9)
+   */
+  public readonly analytics: AnalyticsStore;
   // ─── Phase 7: semantic index build state (additive — null/undefined when embeddings absent) ───
   /** Vector store keyed by tool name. `null` until the build completes successfully (or as no-op for empty tool surface). */
   private semanticIndex: Map<string, Float32Array> | null = null;
@@ -52,6 +65,7 @@ export class MCPackEngine {
     this.config = config;
     this.index = buildIndex(tools);
     this.sessions = new SessionRegistry(config.session);
+    this.analytics = new AnalyticsStore();
     this.searchToolDefinition = {
       name: 'search_tools',
       description:
@@ -263,6 +277,27 @@ export class MCPackEngine {
       timestamp: Date.now(),
     });
 
+    // Phase 9: emit `search` event AFTER queryLog.push but BEFORE response build.
+    // Both sync (no-vectors) and async (hybrid) paths funnel through this method,
+    // so emission is exactly once per search_tools invocation.
+    // `miss` event is a subset signal — emitted at the SAME site, conditional on empty matches.
+    const analyticsTs = Date.now();
+    this.analytics.record({
+      type: 'search',
+      query,
+      role: role ?? '',
+      tools: results.map((r) => r.name),
+      ts: analyticsTs,
+    });
+    if (matches.length === 0) {
+      this.analytics.record({
+        type: 'miss',
+        query,
+        role: role ?? '',
+        ts: analyticsTs,
+      });
+    }
+
     // 7. Build response (UNCHANGED from v1.0 — total_available reflects role-allowed surface count per REQ-v11-session-invariants)
     const allowed = resolveRoleAccess(role, this.config.roles, this.index);
     const response: SearchToolResponse = {
@@ -298,6 +333,28 @@ export class MCPackEngine {
     const role = this.config.defaultRole;
     const session = this.sessions.getOrCreate(sid, role ?? '');
     session.loadedTools.add(toolName);
+  }
+
+  /**
+   * Compute an analytics snapshot from recorded events (Phase 9 — REQ-v11-analytics-api).
+   *
+   * Operator-only entry point. Reachable only from `MCPackHandle.getAnalytics`,
+   * which is callable from host-process code that holds the handle. Never
+   * wire-protocol exposed; never appears in tools/list (Gate 5 enforcement
+   * of REQ-v11-analytics-rbac-integrity).
+   *
+   * @param options - Optional `{ role?: string }`:
+   *   - undefined or `options.role` undefined: operator-unscoped (full event data).
+   *   - `options.role` provided: role-scoped — events EXCLUDED if they involve a
+   *     tool outside the role's allowed set (per DEC-v11-09-02).
+   *
+   * @returns A JSON-shaped AnalyticsSnapshot. Computed on each call (no caching);
+   *   for 10,000-event budgets the cost is sub-millisecond.
+   *
+   * @since v1.1 (Phase 9)
+   */
+  getAnalytics(options?: AnalyticsOptions): AnalyticsSnapshot {
+    return this.analytics.snapshot(this.config.roles, this.index, options);
   }
 
   /**

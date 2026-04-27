@@ -147,7 +147,7 @@ export interface MCPackHandle {
    *
    * @since v1.1 (Phase 9)
    */
-  getAnalytics?(options?: AnalyticsOptions): AnalyticsSnapshot;
+  getAnalytics(options?: AnalyticsOptions): AnalyticsSnapshot;
 }
 
 /**
