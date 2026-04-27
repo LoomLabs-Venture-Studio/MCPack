@@ -2,7 +2,7 @@
   "_meta": {
     "description": "50 hand-authored intent queries against the Stripe MCP tool surface. Used by intent-benchmark.ts to measure recall@5 for v1.0 keyword-only vs v1.1 hybrid ranking.",
     "categories": {
-      "easy": "Direct keyword match — both engines should hit",
+      "easy_keyword": "Direct keyword match — both engines should hit",
       "paraphrased": "Same intent, different surface form — hybrid should win",
       "abbreviation": "Domain abbreviation or shorthand — hybrid should win",
       "typo_or_partial": "Typo, partial spelling, or ambiguous noun — hybrid should help disambiguate"
@@ -11,16 +11,16 @@
     "recall_threshold_pp": 15
   },
   "queries": [
-    { "category": "easy", "query": "create customer", "expectedTool": "create_customer" },
-    { "category": "easy", "query": "list customers", "expectedTool": "list_customers" },
-    { "category": "easy", "query": "create invoice", "expectedTool": "create_invoice" },
-    { "category": "easy", "query": "list invoices", "expectedTool": "list_invoices" },
-    { "category": "easy", "query": "create payment intent", "expectedTool": "create_payment_intent" },
-    { "category": "easy", "query": "list payment intents", "expectedTool": "list_payment_intents" },
-    { "category": "easy", "query": "create refund", "expectedTool": "create_refund" },
-    { "category": "easy", "query": "list refunds", "expectedTool": "list_refunds" },
-    { "category": "easy", "query": "create subscription", "expectedTool": "create_subscription" },
-    { "category": "easy", "query": "create product", "expectedTool": "create_product" },
+    { "category": "easy_keyword", "query": "create customer", "expectedTool": "create_customer" },
+    { "category": "easy_keyword", "query": "list customers", "expectedTool": "list_customers" },
+    { "category": "easy_keyword", "query": "create invoice", "expectedTool": "create_invoice" },
+    { "category": "easy_keyword", "query": "list invoices", "expectedTool": "list_invoices" },
+    { "category": "easy_keyword", "query": "create payment intent", "expectedTool": "create_payment_intent" },
+    { "category": "easy_keyword", "query": "list payment intents", "expectedTool": "list_payment_intents" },
+    { "category": "easy_keyword", "query": "create refund", "expectedTool": "create_refund" },
+    { "category": "easy_keyword", "query": "list refunds", "expectedTool": "list_refunds" },
+    { "category": "easy_keyword", "query": "create subscription", "expectedTool": "create_subscription" },
+    { "category": "easy_keyword", "query": "create product", "expectedTool": "create_product" },
 
     { "category": "paraphrased", "query": "set up a new buyer", "expectedTool": "create_customer" },
     { "category": "paraphrased", "query": "add a person to my customer list", "expectedTool": "create_customer" },

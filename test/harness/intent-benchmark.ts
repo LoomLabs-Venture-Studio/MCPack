@@ -27,20 +27,22 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { MCPackEngine } from '../../src/core.js';
-// NOTE: relative import into the sibling adapter package's source. This is
-// intentional: the harness must work in the dev worktree where
-// `@llvs/mcpack-embeddings` is NOT installed via the root `node_modules/`
-// (it's a sibling workspace, not a dep of the core package — Gate 1
-// preservation). Relative path is also unambiguous against Gate 3 grep
-// (`@llvs/mcpack-embeddings` literal does not appear). Adapter package
-// publishes the same surface as `@llvs/mcpack-embeddings` for downstream
-// users — see packages/mcpack-embeddings/package.json `main` field.
-import { createMiniLMProvider } from '../../packages/mcpack-embeddings/src/index.js';
+// NOTE: adapter is loaded via dynamic import inside main() so the API-key
+// pre-check (which exits 0 when STRIPE_SECRET_KEY is unset) runs without
+// triggering eager module resolution of @huggingface/transformers — the
+// transitive dep is only installed under packages/mcpack-embeddings/ in
+// main repo, not in dev worktrees. Gate 1 (zero-new-core-deps) +
+// Gate 3 REVISED (DEC-v11-10-05) trivially preserved.
+type AdapterModule = {
+  createMiniLMProvider: (opts?: { model?: string; cacheDir?: string }) => Promise<
+    (texts: string[]) => Promise<number[][]>
+  >;
+};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface BenchQuery {
-  category: 'easy' | 'paraphrased' | 'abbreviation' | 'typo_or_partial';
+  category: 'easy_keyword' | 'paraphrased' | 'abbreviation' | 'typo_or_partial';
   query: string;
   expectedTool: string;
 }
@@ -208,7 +210,8 @@ async function main(): Promise<void> {
 
   // 4. Build hybrid engine (with MiniLM provider) and wait for vectors
   console.log('Building hybrid engine + loading MiniLM (~90MB on first run)...');
-  const provider = await createMiniLMProvider();
+  const adapter: AdapterModule = await import('../../packages/mcpack-embeddings/src/index.js');
+  const provider = await adapter.createMiniLMProvider();
   const hybridEngine = new MCPackEngine(tools, { embeddings: { provider } });
 
   // hasVectors() is internal but exposed via the engine instance — Phase 10
@@ -258,7 +261,7 @@ async function main(): Promise<void> {
   const recallDeltaPp = (hybridRecall - keywordRecall) * 100;
 
   // Per-category breakdown
-  const categories: BenchQuery['category'][] = ['easy', 'paraphrased', 'abbreviation', 'typo_or_partial'];
+  const categories: BenchQuery['category'][] = ['easy_keyword', 'paraphrased', 'abbreviation', 'typo_or_partial'];
   const byCategory = {} as Record<BenchQuery['category'], CategorySummary>;
   for (const cat of categories) {
     const rows = perQuery.filter((r) => r.category === cat);

@@ -30,8 +30,15 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
 import { MCPackEngine } from '../../src/core.js';
-// Relative import — see intent-benchmark.ts for rationale (Gate 1 + Gate 3 REVISED).
-import { createMiniLMProvider } from '../../packages/mcpack-embeddings/src/index.js';
+// Adapter loaded via dynamic import inside main() for the same rationale
+// as intent-benchmark.ts: keeps the script importable in environments
+// where the adapter's transitive deps are absent (worktree without
+// `npm install` in packages/mcpack-embeddings/). Gate 1 + Gate 3 REVISED.
+type AdapterModule = {
+  createMiniLMProvider: (opts?: { model?: string; cacheDir?: string }) => Promise<
+    (texts: string[]) => Promise<number[][]>
+  >;
+};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -39,11 +46,19 @@ interface PerfReport {
   generated_at: string;
   tool_count: number;
   index_build_ms: number;
-  keyword_p99_ms: number;
-  keyword_median_ms: number;
-  hybrid_p99_ms: number;
-  hybrid_median_ms: number;
+  // Plan 10-01 must_haves expose individual p99s for jq assertions:
+  search_p99_keyword_ms: number;
+  search_p99_hybrid_ms: number;
   search_p99_delta_ms: number;
+  keyword_p99_ms: number; // alias of search_p99_keyword_ms (backwards compat)
+  keyword_median_ms: number;
+  hybrid_p99_ms: number;  // alias of search_p99_hybrid_ms
+  hybrid_median_ms: number;
+  // tools/list no-regression microbench (REQ-v11-tools-list-no-regression).
+  tools_list_keyword_median_ms: number;
+  tools_list_hybrid_median_ms: number;
+  tools_list_delta_ms: number;
+  tools_list_iterations: number;
   vector_bytes: number;
   vector_count: number;
   vector_dim: number;
@@ -51,10 +66,12 @@ interface PerfReport {
   gate_6c_passed: boolean; // search_p99_delta_ms ≤ 50
   gate_6d_passed: boolean; // index_build_ms ≤ 5000
   gate_perf_memory_passed: boolean; // vector_bytes ≤ 2,097,152
+  gate_tools_list_no_regression_passed: boolean; // tools_list_delta_ms within noise floor
   thresholds: {
     index_build_ms_max: number;
     search_p99_delta_ms_max: number;
     vector_bytes_max: number;
+    tools_list_delta_ms_max: number;
   };
   passed: boolean;
   note: string;
@@ -67,9 +84,15 @@ const REPORT_PATH = join(__dirname, 'perf-bench-report.json');
 
 const TOOL_COUNT = 50;
 const SEARCH_ITERATIONS = 100;
+const TOOLS_LIST_ITERATIONS = 100;
 const INDEX_BUILD_MS_MAX = 5000;
 const SEARCH_P99_DELTA_MS_MAX = 50;
 const VECTOR_BYTES_MAX = 2_097_152; // 2 MiB
+// tools/list noise floor — REQ-v11-tools-list-no-regression. handleToolsList
+// is a single-tool synthetic response; v1.0 measurements never exceeded
+// 0.5ms median. We allow up to 5ms delta to leave headroom for cold-cache
+// jitter without masking real regressions.
+const TOOLS_LIST_DELTA_MS_MAX = 5;
 
 // ─── Synthetic tool corpus ──────────────────────────────────────────────────
 
@@ -170,6 +193,31 @@ async function runSearchSweep(
   return samples;
 }
 
+/**
+ * tools/list no-regression microbench (REQ-v11-tools-list-no-regression).
+ * Measures handleToolsList() latency; this is the cold-path that v1.0
+ * already returns the same {tools:[search_tools]} response for, regardless
+ * of whether `embeddings` is configured. The phase-7-locked invariant is
+ * "handleToolsList never blocks on the in-flight semantic build" — the
+ * microbench proves this empirically by:
+ *   (a) measuring with embeddings unset (v1.0 path).
+ *   (b) measuring with embeddings configured BEFORE the index resolves
+ *       (i.e. immediately after the constructor returns; build still in
+ *       flight). Median latency delta must be within the noise floor.
+ */
+function timeToolsList(engine: MCPackEngine): number {
+  const start = performance.now();
+  engine.handleToolsList();
+  return performance.now() - start;
+}
+
+function runToolsListSweep(engine: MCPackEngine, iterations: number): number[] {
+  for (let i = 0; i < 10; i++) timeToolsList(engine);
+  const samples: number[] = [];
+  for (let i = 0; i < iterations; i++) samples.push(timeToolsList(engine));
+  return samples;
+}
+
 function measureVectorBytes(engine: MCPackEngine): { bytes: number; count: number; dim: number } {
   // Engine.semanticIndex is private but accessible for offline measurement
   // (harness convention — Phase 10 DEC-v11-10-05 allows this).
@@ -195,6 +243,13 @@ async function main(): Promise<void> {
   // ─── Keyword engine (no embeddings) ────────────────────────────────────
   console.log('\n=== Keyword-only engine ===');
   const keywordEngine = new MCPackEngine(tools, {});
+
+  // tools/list no-regression microbench — keyword-only baseline
+  console.log(`Running ${TOOLS_LIST_ITERATIONS} tools/list calls (keyword baseline)...`);
+  const toolsListKeywordSamples = runToolsListSweep(keywordEngine, TOOLS_LIST_ITERATIONS);
+  const toolsListKeywordMedian = computeMedian(toolsListKeywordSamples);
+  console.log(`  tools/list median (keyword): ${toolsListKeywordMedian.toFixed(3)}ms`);
+
   console.log(`Running ${SEARCH_ITERATIONS} search calls (warm cache)...`);
   const keywordSamples = await runSearchSweep(keywordEngine, 'perf-keyword', SEARCH_ITERATIONS);
   const keywordP99 = computePercentile(keywordSamples, 99);
@@ -204,10 +259,23 @@ async function main(): Promise<void> {
   // ─── Hybrid engine (with MiniLM provider) ──────────────────────────────
   console.log('\n=== Hybrid engine (MiniLM) ===');
   console.log('Loading MiniLM provider (first run downloads ~90MB)...');
-  const provider = await createMiniLMProvider();
+  const adapter: AdapterModule = await import('../../packages/mcpack-embeddings/src/index.js');
+  const provider = await adapter.createMiniLMProvider();
   console.log('Constructing hybrid engine + waiting for index build...');
   const buildStart = performance.now();
   const hybridEngine = new MCPackEngine(tools, { embeddings: { provider } });
+
+  // tools/list no-regression microbench — hybrid path WHILE INDEX BUILD IS
+  // IN FLIGHT. Phase 7's locked invariant: handleToolsList returns the
+  // search_tools synthetic response synchronously regardless of build
+  // state. Capture this immediately after the constructor returns.
+  console.log(`Running ${TOOLS_LIST_ITERATIONS} tools/list calls (hybrid, build in-flight)...`);
+  const toolsListHybridSamples = runToolsListSweep(hybridEngine, TOOLS_LIST_ITERATIONS);
+  const toolsListHybridMedian = computeMedian(toolsListHybridSamples);
+  console.log(`  tools/list median (hybrid):  ${toolsListHybridMedian.toFixed(3)}ms`);
+  const toolsListDelta = toolsListHybridMedian - toolsListKeywordMedian;
+  console.log(`  tools/list delta:            ${toolsListDelta.toFixed(3)}ms (≤ ${TOOLS_LIST_DELTA_MS_MAX}ms)`);
+
   const indexBuildMs = await waitFor(
     () => (hybridEngine as unknown as { hasVectors(): boolean }).hasVectors(),
     300_000,
@@ -231,23 +299,31 @@ async function main(): Promise<void> {
   const gate6c = searchP99Delta <= SEARCH_P99_DELTA_MS_MAX;
   const gate6d = wallBuildMs <= INDEX_BUILD_MS_MAX;
   const gateMem = vectorBytes <= VECTOR_BYTES_MAX;
-  const allPassed = gate6c && gate6d && gateMem;
+  const gateToolsList = toolsListDelta <= TOOLS_LIST_DELTA_MS_MAX;
+  const allPassed = gate6c && gate6d && gateMem && gateToolsList;
 
   console.log('\n=== Perf Bench Report ===');
   console.log(`Gate 6d  index_build_ms:        ${wallBuildMs.toFixed(1)} ms  (≤ ${INDEX_BUILD_MS_MAX} ms)  ${gate6d ? 'PASS' : 'FAIL'}`);
   console.log(`Gate 6c  search_p99_delta_ms:   ${searchP99Delta.toFixed(3)} ms  (≤ ${SEARCH_P99_DELTA_MS_MAX} ms)  ${gate6c ? 'PASS' : 'FAIL'}`);
   console.log(`Memory   vector_bytes:          ${vectorBytes} bytes  (≤ ${VECTOR_BYTES_MAX})  ${gateMem ? 'PASS' : 'FAIL'}`);
+  console.log(`tools/list no-regression delta: ${toolsListDelta.toFixed(3)} ms  (≤ ${TOOLS_LIST_DELTA_MS_MAX} ms)  ${gateToolsList ? 'PASS' : 'FAIL'}`);
   console.log(`Overall: ${allPassed ? 'PASS' : 'FAIL'}\n`);
 
   const report: PerfReport = {
     generated_at: new Date().toISOString(),
     tool_count: tools.length,
     index_build_ms: parseFloat(wallBuildMs.toFixed(2)),
+    search_p99_keyword_ms: parseFloat(keywordP99.toFixed(3)),
+    search_p99_hybrid_ms: parseFloat(hybridP99.toFixed(3)),
+    search_p99_delta_ms: parseFloat(searchP99Delta.toFixed(3)),
     keyword_p99_ms: parseFloat(keywordP99.toFixed(3)),
     keyword_median_ms: parseFloat(keywordMedian.toFixed(3)),
     hybrid_p99_ms: parseFloat(hybridP99.toFixed(3)),
     hybrid_median_ms: parseFloat(hybridMedian.toFixed(3)),
-    search_p99_delta_ms: parseFloat(searchP99Delta.toFixed(3)),
+    tools_list_keyword_median_ms: parseFloat(toolsListKeywordMedian.toFixed(3)),
+    tools_list_hybrid_median_ms: parseFloat(toolsListHybridMedian.toFixed(3)),
+    tools_list_delta_ms: parseFloat(toolsListDelta.toFixed(3)),
+    tools_list_iterations: TOOLS_LIST_ITERATIONS,
     vector_bytes: vectorBytes,
     vector_count: vectorCount,
     vector_dim: vectorDim,
@@ -255,16 +331,21 @@ async function main(): Promise<void> {
     gate_6c_passed: gate6c,
     gate_6d_passed: gate6d,
     gate_perf_memory_passed: gateMem,
+    gate_tools_list_no_regression_passed: gateToolsList,
     thresholds: {
       index_build_ms_max: INDEX_BUILD_MS_MAX,
       search_p99_delta_ms_max: SEARCH_P99_DELTA_MS_MAX,
       vector_bytes_max: VECTOR_BYTES_MAX,
+      tools_list_delta_ms_max: TOOLS_LIST_DELTA_MS_MAX,
     },
     passed: allPassed,
     note:
       'Real-MiniLM perf measurement against a synthetic 50-tool corpus. ' +
       'index_build_ms is wall-clock from constructor to hasVectors()=true. ' +
       'p99 measured over 100 warm-cache search_tools calls (10-call warm-up discarded). ' +
+      'tools/list no-regression: 100 calls each side; hybrid path measured ' +
+      'BEFORE the semantic build resolves to verify Phase 7 invariant ' +
+      '(handleToolsList never blocks on in-flight build). ' +
       'First run downloads ~90MB MiniLM model to @huggingface/transformers cache; ' +
       'subsequent runs are warm.',
   };
