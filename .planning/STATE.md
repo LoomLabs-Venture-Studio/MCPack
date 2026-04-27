@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: search-and-observability
 status: ready_to_plan
-stopped_at: "Phase 9 context gathered (4 decisions locked: handle shape, denial storage model, dead-tool scope, plan slicing; NEW Gate 5 added)"
-last_updated: "2026-04-27T04:12:04.592Z"
+stopped_at: Phase 9 plans authored + verified (2/2 plans, plan-checker iter 2 PASSED — WR-03 sites added, optional handle method, line floor dropped)
+last_updated: "2026-04-27T05:35:30.158Z"
 progress:
   total_phases: 11
   completed_phases: 8
-  total_plans: 16
+  total_plans: 18
   completed_plans: 16
-  percent: 100
+  percent: 89
 ---
 
 # Project State
@@ -127,9 +127,9 @@ None for v1.1. Retrospective lessons from v1.0 (`.planning/RETROSPECTIVE.md`) ca
 
 ## Session Continuity
 
-Last session: 2026-04-27T04:12:04.587Z
-Stopped at: Phase 9 context gathered (4 decisions locked: handle shape, denial storage model, dead-tool scope, plan slicing; NEW Gate 5 added)
-Resume file: .planning/phases/09-tool-usage-analytics-v1-1/09-CONTEXT.md
+Last session: 2026-04-27T05:35:30.153Z
+Stopped at: Phase 9 plans authored + verified (2/2 plans, plan-checker iter 2 PASSED — WR-03 sites added, optional handle method, line floor dropped)
+Resume file: .planning/phases/09-tool-usage-analytics-v1-1/09-02-PLAN.md
 
 **Next action when resuming:** `/gsd-execute-phase 7` to execute Phase 7 (Semantic Index Build Pipeline). Wave 1 (07-01) lands first — engine extension + helper file. Wave 2 (07-02) runs after — 17 tests across 7 describe groups.
 
