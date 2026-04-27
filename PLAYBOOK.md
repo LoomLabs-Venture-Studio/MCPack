@@ -46,12 +46,12 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 
 ## Current Sprint (CTO Updates This Section)
 
-### Sprint: Phase 9 — Tool Usage Analytics (v1.1) — UNPLANNED
-**Type:** v1.1 milestone phase 4 of 5
+### Sprint: Phase 10 — Harness, Coverage, Docs, npm Publish (v1.1 GA) — UNPLANNED
+**Type:** v1.1 milestone phase 5 of 5 — **THE V1.1 GA GATE**
 **Priority:** P0
 **PRD Status:** `.planning/inbox/processed/mcpack-prd-v1.1-gsd.md` — board-approved 2026-04-25
 **Harness:** GSD v2
-**Status:** Phase 8 SHIPPED 2026-04-27 — Phase 9 needs `/gsd-discuss-phase 9` then `/gsd-plan-phase 9`
+**Status:** Phase 9 SHIPPED 2026-04-27 — Phase 10 needs `/gsd-discuss-phase 10` then `/gsd-plan-phase 10`
 
 ### Board Locks (still active across all v1.1 phases)
 - **v1.1 = Search & Observability** (PRD B): semantic search via `EmbeddingProvider` hook + `getAnalytics()` API. Adapter package `@llvs/mcpack-embeddings`.
@@ -63,50 +63,85 @@ scope: (NN-NN) for GSD plans, (phase-NN) for phase-wide commits, or a module/are
 - ✅ **Phase 6 — EmbeddingProvider Interface + Adapter Scaffold** (2026-04-26): types + version bump 1.0.0→1.1.0 + sibling package `@llvs/mcpack-embeddings`. 11/11 verification dimensions PASS.
 - ✅ **Phase 7 — Semantic Index Build Pipeline** (2026-04-26): non-blocking startup index build, `isIndexReady()`, RBAC-safe failure path. 11/11 verification dimensions PASS, 124/124 tests, 99.61% coverage.
 - ✅ **Phase 8 — Hybrid Ranking Query Path** (2026-04-27): per-query embedding + cosine similarity + hybrid scoring (0.7·sem + 0.3·kw) + role-filter-after-rank pivot + `hasVectors()` helper. 11/11 verification dimensions PASS, 187/187 tests, 99.73% coverage. Code review surfaced 1 BLOCKER (CR-01 — Infinity-clamp bug in v1.0 keyword-fallback path); auto-fix loop resolved with 13 net new regression tests.
+- ✅ **Phase 9 — Tool Usage Analytics** (2026-04-27): `AnalyticsStore` (in-memory bounded), 4 event types (search/call/denial/miss), `handle.getAnalytics()` (NEVER over MCP wire — Gate 5 architectural ban), role-scoped privacy via event exclusion (reusing `isToolAllowed`), process-lifetime dead-tool detection per role. 11/11 verification dimensions PASS, 234/234 tests, 99.78% coverage. Code review surfaced 2 semantic warnings (WR-01: `denialCount` always 0 for non-wildcard roles; WR-02: `call` events emitted on `isError` returns) + 4 minor; auto-fix loop resolved with 5 net new regression tests.
 
 ### Open Code Review Items (carry forward to Phase 8)
 - **WR-01** — `isIndexReady()` returns `true` for empty-tools no-op path. Phase 8's hybrid router must not treat `isIndexReady() === true` as "vectors are present" — gate on `semanticIndex.size > 0` instead, or refactor to an `indexBuildState` enum during Phase 8 planning.
 - **WR-02** — No regression test asserts the unhandled-rejection invariant (removing the `.catch` in `core.ts:74-80` would silently pass current suite). Add an `unhandledRejection` listener test in Phase 8 or as a tiny standalone fix.
 - **WR-03** — RBAC "no tool names in warn" test is fixture-name-coupled; tighten to assert locked warn format directly + iterate actual fixture names.
 
-### Open Code Review Items from Phase 8 (advisory, IN-scope deferred)
-Phase 8 fix-loop closed all critical+warnings (5/5). Three INFOs were OUT of fix scope:
-- **IN-01** — keyword fallback called from two sites in `core.ts`; could be centralized to a single helper.
-- **IN-02** — `scoreAndRank` and `keywordScoreForEntry` duplicate the 5-tier loop; extract into a shared helper to keep them in sync.
-- **IN-03** — P9 RBAC test passes by construction (test-controlled error message); the truly adversarial provider-error-contains-tool-names case isn't tested.
+### Open Code Review Items (advisory, deferred to v1.1 polish or v1.2)
+Phase 8 fix-loop closed all critical+warnings; 3 INFOs deferred:
+- **08 IN-01** — keyword fallback called from two sites in `core.ts`; could be centralized to a single helper.
+- **08 IN-02** — `scoreAndRank` and `keywordScoreForEntry` duplicate the 5-tier loop; extract into a shared helper.
+- **08 IN-03** — P9 RBAC test passes by construction; the truly adversarial provider-error-contains-tool-names case isn't tested.
 
-Promote any of these to a Phase 999.x backlog item if they accumulate weight before v1.1 ships.
+Phase 9 fix-loop closed all 6 warnings; 4 INFOs deferred:
+- **09 IN-01** — `maxEvents = 10000` is a magic constant; consider a named export or config field.
+- **09 IN-02** — `record()` JSDoc says "O(1)" but is amortized due to `Array.shift` eviction; doc inaccuracy (perf out of v1 scope).
+- **09 IN-03** — denial emission duplicated between `wrap.ts` and `build.ts`; could share a helper.
+- **09 IN-04** — `public readonly analytics` field surface on internal `MCPackEngine` class — visible in TS shape even though class isn't exported.
 
-### Next Sprint — Phase 9 Discuss + Plan Phase
-- **Goal:** `AnalyticsStore` (search/call/denial/miss events), `getAnalytics()` API on server handle, role-scoped queries, dead-tool detection.
-- **Requirements:** REQ-v11-analytics-events, REQ-v11-analytics-storage, REQ-v11-analytics-privacy, REQ-v11-analytics-api, REQ-v11-analytics-role-scoped-query, REQ-v11-analytics-rbac-integrity, REQ-v11-dead-tool-detection
+Promote any of these to Phase 999.x backlog if they accumulate weight before v1.1 ships.
+
+### Next Sprint — Phase 10 Discuss + Plan Phase (THE V1.1 GA GATE)
+- **Goal:** Harness verification + coverage gate + docs update + npm publish for `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0`. This is the v1.1 GA cut.
+- **Requirements:** REQ-v11-test-coverage-floor + harness/benchmark success criteria from PRD §"Success Criteria — v1.1"
+- **Provisional success criteria (from PRD):**
+  - ≥120 tests / ≥99% coverage (currently 234 / 99.78% — already exceeded)
+  - Stripe MCP harness: ≥80.7% token reduction with hybrid ranking (v1.0 baseline)
+  - 50-query intent benchmark: ≥15% recall improvement over v1.0 keyword-only
+  - Docs site (MkDocs Material) updated with v1.1 features
+  - `npm publish @llvs/mcpack@1.1.0` AND `@llvs/mcpack-embeddings@1.1.0`
 - **Open questions to resolve in discuss-phase:**
-  - **OQ1** — `getAnalytics()` flat on handle vs separate `analytics` property
-  - **OQ5** — denial events record tool name even for operators (RBAC-sensitive)
+  - **OQ4** — 50-query intent benchmark source (Stripe / synthetic / community-curated)
+  - **Phase 6 OQ** — adapter package `@llvs/mcpack-embeddings@^1.1.0` couldn't resolve from registry during Phase 6 dev (used `npm link`); Phase 10 publish resolves it. Order matters: publish core first, then publish adapter.
 - **Pre-plan asks for the engineer/researcher:**
-  1. Storage shape: in-memory only, configurable `maxEvents` cap, oldest-dropped on overflow.
-  2. `getAnalytics()` is a server-handle API, NEVER an MCP tool — direct call from the host process.
-  3. Role-scoped queries respect RBAC: callers see only events from sessions they have role visibility into.
-  4. Dead-tool detection: tools with zero `call` events over a window → flag for removal.
+  1. Run the existing Stripe harness against v1.1 and measure token reduction with embeddings ON vs OFF — confirm ≥80.7%.
+  2. Author/source the 50-query intent benchmark; measure recall@5 for v1.0 keyword vs v1.1 hybrid.
+  3. Docs deltas: new `EmbeddingProvider` section, hybrid ranking explainer, `getAnalytics()` API reference, adapter package README.
+  4. Pre-publish checklist: version bump verification, package.json `files:` audit, README sync, CHANGELOG, license headers, `npm pack --dry-run` review.
+  5. Board approval gate: npm publish is a board-locked operation per governance.md.
 
-### Provisional Phase 9 acceptance criteria (locked during plan-phase)
-- [ ] `AnalyticsStore` captures 4 event types at correct decision points (search/call/denial/miss)
-- [ ] In-memory only; resets on process restart; bounded by `maxEvents`
-- [ ] `getAnalytics()` on server handle, role-scoped, NEVER exposed as an MCP tool
-- [ ] RBAC integrity: out-of-role callers can't see other roles' events
-- [ ] All 4 BLOCKING gates pass (zero-new-core-deps, public-API additive, adapter-isolation, baseline tests byte-identical)
-- [ ] Coverage stays ≥99.61% (currently 99.73% post-Phase-8)
-- [ ] No regression on the 187-test baseline
+### Provisional Phase 10 acceptance criteria (locked during plan-phase)
+- [ ] Coverage gate met: ≥120 tests / ≥99% statement (already passing — 234 / 99.78%)
+- [ ] Stripe harness produces ≥80.7% token reduction report
+- [ ] 50-query intent benchmark passes recall threshold
+- [ ] Docs site updated and deployed
+- [ ] `@llvs/mcpack@1.1.0` published to npm registry (board-approved)
+- [ ] `@llvs/mcpack-embeddings@1.1.0` published to npm registry (board-approved)
+- [ ] Adapter package's `peerDependencies: @llvs/mcpack@^1.1.0` resolves cleanly from registry post-publish
+- [ ] All 5 BLOCKING gates pass against post-Phase-9 baseline
+- [ ] No regression on the 234-test baseline
 
 ### Implementation Plan
-1. `/gsd-discuss-phase 9` — lock OQ1 + OQ5 + storage shape decisions
-2. `/gsd-plan-phase 9` — author plans + plan-checker verification cycle
-3. `/gsd-execute-phase 9` — wave-based execution
-4. After Phase 9 ships → Phase 10 (Harness Verification + Coverage + Docs + npm publish — the v1.1 GA gate)
+1. `/gsd-discuss-phase 10` — lock OQ4 + benchmark source + docs scope + publish ordering
+2. `/gsd-plan-phase 10` — author plans + plan-checker verification cycle
+3. `/gsd-execute-phase 10` — wave-based execution (harness measurement, benchmark, docs, publish)
+4. **Board approval required before `npm publish`** (governance.md — billing/publish gates)
+5. After Phase 10 ships → v1.1 milestone closed; v1.2 (Partner Hub) opens for planning
 
 ---
 
 ## Recent Sprints (Log)
+
+### Phase 9 — Tool Usage Analytics ✓ (2026-04-27)
+- **Type:** v1.1 milestone phase 4 of 5
+- **Outcome:** `AnalyticsStore` (sibling module mirroring `session.ts`/`hybrid-scoring.ts`) captures 4 event types (search/call/denial/miss) into in-memory bounded retention (`maxEvents: 10000` default, `Array.shift` eviction). `MCPackEngine.analytics` field; `MCPackHandle.getAnalytics(options?)` REQUIRED method (NEVER over MCP wire — Gate 5 architectural ban). Role-scoped privacy via event exclusion using Phase 8's `isToolAllowed` helper. Process-lifetime dead-tool detection per role.
+- **Engineer:** delivered 14 commits across 2 waves + fix loop (09-01 W1: 5 commits 396c298/92d9554/4c4a95a/254c380/24787e9; 09-02 W2: 7 commits 15341dc/5383f42/26c2884/9f207f1/4a340da/fe617ff/bb7a641 + 2 merges; fix loop: 6 commits f6753b8/98f50ec/a08f0b9/64db82d/db05308/089b3b8)
+- **Plans:** 09-01 (AnalyticsStore module + 20 unit tests), 09-02 (engine event emission at 4 sites + handle API + 22 integration tests with Pr1-Pr6 + Step Z 4-site WR-03 + Wave 0 BLOCKING empirical check)
+- **Result:** 234/234 tests pass (187 baseline + 47 new = 23 unit + 24 integration) | **99.78% statement coverage** (up from Phase 8's 99.73%; `analytics-store.ts`/`build.ts`/`core.ts` all 100%) | All 5 [BLOCKING] gates pass against `0a1759f` (incl. NEW Gate 5: wire-protocol exposure ban) | 11/11 verification dimensions PASS | All 6 privacy invariants Pr1-Pr6 verified behaviorally (Pr5 in BOTH wrap and build modes asserting `tools/call getAnalytics → "Unknown tool"`) | Step Z: 10 occurrences of `tools.map((t) => t.name)` (250% over the ≥4 floor)
+- **Code review:** 0 critical, 6 warnings, 4 info. Auto-fix loop closed all 6 warnings (5/5 in scope + 1 doc-only).
+  - **WR-01 (semantic bug):** `summary.byRole[role].denialCount` was always 0 for non-wildcard roles because the role-tool-allowlist filter excluded denials by definition (denials are emitted BECAUSE the tool is not in the allowed set). Fix: count denials on `event.role === role` match (denials authored by this role) — separate semantic from privacy-filter event-array. +1 regression test that would have caught it.
+  - **WR-02:** `call` events emitted on `{ isError: true }` returns from handlers — broke "success path only" promise. MCP convention is clean-error returns, not throws. Fix: `wrap.ts`/`build.ts` skip `call` emission + `markToolLoaded` when `result.isError === true`. +2 regression tests.
+  - **WR-03:** Snapshot reference aliasing on `search.tools[]` — `record()` now copies the array. +1 test.
+  - **WR-04:** Empty-string `byRole[""]` exposure — excluded from `summary.byRole` keys. +1 test.
+  - **WR-05:** `clear()` JSDoc/visibility mismatch — added `@internal` JSDoc tag; kept public.
+  - **WR-06:** Unbounded query/tool-name lengths in retention — documented as v1.2 concern (out of scope).
+- **2 executor deviations during 09-01 (auto-fixed, documented):**
+  1. Test fixture `topTools[5]` expectation conflicted with locked DEC-v11-09-02 (admin's calls visible to reader's role-scoped query because reader's allowed set covers tool1/tool2). Switched to `ghost` role with zero visible tools — the locked semantic was correct; the test was wrong.
+  2. Wave 2 executor renamed worktree branch to `phase-09-02-execute` for clarity (instead of the original `worktree-agent-...`); orchestrator merged it cleanly via the renamed branch.
+- **Lesson:** Phase 8 lesson reaffirmed — "plan-checker can verify literal patterns but can't catch semantic bugs at the role-filter intersection." WR-01 surfaced because the existing summary tests only used wildcard admin; non-wildcard role coverage was a gap. Future plans involving role-scoped aggregations should require explicit non-wildcard test coverage as an acceptance criterion.
 
 ### Phase 8 — Hybrid Ranking Query Path ✓ (2026-04-27)
 - **Type:** v1.1 milestone phase 3 of 5
