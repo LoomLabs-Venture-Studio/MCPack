@@ -93,6 +93,13 @@ export function minMaxNormalize(scores: number[]): number[] {
  * Both inputs MUST be the same length (the candidate set's size). Throws on
  * length mismatch — caller bug. Empty inputs return empty output.
  *
+ * Weights validation (WR-02 fix):
+ *   TypeScript's structural type for `weights` is erased at runtime. JS callers
+ *   (or TS callers using `as any`) could pass `{ semanticWeight: 0.5 }` (omitting
+ *   `keywordWeight`), which would produce `undefined * x = NaN` for every score
+ *   and silently filter every tool out of results. Validate up-front: both
+ *   weights MUST be finite numbers. Throw a clear error otherwise.
+ *
  * @internal Module-private; not re-exported from `src/index.ts`.
  */
 export function combineHybrid(
@@ -103,6 +110,27 @@ export function combineHybrid(
   if (semanticNorm.length !== keywordNorm.length) {
     throw new Error(
       `MCPack: hybrid combine length mismatch (semantic=${semanticNorm.length}, keyword=${keywordNorm.length})`,
+    );
+  }
+
+  // WR-02 fix: validate weights are finite numbers up-front. Catches partial
+  // weight objects (`{ semanticWeight: 0.5 }` missing keywordWeight) and NaN/
+  // Infinity values that would otherwise produce silent NaN scores and empty
+  // results. Throws with a clear error pinpointing the missing/malformed field.
+  if (
+    typeof weights?.semanticWeight !== 'number' ||
+    !Number.isFinite(weights.semanticWeight)
+  ) {
+    throw new Error(
+      `MCPack: hybrid weights.semanticWeight must be a finite number (got ${String(weights?.semanticWeight)})`,
+    );
+  }
+  if (
+    typeof weights?.keywordWeight !== 'number' ||
+    !Number.isFinite(weights.keywordWeight)
+  ) {
+    throw new Error(
+      `MCPack: hybrid weights.keywordWeight must be a finite number (got ${String(weights?.keywordWeight)})`,
     );
   }
 

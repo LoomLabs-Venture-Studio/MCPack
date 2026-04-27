@@ -647,6 +647,66 @@ describe('MCPackEngine — Phase 8 hybrid ranking query path', () => {
     });
   });
 
+  // ─── Group 6b: WR-02 regression — engine-level weights default coercion ─
+
+  describe('WR-02 regression — engine-level per-field weights default coercion', () => {
+    it('WR-02: partial weights config (only semanticWeight) coerces missing keywordWeight to 0.3 default', async () => {
+      // Pre-fix: `weights ?? {0.7, 0.3}` only defaulted when weights was wholly
+      // absent. A partial config like `{ semanticWeight: 0.5 }` passed through
+      // unchanged → keywordWeight=undefined → NaN scores → empty results.
+      // Post-fix: per-field default coercion at engine boundary.
+      const tools = [
+        makeTool('create_customer', 'Create a customer'),
+        makeTool('list_payments', 'List payments'),
+      ];
+      engine = new MCPackEngine(tools, {
+        embeddings: {
+          provider: mockProvider,
+          // Partial weights — keywordWeight is omitted. TS type allows it via
+          // `as any` here; JS callers do this routinely.
+          weights: { semanticWeight: 0.5 } as unknown as {
+            semanticWeight: number;
+            keywordWeight: number;
+          },
+        },
+      });
+      await (engine as any).indexBuildPromise;
+
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-wr02-partial-1',
+      );
+      const response = parseSearchResponse(result);
+      // Engine ran without throwing; results are non-empty (keywordWeight
+      // defaulted to 0.3, hybrid scoring produces real signals).
+      expect(response.tools.map((t) => t.name)).toContain('create_customer');
+    });
+
+    it('WR-02: partial weights config (only keywordWeight) coerces missing semanticWeight to 0.7 default', async () => {
+      const tools = [
+        makeTool('create_customer', 'Create a customer'),
+        makeTool('list_payments', 'List payments'),
+      ];
+      engine = new MCPackEngine(tools, {
+        embeddings: {
+          provider: mockProvider,
+          weights: { keywordWeight: 0.5 } as unknown as {
+            semanticWeight: number;
+            keywordWeight: number;
+          },
+        },
+      });
+      await (engine as any).indexBuildPromise;
+
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-wr02-partial-2',
+      );
+      const response = parseSearchResponse(result);
+      expect(response.tools.map((t) => t.name)).toContain('create_customer');
+    });
+  });
+
   // ─── Group 7a: WR-01 regression — cosine dimension mismatch graceful fallback ─
 
   describe('WR-01 regression — cosine dimension mismatch graceful fallback', () => {

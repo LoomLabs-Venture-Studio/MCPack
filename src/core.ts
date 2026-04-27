@@ -420,9 +420,19 @@ export class MCPackEngine {
 
     // Apply hybrid formula: (semanticWeight·semNorm) + (keywordWeight·kwNorm).
     // Defaults 0.7/0.3 when weights omitted (REQ-v11-hybrid-ranking + DEC-v11-08-01).
-    const weights = this.config.embeddings?.weights ?? {
-      semanticWeight: 0.7,
-      keywordWeight: 0.3,
+    //
+    // WR-02 fix: per-field defaults — the original `?? { 0.7, 0.3 }` only
+    // defaulted when `weights` was wholly absent. A partial object like
+    // `{ semanticWeight: 0.5 }` would pass through with `keywordWeight =
+    // undefined`, producing silent NaN scores in combineHybrid. Defaulting
+    // each field individually makes partial-weights ergonomic from JS callers
+    // and keeps the engine resilient. combineHybrid still validates finiteness
+    // as a defense-in-depth boundary check (caught at call site here, not
+    // surfaced to MCP caller).
+    const userWeights = this.config.embeddings?.weights;
+    const weights = {
+      semanticWeight: userWeights?.semanticWeight ?? 0.7,
+      keywordWeight: userWeights?.keywordWeight ?? 0.3,
     };
     const hybridScores = combineHybrid(semanticNorm, keywordNorm, weights);
 

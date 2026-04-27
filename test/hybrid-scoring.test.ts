@@ -165,6 +165,77 @@ describe('combineHybrid', () => {
     expect(result[1]).toBeCloseTo(0.5, 9);
     expect(result[2]).toBeCloseTo(0.3, 9);
   });
+
+  // WR-02 fix: weights validation — reject NaN-producing partial / non-finite
+  // weight objects at runtime. TypeScript's type erasure means JS callers (or
+  // TS callers using `as any`) can pass partial or malformed weights; without
+  // these guards, `undefined * x = NaN` would silently filter every tool out.
+
+  it('WR-02: throws on missing keywordWeight (partial weights from JS caller)', () => {
+    expect(() =>
+      combineHybrid([1, 0], [0, 1], { semanticWeight: 0.5 } as unknown as {
+        semanticWeight: number;
+        keywordWeight: number;
+      }),
+    ).toThrow(
+      /^MCPack: hybrid weights\.keywordWeight must be a finite number \(got undefined\)$/,
+    );
+  });
+
+  it('WR-02: throws on missing semanticWeight (partial weights from JS caller)', () => {
+    expect(() =>
+      combineHybrid([1, 0], [0, 1], { keywordWeight: 0.3 } as unknown as {
+        semanticWeight: number;
+        keywordWeight: number;
+      }),
+    ).toThrow(
+      /^MCPack: hybrid weights\.semanticWeight must be a finite number \(got undefined\)$/,
+    );
+  });
+
+  it('WR-02: throws on NaN weight value', () => {
+    expect(() =>
+      combineHybrid([1, 0], [0, 1], { semanticWeight: NaN, keywordWeight: 0.3 }),
+    ).toThrow(/semanticWeight must be a finite number \(got NaN\)/);
+  });
+
+  it('WR-02: throws on Infinity weight value', () => {
+    expect(() =>
+      combineHybrid([1, 0], [0, 1], {
+        semanticWeight: 0.7,
+        keywordWeight: Infinity,
+      }),
+    ).toThrow(/keywordWeight must be a finite number \(got Infinity\)/);
+  });
+
+  it('WR-02: throws on non-number weight value (string passed via JS)', () => {
+    expect(() =>
+      combineHybrid([1, 0], [0, 1], {
+        semanticWeight: 0.7,
+        keywordWeight: '0.3' as unknown as number,
+      }),
+    ).toThrow(/keywordWeight must be a finite number \(got 0\.3\)/);
+  });
+
+  it('WR-02: accepts zero weights as finite (legitimate config)', () => {
+    // Both zero is a degenerate but valid case — caller chose to zero out
+    // both tracks. Result should be all zeros, not throw.
+    expect(
+      combineHybrid([1, 0.5], [0.5, 1], { semanticWeight: 0, keywordWeight: 0 }),
+    ).toEqual([0, 0]);
+  });
+
+  it('WR-02: accepts negative weights (caller bug, but finite — validation is finiteness only)', () => {
+    // Validation is "finite number" only — negative is finite. Caller decides
+    // semantics. This test pins down the contract: the guard is
+    // finite-vs-NaN/Infinity, not range-checked.
+    const result = combineHybrid([1, 0], [0, 1], {
+      semanticWeight: -0.5,
+      keywordWeight: 1.5,
+    });
+    expect(result[0]).toBeCloseTo(-0.5, 9);
+    expect(result[1]).toBeCloseTo(1.5, 9);
+  });
 });
 
 // ─── Group 4: keywordScoreForEntry + regression invariant ─────────────────
