@@ -1,11 +1,11 @@
 {
   "plan": "10-03",
   "task": "Task 2 — Pre-publish checklist",
-  "generated_at": "2026-04-27T19:42:34Z",
-  "head_sha": "bae2130",
+  "generated_at": "2026-04-27T19:48:43Z",
+  "head_sha": "b3ab8a0",
   "baseline_sha": "d732eaa",
-  "operator": "",
-  "summary": { "pass": 13, "fail": 0, "deferred": 1 },
+  "operator": "llvs",
+  "summary": { "pass": 14, "fail": 0, "deferred": 0 },
   "checks": [
     {"id": "1", "status": "PASS", "message": "versions: root=1.1.0, adapter=1.1.0"},
     {"id": "2", "status": "PASS", "message": "adapter @llvs/mcpack pin: peer=^1.1.0 dev=^1.1.0"},
@@ -20,6 +20,6 @@
     {"id": "10b", "status": "PASS", "message": "Gate 6b — recall@5 improvement = +37.5pp (≥15)"},
     {"id": "10c", "status": "PASS", "message": "Gate 6c — search p99 delta = 3.057ms (≤50; canonical value from v1.1-release-report.md)"},
     {"id": "10d", "status": "PASS", "message": "Gate 6d — index build = 216.6ms (≤5000; canonical value from v1.1-release-report.md)"},
-    {"id": "11", "status": "DEFERRED", "message": "docs clean (0 placeholders); npm whoami=ENEEDAUTH — board operator must `npm login` before publish (operator-credential gate)"}
+    {"id": "11", "status": "PASS", "message": "no docs placeholders; npm whoami=llvs"}
   ]
 }
