@@ -12,6 +12,49 @@ npm install @llvs/mcpack
 
 Peer dependency: `@modelcontextprotocol/sdk ^1.0.0`
 
+## What's New in v1.1 (Search & Observability)
+
+v1.1 is fully backward compatible: `v1.0 → v1.1 requires zero config changes`. The new features are opt-in; with no `embeddings` configured, the search code path is byte-identical to v1.0 keyword-only behavior.
+
+### Semantic search (opt-in)
+
+Pair MCPack with [`@llvs/mcpack-embeddings`](./packages/mcpack-embeddings/README.md) to enable hybrid semantic + keyword ranking:
+
+```ts
+import { mcpack } from '@llvs/mcpack';
+import { createMiniLMProvider } from '@llvs/mcpack-embeddings';
+
+const handle = await mcpack(server, {
+  embeddings: { provider: await createMiniLMProvider() },
+});
+```
+
+Default hybrid weights: `0.7` semantic + `0.3` keyword (configurable via `MCPackConfig.embeddings.weights`). When the semantic index is still building, queries fall back to v1.0 keyword scoring — `search_tools` is never blocked. See [`docs/semantic-search.md`](./docs/semantic-search.md) for the full reference.
+
+### Tool usage analytics (in-process)
+
+Inspect search / call / denial / miss patterns and dead tools without exposing analytics over the MCP wire:
+
+```ts
+const snap = handle.getAnalytics({ role: 'cofounder' });
+console.log(snap.summary.byRole.cofounder.deadTools);
+```
+
+`getAnalytics()` lives on the returned server handle, NOT as a callable MCP tool. Operator-only by architecture — agents calling `tools/call` with name `getAnalytics` receive the standard `"Unknown tool: getAnalytics"` opaque-denial response. See [`docs/analytics.md`](./docs/analytics.md) for the API reference.
+
+### Measured v1.1 results
+
+Measured against v1.0 baseline. Two of the four PRD targets are re-verified at publish time with the operator's `STRIPE_SECRET_KEY` (the headline targets restate v1.0's anchor on the same 28-tool surface; see CHANGELOG.md for measurement state).
+
+| Target | Threshold | v1.1 status |
+|--------|-----------|-------------|
+| Stripe MCP token reduction (hybrid ON, 28-tool surface) | ≥ **80.7%** aggregate (v1.0 anchor) | re-verified at publish (Plan 10-03) |
+| 50-query intent benchmark recall@5 delta | hybrid ≥ keyword + 15 pp | re-verified at publish (Plan 10-03) |
+| `search_tools` p99 latency delta vs v1.0 | ≤ 50 ms | **3.057 ms** PASS |
+| Semantic index build for 50-tool MiniLM engine | ≤ 5,000 ms | **216.6 ms** PASS |
+
+Full release-measurement report: [`.planning/phases/10-harness-coverage-docs-npm-publish-v1-1/v1.1-release-report.md`](./.planning/phases/10-harness-coverage-docs-npm-publish-v1-1/v1.1-release-report.md).
+
 ## Quick Start
 
 ```typescript
