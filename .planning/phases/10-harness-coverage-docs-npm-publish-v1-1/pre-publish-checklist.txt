@@ -1,0 +1,27 @@
+========================================================
+PLAN 10-03 TASK 2 — PRE-PUBLISH CHECKLIST (11 conditions)
+========================================================
+  [PASS     ] 1   versions: root=1.1.0, adapter=1.1.0
+  [PASS     ] 2   adapter @llvs/mcpack pin: peer=^1.1.0 dev=^1.1.0
+  [PASS     ] 3   tarballs include LICENSE+README (root + adapter)
+  [PASS     ] 4   root test suite: 234/234 passing
+  [PASS     ] 5   typecheck: root + adapter exit 0
+  [PASS     ] 6   dist/index.js present in root + adapter
+  [PASS     ] 7   Gate 1 — root deps + peerDependencies UNCHANGED vs d732eaa
+  [PASS     ] 8   Gate 2 — src/index.ts byte-identical vs d732eaa
+  [PASS     ] 9   Gates 3 (REVISED) + 4 + 5 — adapter isolation, protected test set, wire ban
+  [DEFERRED ] 10a Gate 6a — STRIPE_SECRET_KEY unset; board operator must re-run `npm run harness` before publish (per v1.1-release-report.md)
+  [DEFERRED ] 10b Gate 6b — STRIPE_SECRET_KEY unset; board operator must re-run `npm run benchmark` before publish (per v1.1-release-report.md)
+  [PASS     ] 10c Gate 6c — search p99 delta = 3.057ms (≤50; canonical value from v1.1-release-report.md)
+  [PASS     ] 10d Gate 6d — index build = 216.6ms (≤5000; canonical value from v1.1-release-report.md)
+  [DEFERRED ] 11  docs clean (0 placeholders); npm whoami=ENEEDAUTH — board operator must `npm login` before publish (operator-credential gate)
+
+========================================================
+PRE-PUBLISH CHECKLIST: ALL NON-DEFERRED CHECKS PASS — board must resolve 3 DEFERRED gate(s) before publish
+  PASS=11  FAIL=0  DEFERRED=3
+  Operator: ENEEDAUTH (must `npm login` before publish)
+  Root version:    1.1.0
+  Adapter version: 1.1.0
+========================================================
+  Artifact: /Users/zaid/Projects/MCPack/.planning/phases/10-harness-coverage-docs-npm-publish-v1-1/pre-publish-checklist.json
+========================================================

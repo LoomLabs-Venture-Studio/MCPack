@@ -1,0 +1,25 @@
+{
+  "plan": "10-03",
+  "task": "Task 2 — Pre-publish checklist",
+  "generated_at": "2026-04-27T18:14:26Z",
+  "head_sha": "088640a",
+  "baseline_sha": "d732eaa",
+  "operator": "",
+  "summary": { "pass": 11, "fail": 0, "deferred": 3 },
+  "checks": [
+    {"id": "1", "status": "PASS", "message": "versions: root=1.1.0, adapter=1.1.0"},
+    {"id": "2", "status": "PASS", "message": "adapter @llvs/mcpack pin: peer=^1.1.0 dev=^1.1.0"},
+    {"id": "3", "status": "PASS", "message": "tarballs include LICENSE+README (root + adapter)"},
+    {"id": "4", "status": "PASS", "message": "root test suite: 234/234 passing"},
+    {"id": "5", "status": "PASS", "message": "typecheck: root + adapter exit 0"},
+    {"id": "6", "status": "PASS", "message": "dist/index.js present in root + adapter"},
+    {"id": "7", "status": "PASS", "message": "Gate 1 — root deps + peerDependencies UNCHANGED vs d732eaa"},
+    {"id": "8", "status": "PASS", "message": "Gate 2 — src/index.ts byte-identical vs d732eaa"},
+    {"id": "9", "status": "PASS", "message": "Gates 3 (REVISED) + 4 + 5 — adapter isolation, protected test set, wire ban"},
+    {"id": "10a", "status": "DEFERRED", "message": "Gate 6a — STRIPE_SECRET_KEY unset; board operator must re-run `npm run harness` before publish (per v1.1-release-report.md)"},
+    {"id": "10b", "status": "DEFERRED", "message": "Gate 6b — STRIPE_SECRET_KEY unset; board operator must re-run `npm run benchmark` before publish (per v1.1-release-report.md)"},
+    {"id": "10c", "status": "PASS", "message": "Gate 6c — search p99 delta = 3.057ms (≤50; canonical value from v1.1-release-report.md)"},
+    {"id": "10d", "status": "PASS", "message": "Gate 6d — index build = 216.6ms (≤5000; canonical value from v1.1-release-report.md)"},
+    {"id": "11", "status": "DEFERRED", "message": "docs clean (0 placeholders); npm whoami=ENEEDAUTH — board operator must `npm login` before publish (operator-credential gate)"}
+  ]
+}
