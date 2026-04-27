@@ -90,7 +90,11 @@ Plans:
   3. With no `EmbeddingProvider`, the keyword-only path runs unchanged (implicit `keywordWeight: 1.0`) and existing v1.0 tests pass unmodified
   4. Role filtering applied AFTER ranking — restricted tools never appear in output regardless of score; opaque denial preserved
   5. Schemas-loaded `{loaded: true}` references and `"Unknown tool: {name}"` denial behavior unchanged
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Scoring kernel + unit tests: pure-function helpers (cosineSimilarity, minMaxNormalize, combineHybrid) in src/hybrid-scoring.ts + additive keywordScoreForEntry in src/search.ts + ≥14 unit tests in test/hybrid-scoring.test.ts
+- [ ] 08-02-PLAN.md — Query path integration + integration tests: refactor handleSearchTools to async with hasVectors gate + embedQuery + scoreAndRankHybrid + scoreAndRankKeywordWithRoleAfter; ≥18 integration tests including all 4 pitfall negative controls (P7/P8/P9/P10) and WR-02 unhandled-rejection regression in test/hybrid-ranking.test.ts
 
 ### Phase 9: Tool Usage Analytics (v1.1)
 **Goal**: Give operators in-process visibility into search/call/denial/miss patterns and dead tools without exposing analytics over the MCP wire.
