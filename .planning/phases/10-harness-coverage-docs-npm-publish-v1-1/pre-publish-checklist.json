@@ -1,11 +1,11 @@
 {
   "plan": "10-03",
   "task": "Task 2 — Pre-publish checklist",
-  "generated_at": "2026-04-27T18:14:26Z",
-  "head_sha": "088640a",
+  "generated_at": "2026-04-27T19:42:34Z",
+  "head_sha": "bae2130",
   "baseline_sha": "d732eaa",
   "operator": "",
-  "summary": { "pass": 11, "fail": 0, "deferred": 3 },
+  "summary": { "pass": 13, "fail": 0, "deferred": 1 },
   "checks": [
     {"id": "1", "status": "PASS", "message": "versions: root=1.1.0, adapter=1.1.0"},
     {"id": "2", "status": "PASS", "message": "adapter @llvs/mcpack pin: peer=^1.1.0 dev=^1.1.0"},
@@ -16,8 +16,8 @@
     {"id": "7", "status": "PASS", "message": "Gate 1 — root deps + peerDependencies UNCHANGED vs d732eaa"},
     {"id": "8", "status": "PASS", "message": "Gate 2 — src/index.ts byte-identical vs d732eaa"},
     {"id": "9", "status": "PASS", "message": "Gates 3 (REVISED) + 4 + 5 — adapter isolation, protected test set, wire ban"},
-    {"id": "10a", "status": "DEFERRED", "message": "Gate 6a — STRIPE_SECRET_KEY unset; board operator must re-run `npm run harness` before publish (per v1.1-release-report.md)"},
-    {"id": "10b", "status": "DEFERRED", "message": "Gate 6b — STRIPE_SECRET_KEY unset; board operator must re-run `npm run benchmark` before publish (per v1.1-release-report.md)"},
+    {"id": "10a", "status": "PASS", "message": "Gate 6a — Stripe hybrid token reduction = 89.8% (≥80.7)"},
+    {"id": "10b", "status": "PASS", "message": "Gate 6b — recall@5 improvement = +37.5pp (≥15)"},
     {"id": "10c", "status": "PASS", "message": "Gate 6c — search p99 delta = 3.057ms (≤50; canonical value from v1.1-release-report.md)"},
     {"id": "10d", "status": "PASS", "message": "Gate 6d — index build = 216.6ms (≤5000; canonical value from v1.1-release-report.md)"},
     {"id": "11", "status": "DEFERRED", "message": "docs clean (0 placeholders); npm whoami=ENEEDAUTH — board operator must `npm login` before publish (operator-credential gate)"}
