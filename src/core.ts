@@ -386,7 +386,30 @@ export class MCPackEngine {
       // isn't in the map (defensive — should not happen if buildSemanticIndex
       // and buildIndex were given the same tool surface), score 0.
       const toolVec = vectors.get(entry.name);
-      semanticScores.push(toolVec ? cosineSimilarity(queryVec, toolVec) : 0);
+      // WR-01 fix: graceful fallback if cosineSimilarity throws on dimension
+      // mismatch (e.g., provider returned a query vector of a different
+      // dimension than the build vectors — provider misbehavior, model swap,
+      // or version drift). Score this tool as 0 on the semantic track so it
+      // falls through to keyword-only ranking via min-max normalization,
+      // rather than propagating the throw to the MCP caller (which would fail
+      // the tools/call request — inconsistent with embedQuery's failure
+      // philosophy: "never propagate to the MCP caller — would break the
+      // session", core.ts ~309).
+      let semScore = 0;
+      if (toolVec) {
+        try {
+          semScore = cosineSimilarity(queryVec, toolVec);
+        } catch {
+          // Dimension mismatch (or any other cosine throw) → score 0 silently.
+          // No console.warn here: the warn-once surface for query-path issues
+          // is owned by embedQuery, and a per-tool dim-mismatch in the hybrid
+          // path is the same class of provider misbehavior. RBAC invariant
+          // also forbids logging tool names, which would be required to make
+          // a per-tool warn meaningful.
+          semScore = 0;
+        }
+      }
+      semanticScores.push(semScore);
       // Keyword: per-tool deterministic score via Plan 08-01's helper.
       keywordScores.push(keywordScoreForEntry(query, entry));
     }

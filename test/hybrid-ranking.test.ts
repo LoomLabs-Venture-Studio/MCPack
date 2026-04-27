@@ -647,6 +647,90 @@ describe('MCPackEngine — Phase 8 hybrid ranking query path', () => {
     });
   });
 
+  // ─── Group 7a: WR-01 regression — cosine dimension mismatch graceful fallback ─
+
+  describe('WR-01 regression — cosine dimension mismatch graceful fallback', () => {
+    it('WR-01: query vector with different dimension than tool vectors does NOT propagate error to MCP caller', async () => {
+      // Counter-based provider: succeeds on build with 8-dim vectors, then
+      // returns a different-dim vector for the query call. Pre-fix this would
+      // throw `MCPack: cosine similarity dimension mismatch (...)` from
+      // scoreAndRankHybrid → propagate to runHybridQuery (no try/catch) →
+      // reject the Promise → fail the MCP tools/call request.
+      // Post-fix: cosineSimilarity throw is caught per-tool, semantic score
+      // becomes 0, hybrid path falls through to keyword-only signal via
+      // min-max normalization. Caller sees normal results.
+      let callCount = 0;
+      const dimDriftProvider: EmbeddingProvider = async (texts) => {
+        callCount++;
+        if (callCount === 1) {
+          // Build: 8-dim vectors.
+          return texts.map(() => [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]);
+        }
+        // Query: 16-dim vector — dimension mismatch!
+        return texts.map(() =>
+          Array.from({ length: 16 }, (_, i) => (i + 1) / 16),
+        );
+      };
+      const tools = [
+        makeTool('create_customer', 'Create a customer'),
+        makeTool('list_payments', 'List payments'),
+      ];
+      engine = new MCPackEngine(tools, {
+        embeddings: { provider: dimDriftProvider },
+      });
+      await (engine as any).indexBuildPromise;
+      expect(engine.hasVectors()).toBe(true);
+
+      // The MCP call MUST resolve successfully — no rejection from cosine throw.
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-wr01-1',
+      );
+      const response = parseSearchResponse(result);
+      // Hybrid path executed end-to-end: semantic scores all 0 (dim-mismatch
+      // catch), keyword normalization carries the signal. 'create_customer'
+      // returns because it has keyword signal on 'customer'.
+      expect(response.tools.map((t) => t.name)).toContain('create_customer');
+      expect(response.session_id).toBe('sess-wr01-1');
+    });
+
+    it('WR-01: dimension mismatch produces zero semantic score, keyword signal still ranks correctly', async () => {
+      // Verify the post-mismatch behavior: with semantic uniformly 0 (degenerate
+      // → all-zeros after min-max), only the keyword track contributes signal,
+      // and the result mirrors the v1.0 keyword tier ordering.
+      let callCount = 0;
+      const dimDriftProvider: EmbeddingProvider = async (texts) => {
+        callCount++;
+        if (callCount === 1) {
+          return texts.map(() => [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]);
+        }
+        // Query vector: drastically wrong dim.
+        return texts.map(() => [0.5, 0.5]);
+      };
+      const tools = [
+        makeTool('customer', 'unrelated'), // EXACT_NAME=10
+        makeTool('getCustomer', 'unrelated'), // PARTIAL_NAME=5
+        makeTool('unrelated_tool', 'has nothing relevant'), // 0 keyword
+      ];
+      engine = new MCPackEngine(tools, {
+        embeddings: { provider: dimDriftProvider },
+      });
+      await (engine as any).indexBuildPromise;
+
+      const result = await engine.handleSearchTools(
+        { query: 'customer' },
+        'sess-wr01-2',
+      );
+      const response = parseSearchResponse(result);
+      const returnedNames = response.tools.map((t) => t.name);
+      // Both keyword-matching tools returned. 'unrelated_tool' has 0 keyword
+      // score → after min-max, hybrid score is 0 → filtered by score>0.
+      expect(returnedNames).toContain('customer');
+      expect(returnedNames).toContain('getCustomer');
+      expect(returnedNames).not.toContain('unrelated_tool');
+    });
+  });
+
   // ─── Group 7b: CR-01 regression — rank-then-filter must score full surface ─
 
   describe('CR-01 regression — keyword fallback rank-then-filter against full surface', () => {
