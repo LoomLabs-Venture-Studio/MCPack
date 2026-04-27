@@ -124,11 +124,11 @@ Plans:
   4. `search_tools` p99 within 50ms of v1.0 baseline using local MiniLM
   5. Docs site updated (semantic search hook, analytics, adapter package); README updated with v1.1 examples
   6. `@llvs/mcpack@1.1.0` and `@llvs/mcpack-embeddings@1.1.0` published to npm; existing v1.0 deployments upgrade with zero config changes
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [x] 10-01-PLAN.md — Harness + Benchmark + Perf Measurement (Wave 1; autonomous)
-- [ ] 10-02-PLAN.md — Docs Update (Wave 2; autonomous; depends on 10-01)
+- [x] 10-02-PLAN.md — Docs Update (Wave 2; autonomous; depends on 10-01)
 - [ ] 10-03-PLAN.md — Pre-Publish Checklist + BOARD CHECKPOINT + sequential publish (Wave 3; autonomous: false; depends on 10-01 + 10-02)
 
 ### Phase 11: Multi-Source Composition + Collision Handling + Routing (v1.2 — DEFERRED)
