@@ -12,7 +12,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -25,7 +27,8 @@
     "test:coverage": "vitest run --coverage",
     "harness": "npx tsx test/harness/stripe-harness.ts",
     "benchmark": "npx tsx test/harness/intent-benchmark.ts",
-    "perf-bench": "npx tsx test/harness/perf-bench.ts"
+    "perf-bench": "npx tsx test/harness/perf-bench.ts",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"

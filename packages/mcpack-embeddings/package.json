@@ -2,6 +2,17 @@
   "name": "@llvs/mcpack-embeddings",
   "version": "1.1.0",
   "description": "Local MiniLM embedding adapter for @llvs/mcpack",
+  "license": "MIT",
+  "author": "LoomLabs Venture Studio",
+  "homepage": "https://github.com/LoomLabs-Venture-Studio/MCPack/tree/main/packages/mcpack-embeddings#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoomLabs-Venture-Studio/MCPack.git",
+    "directory": "packages/mcpack-embeddings"
+  },
+  "bugs": {
+    "url": "https://github.com/LoomLabs-Venture-Studio/MCPack/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +23,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "engines": {
     "node": ">=18.0.0"
@@ -22,7 +35,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --reporter=verbose",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test"
   },
   "peerDependencies": {
     "@llvs/mcpack": "^1.1.0"
