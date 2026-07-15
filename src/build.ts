@@ -144,6 +144,11 @@ export function createMCPackServer(config: MCPackServerConfig): MCPackServer {
       };
       const result = await handler(args, ctx);
       engine.markToolLoaded(name, sessionId);
+      if (config.onToolCall){
+        try {
+          config.onToolCall(name, args, result, sid);
+        } catch {}
+      }
       return normalizeResult(result);
     } catch (err: any) {
       return {

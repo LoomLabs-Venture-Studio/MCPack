@@ -125,6 +125,12 @@ export async function mcpack(
       const result = await originalCallHandler(request, extra);
       const sessionId = (extra as any).sessionId as string | undefined;
       engine.markToolLoaded(name, sessionId);
+
+      if (config.onToolCall){
+        try {
+          config.onToolCall(name, args, result, sessionId ?? '__stdio__');
+        } catch {}
+      }
       return result;
     } catch (err: any) {
       return {

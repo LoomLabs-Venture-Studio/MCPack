@@ -11,6 +11,7 @@ export interface MCPackConfig {
   defaultRole?: string;
   index?: IndexConfig;
   session?: SessionConfig;
+  onToolCall?: (toolName: string, args: Record<string, unknown>, result: unknown, sessionId: string) => void;
 }
 
 /**
