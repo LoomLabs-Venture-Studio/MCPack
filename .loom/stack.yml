@@ -1,0 +1,8 @@
+detected_at: 2026-10-25T03:09:19.791Z
+loom_version: 1.7.12
+platforms: []
+databases: []
+orms: []
+frameworks: []
+overrides:
+  skip_checks: []
