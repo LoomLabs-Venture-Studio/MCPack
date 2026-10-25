@@ -13,3 +13,7 @@ test/harness/perf-bench-report.json
 
 # Graphify output
 graphify-out/
+.loom/handoff.md
+.loom/.handoff-consumed
+.loom/threads/
+.loom/.nudge-state

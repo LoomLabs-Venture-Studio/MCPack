@@ -2,6 +2,8 @@ project_name: MCPack
 mode: agent-teams
 harness: gsd
 knowledge_base: graphify
+memory:
+  enabled: true
 remote_enabled: true
 detected_tooling:
   clis:
@@ -21,5 +23,5 @@ detected_tooling:
   harnesses:
     - gsd-v2
     - ruflo
-last_setup: 2026-04-23T22:30:00.000Z
-loom_version: 1.2.3
+last_setup: 2026-10-25T03:09:19.797Z
+loom_version: 1.7.12
